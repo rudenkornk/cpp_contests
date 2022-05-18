@@ -1,0 +1,4 @@
+# RUN: sed '/\(^$\|^#\)/d' %s &> %t
+# RUN: %missing_numbers_cli %t | FileCheck %s
+7 4 1 0 3 6
+# CHECK: 2 5
