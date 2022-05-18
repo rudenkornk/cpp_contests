@@ -1,0 +1,103 @@
+name: Test workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  BUILD_DIR: build
+
+jobs:
+  clang-format:
+    name: clang-format
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-20.04
+    container:
+      image: rudenkornk/docker_cpp:0.1.3
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - name: Workaround "unsafe repository" issue
+      run: |
+        # See also https://github.com/actions/checkout/issues/760
+        git config --global --add safe.directory "$PWD"
+    - name: Run clang-format for the patch
+      run: |
+        git diff -U0 --no-color --relative HEAD^ | clang-format-diff -p1 > clang-format.patch
+        if [ -s clang-format.patch ]; then
+          cat clang-format.patch
+          exit 1
+        fi
+
+  clang-tidy:
+    name: clang-tidy
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-20.04
+    container:
+      image: rudenkornk/docker_cpp:0.1.3
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - name: Workaround "unsafe repository" issue
+      run: |
+        # See also https://github.com/actions/checkout/issues/760
+        git config --global --add safe.directory "$PWD"
+    - name: Configure cmake
+      run: |
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B $BUILD_DIR
+    - name: Run clang-tidy
+      run: |
+        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j8 -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
+        if [ -s clang-tidy.patch ]; then
+          cat clang-tidy.patch
+          exit 1
+        fi
+
+  build_linux:
+    name: linux
+    runs-on: ubuntu-20.04
+    env:
+      CORES: 2
+    container:
+      image: rudenkornk/docker_cpp:0.1.3
+    strategy:
+      matrix:
+        toolchain: [gcc, llvm]
+        build_type: [debug, release]
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Set environment
+      run: |
+        if [[ "${{ matrix.toolchain }}" == "gcc" ]]; then
+          echo "CC=gcc" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
+        elif [[ "${{ matrix.toolchain }}" == "llvm" ]]; then
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+        fi
+    - name: Configure cmake
+      run: |
+        CC=${{ env.CC }} CXX=${{ env.CXX }} cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B $BUILD_DIR
+    - name: Build
+      run: cmake --build $BUILD_DIR --parallel ${{ env.CORES }}
+    - name: Test
+      run: ctest --verbose --test-dir $BUILD_DIR
+
