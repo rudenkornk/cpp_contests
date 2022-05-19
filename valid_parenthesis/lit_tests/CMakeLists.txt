@@ -1,4 +1,4 @@
-set(test_target valid_parenthesis_cli)
+set(test_target valid_parenthesis)
 set(target_relative_dir valid_parenthesis)
 configure_file(lit.site.cfg.py.in lit.site.cfg.py @ONLY)
 
