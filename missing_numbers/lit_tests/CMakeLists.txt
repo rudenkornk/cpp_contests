@@ -1,4 +1,4 @@
-set(test_target missing_numbers_cli)
+set(test_target missing_numbers)
 set(target_relative_dir missing_numbers)
 configure_file(lit.site.cfg.py.in lit.site.cfg.py @ONLY)
 

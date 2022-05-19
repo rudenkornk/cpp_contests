@@ -1,5 +1,5 @@
 # RUN: sed '/\(^$\|^#\)/d' %s &> %t
-# RUN: %valid_parenthesis_cli %t | FileCheck %s
+# RUN: %valid_parenthesis %t | FileCheck %s
 
 ()
 # CHECK: 1

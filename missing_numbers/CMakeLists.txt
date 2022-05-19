@@ -9,6 +9,7 @@ target_compile_options(
   missing_numbers_cli
   PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
           $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic -Werror>)
+set_target_properties(missing_numbers_cli PROPERTIES OUTPUT_NAME missing_numbers)
 
 add_subdirectory(unit_tests)
 add_subdirectory(lit_tests)
