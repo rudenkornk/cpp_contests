@@ -2,14 +2,14 @@
 import os
 import lit.formats
 
-config.target_name = r"@target_name@"
+config.test_target = r"@test_target@"
 config.target_relative_dir = r"@target_relative_dir@"
-config.name = config.target_name
+config.name = config.test_target
 config.test_format = lit.formats.ShTest(True)
 config.test_source_root = r"@CMAKE_CURRENT_SOURCE_DIR@"
 config.binary_dir = r"@CMAKE_BINARY_DIR@"
 config.target_dir = os.path.join(config.binary_dir, config.target_relative_dir)
-config.target_path = os.path.join(config.target_dir, config.target_name)
+config.target_path = os.path.join(config.target_dir, config.test_target)
 config.test_exec_root = config.target_dir
 config.suffixes = [".lit"]
-config.substitutions.append(("%" + config.target_name, config.target_path))
+config.substitutions.append(("%" + config.test_target, config.target_path))
