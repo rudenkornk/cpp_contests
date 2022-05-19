@@ -44,6 +44,8 @@ jobs:
     runs-on: ubuntu-20.04
     container:
       image: rudenkornk/docker_cpp:0.1.3
+    env:
+      CORES: 2
     defaults:
       run:
         shell: bash
@@ -61,7 +63,7 @@ jobs:
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B $BUILD_DIR
     - name: Run clang-tidy
       run: |
-        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j8 -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
+        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.CORES }} -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
         if [ -s clang-tidy.patch ]; then
           cat clang-tidy.patch
           exit 1
