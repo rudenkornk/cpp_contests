@@ -21,6 +21,6 @@ Config your system [using provided scripts from docker repo](https://github.com/
 ```bash
 cmake -B build
 cmake --build build
-ctest --verbose --test-dir build
+ctest --test-dir build
 ```
 
