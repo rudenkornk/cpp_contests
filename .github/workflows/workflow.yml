@@ -70,14 +70,14 @@ jobs:
   build_linux:
     name: linux
     runs-on: ubuntu-20.04
-    env:
-      CORES: 2
     container:
       image: rudenkornk/docker_cpp:0.1.3
     strategy:
       matrix:
         toolchain: [gcc, llvm]
         build_type: [debug, release]
+    env:
+      CORES: 2
     defaults:
       run:
         shell: bash
