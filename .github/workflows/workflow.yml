@@ -99,5 +99,5 @@ jobs:
     - name: Build
       run: cmake --build $BUILD_DIR --parallel ${{ env.CORES }}
     - name: Test
-      run: ctest --verbose --test-dir $BUILD_DIR
+      run: ctest --test-dir $BUILD_DIR --parallel ${{ env.CORES }} --verbose
 
