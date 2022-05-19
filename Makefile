@@ -1,7 +1,39 @@
+# This makefile only has helper targets, it is not meant to handle dependencies --- this is cmake's job
 SHELL = /usr/bin/env bash
 
 PROJECT_NAME := cpp_contests
+BUILD_DIR ?= build
 MAKE_BUILD_DIR ?= build_docker
+PARALLEL ?= 16
+BUILD_TYPE ?= debug
+COMMIT ?= HEAD^
+CLANG_FORMAT_OPTIONS ?= -i
+CLANG_TIDY_OPTIONS ?=
+CONFIG_OPTIONS ?=
+BUILD_OPTIONS ?=
+TEST_OPTIONS ?=
+
+.PHONY: config
+config:
+	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -B $(BUILD_DIR) $(CONFIG_OPTIONS)
+
+.PHONY: build
+build:
+	cmake --build $(BUILD_DIR) --parallel $(PARALLEL) $(BUILD_OPTIONS)
+
+.PHONY: test
+test:
+	ctest --test-dir $(BUILD_DIR) --parallel $(PARALLEL) $(TEST_OPTIONS)
+
+.PHONY: clang-format
+clang-format:
+	git diff -U0 --no-color $(COMMIT) | \
+		clang-format-diff -p1 $(CLANG_FORMAT_OPTIONS)
+
+.PHONY: clang-tidy
+clang-tidy:
+	git diff -U0 --no-color $(COMMIT) | \
+		clang-tidy-diff.py -j$(PARALLEL) -p1 -path $(BUILD_DIR) $(CLANG_TIDY_OPTIONS)
 
 
 ###################### docker support ######################
