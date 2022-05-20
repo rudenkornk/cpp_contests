@@ -2,8 +2,9 @@
 import os
 import lit.formats
 
-config.test_target = r"@test_target@"
-config.target_relative_dir = r"@target_relative_dir@"
+config.test_target = "missing_numbers"
+config.target_absolute_dir = os.path.abspath(os.path.join(r"@CMAKE_CURRENT_SOURCE_DIR@", os.pardir))
+config.target_relative_dir = os.path.relpath(config.target_absolute_dir, r"@PROJECT_SOURCE_DIR@")
 config.name = config.test_target
 config.test_format = lit.formats.ShTest(True)
 config.test_source_root = r"@CMAKE_CURRENT_SOURCE_DIR@"
