@@ -1,0 +1,8 @@
+function(target_enable_warnings TARGET)
+  if(NOT ${ARGC} EQUAL 1)
+    message(FATAL_ERROR "Provide exactly one target")
+  endif()
+  target_compile_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -pedantic -Werror>)
+  target_compile_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -pedantic -Werror>)
+  target_compile_options(${TARGET} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>)
+endfunction()
