@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
   auto input = std::ifstream{filename};
   if (!input.good()) {
     std::cerr << "Error opening '" << filename << "'\n";
+    return 1;
   }
   std::string parens{};
   input >> parens;

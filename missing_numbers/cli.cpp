@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
   auto input = std::ifstream{filename};
   if (!input.good()) {
     std::cerr << "Error opening '" << filename << "'\n";
+    return 1;
   }
   std::vector<unsigned> numbers{};
   unsigned value = 0;
