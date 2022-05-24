@@ -2,16 +2,33 @@ cmake_minimum_required(VERSION 3.20)
 
 project(cpp_contests)
 
-list(APPEND CMAKE_MODULE_PATH cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-include(CTest)
-include(CodeCoverage)
+include(Testing)
 include(Warnings)
 
 option(COVERAGE "Enable code coverage tests" OFF)
+option(PARALLEL_TESTING "Run tests in parallel" OFF)
 option(VALGRIND "Run tests under valgrind" OFF)
 
+enable_testing()
+enable_warnings()
+if(CODE_COVERAGE)
+  enable_code_coverage()
+endif()
+if(PARALLEL_TESTING)
+  enable_parallel_testing()
+endif()
+if(VALGRIND)
+  enable_valgrind_testing()
+endif()
+
+add_subdirectory(code_coverage_test)
 add_subdirectory(k_max)
 add_subdirectory(missing_numbers)
 add_subdirectory(reverse_list)
 add_subdirectory(valid_parenthesis)
+
+if(CODE_COVERAGE)
+  add_code_coverage_test()
+endif()

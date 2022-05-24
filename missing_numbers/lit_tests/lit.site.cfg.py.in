@@ -2,15 +2,15 @@
 import os
 import lit.formats
 
-config.test_target = "missing_numbers"
-config.target_absolute_dir = os.path.abspath(os.path.join(r"@CMAKE_CURRENT_SOURCE_DIR@", os.pardir))
-config.target_relative_dir = os.path.relpath(config.target_absolute_dir, r"@PROJECT_SOURCE_DIR@")
-config.name = config.test_target
+target_files = r"@TARGET_FILES@".split()
+target_environments = @TARGET_ENVIRONMENTS@
+
+config.name = r"@TEST_NAME@"
 config.test_format = lit.formats.ShTest(True)
 config.test_source_root = r"@CMAKE_CURRENT_SOURCE_DIR@"
-config.binary_dir = r"@CMAKE_BINARY_DIR@"
-config.target_dir = os.path.join(config.binary_dir, config.target_relative_dir)
-config.target_path = os.path.join(config.target_dir, config.test_target)
-config.test_exec_root = config.target_dir
+config.test_exec_root = os.path.join(os.path.abspath(__file__), os.pardir)
 config.suffixes = [".lit"]
-config.substitutions.append(("%" + config.test_target, config.target_path))
+for target_file, target_environment in zip(target_files, target_environments):
+    target_filename = os.path.basename(target_file)
+    config.substitutions.append(
+        ("%" + target_filename, target_environment + " " + target_file))
