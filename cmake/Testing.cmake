@@ -2,6 +2,7 @@ include(ProcessorCount)
 include(Utils)
 
 define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
+define_property(TARGET PROPERTY VALGRIND_ENABLED)
 
 function(enable_parallel_testing)
   if(${ARGC} GREATER 1)
@@ -24,12 +25,6 @@ function(enable_parallel_testing)
       PARENT_SCOPE)
 endfunction()
 
-function(enable_valgrind_testing)
-  set(valgrind_testing_enabled
-      ON
-      PARENT_SCOPE)
-endfunction()
-
 function(add_code_coverage_test)
   get_all_targets(targets)
   get_all_tests(tests)
@@ -49,8 +44,7 @@ function(add_code_coverage_test)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_test(
       NAME merge_code_coverage_data
-      COMMAND bash -c
-              "llvm-profdata merge --output profdata $(find -name *.profraw)"
+      COMMAND bash -c "llvm-profdata merge --output profdata $(find -name *.profraw)"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}")
     foreach(target ${code_coveraged_targets})
@@ -60,12 +54,10 @@ function(add_code_coverage_test)
       NAME code_coverage_report
       COMMAND llvm-cov report --instr-profile profdata ${objects}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    set_tests_properties(code_coverage_report PROPERTIES DEPENDS
-                                                  merge_code_coverage_data)
+    set_tests_properties(code_coverage_report PROPERTIES DEPENDS merge_code_coverage_data)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # also can be done with lcov: lcov --directory ${CMAKE_BINARY_DIR} --capture
-    # --output-file ${CMAKE_BINARY_DIR}/coverage_report/coverage.info lcov
-    # --summary ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
+    # also can be done with lcov: lcov --directory ${CMAKE_BINARY_DIR} --capture --output-file
+    # ${CMAKE_BINARY_DIR}/coverage_report/coverage.info lcov --summary ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
     add_test(
       NAME code_coverage_report
       COMMAND gcovr ${CMAKE_BINARY_DIR}
@@ -78,25 +70,25 @@ endfunction()
 
 function(add_unit_tests)
   set(options)
-  set(oneValueArgs NAME)
-  set(multiValueArgs COMMAND)
-  cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}"
-                        "${multiValueArgs}")
+  set(oneValueArgs NAME TARGET)
+  set(multiValueArgs COMMAND_ARGUMENTS)
+  cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
   if(NOT DEFINED TEST_NAME)
     message(FATAL_ERROR "NAME is required argument")
   endif()
-  if(NOT DEFINED TEST_COMMAND)
-    message(FATAL_ERROR "COMMAND is required argument")
+  if(NOT DEFINED TEST_TARGET)
+    message(FATAL_ERROR "TARGET is required argument")
   endif()
-  list(POP_FRONT TEST_COMMAND TARGET)
-  if(valgrind_testing_enabled)
-    add_test(NAME ${TEST_NAME}
-             COMMAND valgrind $<TARGET_FILE:${TARGET}> ${TEST_COMMAND}
-                     ${TEST_UNPARSED_ARGUMENTS})
-  else()
-    add_test(NAME ${TEST_NAME} COMMAND ${TARGET} ${TEST_COMMAND}
+  get_property(
+    target_valgrind_enabled
+    TARGET ${TEST_TARGET}
+    PROPERTY VALGRIND)
+  if(target_valgrind_enabled)
+    add_test(NAME ${TEST_NAME} COMMAND valgrind $<TARGET_FILE:${TEST_TARGET}> ${TEST_COMMAND_ARGUMENTS}
                                        ${TEST_UNPARSED_ARGUMENTS})
+  else()
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} ${TEST_COMMAND_ARGUMENTS} ${TEST_UNPARSED_ARGUMENTS})
   endif()
 endfunction()
 
@@ -104,8 +96,7 @@ function(add_lit_tests)
   set(options)
   set(oneValueArgs NAME WORKING_DIRECTORY LIT_CONFIG)
   set(multiValueArgs COMMAND TARGETS)
-  cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}"
-                        "${multiValueArgs}")
+  cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
   if(NOT DEFINED TEST_NAME)
     message(FATAL_ERROR "NAME is required argument")
@@ -127,34 +118,44 @@ function(add_lit_tests)
       TARGET ${target}
       PROPERTY BINARY_DIR)
     get_property(
-      target_filename
+      target_prefix
+      TARGET ${target}
+      PROPERTY PREFIX)
+    get_property(
+      target_name
       TARGET ${target}
       PROPERTY OUTPUT_NAME)
-    cmake_path(APPEND target_file_dir ${target_filename} OUTPUT_VARIABLE
-               target_file)
-    list(APPEND TARGET_FILES ${target_file})
+    get_property(
+      target_suffix
+      TARGET ${target}
+      PROPERTY SUFFIX)
+    string(APPEND target_filename "${target_prefix}" "${target_name}" "${target_suffix}")
+    cmake_path(APPEND target_file_dir "${target_filename}" OUTPUT_VARIABLE target_file)
+    string(APPEND TARGET_FILES "${target_file} ")
     get_property(
       target_code_coverage_enabled
       TARGET ${target}
       PROPERTY CODE_COVERAGE_ENABLED)
-    if(target_code_coverage_enabled)
-      if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(TARGET_ENVIRONMENT
-            "LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/$(basename %s.profraw)"
-        )
-      endif()
+    if((target_code_coverage_enabled) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+      set(TARGET_ENVIRONMENT "LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/$(basename %s.profraw)")
       string(APPEND TARGET_ENVIRONMENTS "\"${TARGET_ENVIRONMENT}\", ")
     else()
       string(APPEND TARGET_ENVIRONMENTS "\"\", ")
     endif()
+    get_property(
+      target_valgrind_enabled
+      TARGET ${target}
+      PROPERTY VALGRIND)
+    if(target_valgrind_enabled)
+      # Enable valgrind if at least one target has valgrind enabled
+      set(enable_vagrind ON)
+    endif()
   endforeach()
   string(APPEND TARGET_ENVIRONMENTS "]")
   cmake_path(GET TEST_LIT_CONFIG FILENAME lit_config_name)
-  string(REGEX REPLACE "\.py\.[a-zA-Z0-9_]+$" ".py" lit_config_out
-                       ${lit_config_name})
+  string(REGEX REPLACE "\.py\.[a-zA-Z0-9_]+$" ".py" lit_config_out ${lit_config_name})
   if(DEFINED TEST_WORKING_DIRECTORY)
-    cmake_path(APPEND TEST_WORKING_DIRECTORY ${lit_config_out} OUTPUT_VARIABLE
-               lit_config_out)
+    cmake_path(APPEND TEST_WORKING_DIRECTORY ${lit_config_out} OUTPUT_VARIABLE lit_config_out)
   endif()
   configure_file(${TEST_LIT_CONFIG} ${lit_config_out} @ONLY)
 
@@ -162,7 +163,7 @@ function(add_lit_tests)
   if(DEFINED test_workers)
     list(APPEND lit_options --workers ${test_workers})
   endif()
-  if(valgrind_testing_enabled)
+  if(enable_vagrind)
     list(APPEND lit_options --vg)
   endif()
   add_test(
@@ -176,9 +177,8 @@ function(target_enable_code_coverage TARGET)
     message(FATAL_ERROR "Provide exactly one target")
   endif()
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(
-      ${TARGET} PRIVATE -fprofile-instr-generate -fcoverage-mapping -mllvm
-                        -enable-name-compression=false)
+    target_compile_options(${TARGET} PRIVATE -fprofile-instr-generate -fcoverage-mapping -mllvm
+                                             -enable-name-compression=false)
     target_link_options(${TARGET} PRIVATE -fprofile-instr-generate)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${TARGET} PRIVATE --coverage)
@@ -189,8 +189,21 @@ function(target_enable_code_coverage TARGET)
   set_property(TARGET ${TARGET} PROPERTY CODE_COVERAGE_ENABLED ON)
 endfunction()
 
+function(target_enable_valgrind TARGET)
+  if(${ARGC} LESS 1)
+    message(FATAL_ERROR "Provide exactly one target")
+  endif()
+  set_property(TARGET ${TARGET} PROPERTY VALGRIND ON)
+endfunction()
+
 function(enable_code_coverage)
   set(code_coverage_enabled
+      ON
+      PARENT_SCOPE)
+endfunction()
+
+function(enable_valgrind_testing)
+  set(valgrind_testing_enabled
       ON
       PARENT_SCOPE)
 endfunction()
@@ -198,5 +211,8 @@ endfunction()
 function(target_enable_instrumentation TARGET)
   if(code_coverage_enabled)
     target_enable_code_coverage(${TARGET})
+  endif()
+  if(valgrind_testing_enabled)
+    target_enable_valgrind(${TARGET})
   endif()
 endfunction()

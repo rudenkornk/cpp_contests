@@ -11,4 +11,4 @@ file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(reverse_list_unit_tests PRIVATE ${unit_tests_sources})
 target_enable_instrumentation(reverse_list_unit_tests)
 
-add_unit_tests(NAME reverse_list_unit_tests COMMAND reverse_list_unit_tests)
+add_unit_tests(NAME reverse_list_unit_tests TARGET reverse_list_unit_tests)

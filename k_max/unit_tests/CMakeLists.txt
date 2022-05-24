@@ -12,4 +12,4 @@ target_sources(k_max_unit_tests PRIVATE ${unit_tests_sources})
 
 target_enable_instrumentation(k_max_unit_tests)
 
-add_unit_tests(NAME k_max_unit_tests COMMAND k_max_unit_tests)
+add_unit_tests(NAME k_max_unit_tests TARGET k_max_unit_tests)
