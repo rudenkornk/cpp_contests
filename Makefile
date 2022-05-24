@@ -15,7 +15,7 @@ TEST_OPTIONS ?=
 
 .PHONY: config
 config:
-	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -B $(BUILD_DIR) $(CONFIG_OPTIONS)
+	cmake -DPARALLEL_TESTING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DVALGRIND=OFF -DCODE_COVERAGE=OFF -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -B $(BUILD_DIR) $(CONFIG_OPTIONS)
 
 .PHONY: build
 build:
@@ -23,7 +23,7 @@ build:
 
 .PHONY: test
 test:
-	ctest --test-dir $(BUILD_DIR) --parallel $(PARALLEL) $(TEST_OPTIONS)
+	ctest --schedule-random --test-dir $(BUILD_DIR) --parallel $(PARALLEL) $(TEST_OPTIONS) --verbose
 
 .PHONY: clang-format
 clang-format:
