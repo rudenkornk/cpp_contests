@@ -4,6 +4,7 @@ project(cpp_contests)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+include(Utils)
 include(Testing)
 include(Warnings)
 

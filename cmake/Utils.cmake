@@ -49,3 +49,15 @@ function(get_all_tests out_var)
       ${tests}
       PARENT_SCOPE)
 endfunction()
+
+# Normally we do not add sources of one target to another target But this might be useful in two cases:
+# 1. A closely related target, such as command-line wrapper for library
+# 2. Unit test, testing specifically this library
+function(target_add_headers_as_sources TARGET FROM)
+  get_target_property(includes ${FROM} INTERFACE_INCLUDE_DIRECTORIES)
+  foreach(dir ${includes})
+    file(GLOB tmp CONFIGURE_DEPENDS ${dir}/*.hpp)
+    set(headers ${headers} ${tmp})
+  endforeach()
+  target_sources(${TARGET} PRIVATE ${headers})
+endfunction()

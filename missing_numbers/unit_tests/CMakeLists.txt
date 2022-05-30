@@ -9,6 +9,7 @@ target_include_directories(missing_numbers_unit_tests SYSTEM
 
 file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(missing_numbers_unit_tests PRIVATE ${unit_tests_sources})
+target_add_headers_as_sources(missing_numbers_unit_tests missing_numbers)
 
 target_enable_instrumentation(missing_numbers_unit_tests)
 
