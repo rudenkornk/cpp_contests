@@ -6,7 +6,7 @@
 std::pair<unsigned, unsigned> inline missing_numbers(
     std::vector<unsigned> const &nums) {
   assert(nums.size() + 2 < (1u << sizeof(unsigned) * CHAR_BIT / 2));
-  unsigned n = nums.size() + 1;
+  unsigned n = static_cast<unsigned>(nums.size() + 1);
   unsigned total_sum = ((n + 1) * n) / 2;
   unsigned missing_sum = total_sum - std::reduce(nums.begin(), nums.end());
   unsigned half_missing_sum = (missing_sum - 1) / 2;
