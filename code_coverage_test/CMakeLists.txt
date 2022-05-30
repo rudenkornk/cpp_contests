@@ -1,6 +1,9 @@
 add_library(code_coverage_test)
 target_include_directories(code_coverage_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_sources(code_coverage_test PRIVATE solution.cpp)
+target_sources(code_coverage_test PRIVATE
+  solution.hpp
+  solution.cpp
+  )
 target_compile_features(code_coverage_test PRIVATE cxx_std_20)
 target_enable_instrumentation(code_coverage_test)
 
