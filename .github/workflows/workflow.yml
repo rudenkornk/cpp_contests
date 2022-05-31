@@ -45,7 +45,7 @@ jobs:
     container:
       image: rudenkornk/docker_cpp:0.1.3
     env:
-      CORES: 2
+      cores: 2
     defaults:
       run:
         shell: bash
@@ -63,7 +63,7 @@ jobs:
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B $BUILD_DIR
     - name: Run clang-tidy
       run: |
-        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.CORES }} -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
+        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.cores }} -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
         if [ -s clang-tidy.patch ]; then
           cat clang-tidy.patch
           exit 1
@@ -79,7 +79,7 @@ jobs:
         toolchain: [gcc, llvm]
         build_type: [debug, release]
     env:
-      CORES: 2
+      cores: 2
     defaults:
       run:
         shell: bash
@@ -98,7 +98,7 @@ jobs:
     - name: Configure cmake
       run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B $BUILD_DIR
     - name: Build
-      run: cmake --build $BUILD_DIR --parallel ${{ env.CORES }}
+      run: cmake --build $BUILD_DIR --parallel ${{ env.cores }}
     - name: Test
-      run: ctest --test-dir $BUILD_DIR --parallel ${{ env.CORES }} --verbose
+      run: ctest --test-dir $BUILD_DIR --parallel ${{ env.cores }} --verbose
 
