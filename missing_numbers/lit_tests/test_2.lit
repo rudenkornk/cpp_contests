@@ -1,4 +1,4 @@
-# RUN: sed '/\(^$\|^#\)/d' %s &> %t
+# RUN: %strip_comments %s -o %t
 # RUN: %missing_numbers %t | FileCheck %s
 7 4 1 0 3 6
 # CHECK: 2 5

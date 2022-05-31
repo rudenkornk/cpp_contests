@@ -1,4 +1,4 @@
-# RUN: sed '/\(^$\|^#\)/d' %s &> %t
+# RUN: %strip_comments %s -o %t
 # RUN: %valid_parenthesis %t | FileCheck %s
 
 ()[]{}
