@@ -102,3 +102,39 @@ jobs:
     - name: Test
       run: ctest --test-dir ${{ env.build_dir }} --parallel ${{ env.cores }} --verbose
 
+  build_windows:
+    name: windows
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        toolchain: [msvc, llvm]
+        build_type: [debug, release]
+    env:
+      cores: 2
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: "Login to Docker Hub"
+      # Container is private due to Visual Studio policy
+      # But you can view source and compile it from
+      # https://github.com/rudenkornk/docker_cpp_windows
+      uses: docker/login-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
+    - name: Set environment
+      run: |
+        if("${{ matrix.toolchain }}" -eq "msvc")
+        { "toolset=v143" >> $env:GITHUB_ENV}
+        elseif("${{ matrix.toolchain }}" -eq "llvm")
+        { "toolset=ClangCL" >> $env:GITHUB_ENV}
+        "DOCKER_ISOLATION=process" >> $env:GITHUB_ENV
+        "make_in_docker=make --file makefile_windows in_docker DOCKER_COMMAND=" >> $env:GITHUB_ENV
+    - name: Download and start container
+      run: make --file makefile_windows cpp_contests_container
+    - name: Configure cmake
+      run: ${{ env.make_in_docker }}"cmake -DPARALLEL_TESTING=ON -DLIT=ON -S . -B ${{ env.build_dir }} -T ${{ env.toolset }}"
+    - name: Build
+      run: ${{ env.make_in_docker }}"cmake --build ${{ env.build_dir }} --config ${{ matrix.build_type }} --parallel ${{ env.cores }}"
+    - name: Test
+      run: ${{ env.make_in_docker }}"ctest --test-dir ${{ env.build_dir }} --parallel ${{ env.cores }} --verbose --build-config ${{ matrix.build_type }}"
