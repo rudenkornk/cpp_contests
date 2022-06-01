@@ -9,6 +9,7 @@ include(Testing)
 include(Warnings)
 
 option(CODE_COVERAGE "Enable code coverage tests" OFF)
+option(LIT "Run lit tests" OFF)
 option(PARALLEL_TESTING "Run tests in parallel" OFF)
 option(VALGRIND "Run tests under valgrind" OFF)
 
@@ -22,6 +23,9 @@ if(PARALLEL_TESTING)
 endif()
 if(VALGRIND)
   enable_valgrind_testing()
+endif()
+if(LIT)
+  enable_lit_tests()
 endif()
 
 add_subdirectory(code_coverage_test)

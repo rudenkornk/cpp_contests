@@ -98,6 +98,10 @@ function(add_lit_tests)
   set(multiValueArgs COMMAND TARGETS)
   cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
+  if(NOT lit_tests_enabled)
+    return()
+  endif()
+
   if(NOT DEFINED TEST_NAME)
     message(FATAL_ERROR "NAME is required argument.")
   endif()
@@ -213,7 +217,17 @@ function(enable_code_coverage)
 endfunction()
 
 function(enable_valgrind_testing)
+  find_program(valgrind valgrind REQUIRED)
   set(valgrind_testing_enabled
+      ON
+      PARENT_SCOPE)
+endfunction()
+
+function(enable_lit_tests)
+  find_package(Python3 REQUIRED)
+  find_program(lit lit REQUIRED)
+  find_program(filecheck FileCheck REQUIRED)
+  set(lit_tests_enabled
       ON
       PARENT_SCOPE)
 endfunction()
