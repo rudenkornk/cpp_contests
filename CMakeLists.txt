@@ -8,7 +8,7 @@ include(Utils)
 include(Testing)
 include(Warnings)
 
-option(COVERAGE "Enable code coverage tests" OFF)
+option(CODE_COVERAGE "Enable code coverage tests" OFF)
 option(PARALLEL_TESTING "Run tests in parallel" OFF)
 option(VALGRIND "Run tests under valgrind" OFF)
 
