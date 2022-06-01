@@ -96,7 +96,7 @@ jobs:
           echo "CXX=clang++" >> $GITHUB_ENV
         fi
     - name: Configure cmake
-      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B $BUILD_DIR
+      run: cmake -DPARALLEL_TESTING=ON -DLIT=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B $BUILD_DIR
     - name: Build
       run: cmake --build $BUILD_DIR --parallel ${{ env.cores }}
     - name: Test
