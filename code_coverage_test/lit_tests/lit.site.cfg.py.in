@@ -2,15 +2,15 @@
 import os
 import lit.formats
 
-subs_names = @SUBS_NAMES@
-subs_files = @SUBS_FILES@
-subs_environments = @SUBS_ENVIRONMENTS@
+subs_names = [ @SUBS_NAMES@ ]
+subs_paths = [ @SUBS_PATHS@ ]
+subs_runs = [ @SUBS_RUNS@ ]
 
 config.name = r"@TEST_NAME@"
 config.test_format = lit.formats.ShTest(True)
 config.test_source_root = r"@CMAKE_CURRENT_SOURCE_DIR@"
 config.test_exec_root = os.path.join(os.path.abspath(__file__), os.pardir)
 config.suffixes = [".lit"]
-for sub_name, sub_file, sub_environment in zip(subs_names, subs_files, subs_environments):
-    config.substitutions.append(
-        ("%" + sub_name, sub_environment + " " + sub_file))
+for sub_name, sub_path, sub_run in zip(subs_names, subs_paths, subs_runs):
+    sub_path = "\"" + sub_path % lit_config.params + "\""
+    config.substitutions.append(("%" + sub_name, sub_run + sub_path))
