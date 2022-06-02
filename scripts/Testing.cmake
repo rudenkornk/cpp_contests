@@ -115,57 +115,37 @@ function(add_lit_tests)
     message(FATAL_ERROR "COMMAND is not allowed here.")
   endif()
 
-  set(SUBS_ENVIRONMENTS "[")
-  set(SUBS_FILES "[")
-  set(SUBS_NAMES "[")
   foreach(target ${TEST_TARGETS})
-    get_property(
-      target_file_dir
-      TARGET ${target}
-      PROPERTY BINARY_DIR)
-    get_property(
-      target_prefix
-      TARGET ${target}
-      PROPERTY PREFIX)
     get_property(
       target_name
       TARGET ${target}
       PROPERTY OUTPUT_NAME)
-    get_property(
-      target_suffix
-      TARGET ${target}
-      PROPERTY SUFFIX)
-    string(APPEND target_filename "${target_prefix}" "${target_name}" "${target_suffix}")
-    cmake_path(APPEND target_file_dir "${target_filename}" OUTPUT_VARIABLE target_file)
-    string(APPEND SUBS_FILES "\"${target_file}\", ")
-    string(APPEND SUBS_NAMES "\"${target_name}\", ")
     get_property(
       target_code_coverage_enabled
       TARGET ${target}
       PROPERTY CODE_COVERAGE_ENABLED)
     if((target_code_coverage_enabled) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
       cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "$(basename %s.profraw)" OUTPUT_VARIABLE llvm_profile)
-      set(TARGET_ENVIRONMENT "LLVM_PROFILE_FILE=\"${llvm_profile}\"")
-      string(APPEND SUBS_ENVIRONMENTS "\"${TARGET_ENVIRONMENT}\", ")
-    else()
-      string(APPEND SUBS_ENVIRONMENTS "\"\", ")
+      set(target_environment "LLVM_PROFILE_FILE=\\\"${llvm_profile}\\\" ")
     endif()
     get_property(
       target_valgrind_enabled
       TARGET ${target}
       PROPERTY VALGRIND)
     if(target_valgrind_enabled)
-      # Enable valgrind if at least one target has valgrind enabled
-      set(enable_vagrind ON)
+      set(valgrind_if_enabled "valgrind ")
     endif()
+
+    string(APPEND SUBS_NAMES "\"${target_name}\", ")
+    string(APPEND SUBS_PATHS "\"%(${target_name})s\", ")
+    string(APPEND SUBS_RUNS "\"${target_environment}${valgrind_if_enabled}\", ")
+    list(APPEND lit_options --param ${target_name}=$<TARGET_FILE:${target}>)
   endforeach()
   cmake_path(APPEND CMAKE_SOURCE_DIR scripts strip_comments.py OUTPUT_VARIABLE strip_path)
   string(APPEND SUBS_NAMES "\"strip_comments\", ")
-  string(APPEND SUBS_FILES "\"${strip_path}\", ")
-  string(APPEND SUBS_ENVIRONMENTS "\"\", ")
-  string(APPEND SUBS_NAMES "]")
-  string(APPEND SUBS_FILES "]")
-  string(APPEND SUBS_ENVIRONMENTS "]")
+  string(APPEND SUBS_PATHS "\"${strip_path}\", ")
+  string(APPEND SUBS_RUNS "\"python3 \", ")
+
   cmake_path(GET TEST_LIT_CONFIG FILENAME lit_config_name)
   string(REGEX REPLACE "\.py\.[a-zA-Z0-9_]+$" ".py" lit_config_out ${lit_config_name})
   if(DEFINED TEST_WORKING_DIRECTORY)
@@ -176,9 +156,6 @@ function(add_lit_tests)
   list(APPEND lit_options --verbose)
   if(DEFINED test_workers)
     list(APPEND lit_options --workers ${test_workers})
-  endif()
-  if(enable_vagrind)
-    list(APPEND lit_options --vg)
   endif()
   add_test(
     NAME ${TEST_NAME}
