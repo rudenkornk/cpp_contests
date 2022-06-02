@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  BUILD_DIR: build
+  build_dir: build
 
 jobs:
   clang-format:
@@ -60,10 +60,10 @@ jobs:
         git config --global --add safe.directory "$PWD"
     - name: Configure cmake
       run: |
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B $BUILD_DIR
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B ${{ env.build_dir }}
     - name: Run clang-tidy
       run: |
-        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.cores }} -p1 -path $BUILD_DIR -export-fixes clang-tidy.patch
+        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.cores }} -p1 -path ${{ env.build_dir }} -export-fixes clang-tidy.patch
         if [ -s clang-tidy.patch ]; then
           cat clang-tidy.patch
           exit 1
@@ -96,9 +96,9 @@ jobs:
           echo "CXX=clang++" >> $GITHUB_ENV
         fi
     - name: Configure cmake
-      run: cmake -DPARALLEL_TESTING=ON -DLIT=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B $BUILD_DIR
+      run: cmake -DPARALLEL_TESTING=ON -DLIT=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B ${{ env.build_dir }}
     - name: Build
-      run: cmake --build $BUILD_DIR --parallel ${{ env.cores }}
+      run: cmake --build ${{ env.build_dir }} --parallel ${{ env.cores }}
     - name: Test
-      run: ctest --test-dir $BUILD_DIR --parallel ${{ env.cores }} --verbose
+      run: ctest --test-dir ${{ env.build_dir }} --parallel ${{ env.cores }} --verbose
 
