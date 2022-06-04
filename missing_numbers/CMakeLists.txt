@@ -1,6 +1,5 @@
 add_library(missing_numbers INTERFACE)
 target_include_directories(missing_numbers INTERFACE .)
-target_compile_features(missing_numbers INTERFACE cxx_std_20)
 
 add_executable(missing_numbers_cli)
 target_sources(missing_numbers_cli PRIVATE cli.cpp)
