@@ -9,7 +9,7 @@ function(target_enable_warnings TARGET)
   else()
     message(
       WARNING
-        "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variand \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
+        "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variant \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
     )
   endif()
 endfunction()
@@ -39,7 +39,7 @@ function(enable_warnings)
   else()
     message(
       WARNING
-        "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variand \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
+        "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variant \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
     )
   endif()
 endfunction()
