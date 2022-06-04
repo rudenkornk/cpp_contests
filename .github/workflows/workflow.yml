@@ -72,35 +72,41 @@ jobs:
   build_linux:
     name: linux
     runs-on: ubuntu-20.04
-    container:
-      image: rudenkornk/docker_cpp:0.1.3
     strategy:
       matrix:
         toolchain: [gcc, llvm]
-        build_type: [debug, release]
-    env:
-      cores: 2
+        build_type: [Debug, Release]
     defaults:
       run:
         shell: bash
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        if [[ "${{ matrix.toolchain }}" == "gcc" ]]; then
-          echo "CC=gcc" >> $GITHUB_ENV
-          echo "CXX=g++" >> $GITHUB_ENV
-        elif [[ "${{ matrix.toolchain }}" == "llvm" ]]; then
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "CXX=clang++" >> $GITHUB_ENV
-        fi
+        echo "makefile=makefile" >> $GITHUB_ENV
+        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
+        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "PARALLEL=ON" >> $GITHUB_ENV
+        echo "LIT=ON" >> $GITHUB_ENV
+        echo "CODE_COVERAGE=OFF" >> $GITHUB_ENV
+        echo "VALGRIND=OFF" >> $GITHUB_ENV
+        echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
+    - name: Download and start container
+      run: make --file ${{ env.makefile }} cpp_contests_container
     - name: Configure cmake
-      run: cmake -DPARALLEL_TESTING=ON -DLIT=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S . -B ${{ env.build_dir }}
+      run: make --file ${{ env.makefile }} in_docker TARGET=config
     - name: Build
-      run: cmake --build ${{ env.build_dir }} --parallel ${{ env.cores }}
+      run: make --file ${{ env.makefile }} in_docker TARGET=build
     - name: Test
-      run: ctest --test-dir ${{ env.build_dir }} --parallel ${{ env.cores }} --verbose
+      run: make --file ${{ env.makefile }} in_docker TARGET=test
+    - name: Install
+      run: make --file ${{ env.makefile }} in_docker TARGET=install
 
   build_windows:
     name: windows
