@@ -1,9 +1,12 @@
+# This makefile only has helper targets, it is not meant to handle dependencies --- this is cmake's job
 SHELL := pwsh.exe
 .SHELLFLAGS := -Command
 
 PROJECT_NAME := cpp_contests
 MAKE_BUILD_DIR ?= build_docker
 
+.PHONY: install
+install: # not implemented yet
 
 ###################### docker support ######################
 DOCKER_COMMAND ?=
