@@ -114,9 +114,7 @@ jobs:
     strategy:
       matrix:
         toolchain: [msvc, llvm]
-        build_type: [debug, release]
-    env:
-      cores: 2
+        build_type: [Debug, Release]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -130,17 +128,24 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        if("${{ matrix.toolchain }}" -eq "msvc")
-        { "toolset=v143" >> $env:GITHUB_ENV}
-        elseif("${{ matrix.toolchain }}" -eq "llvm")
-        { "toolset=ClangCL" >> $env:GITHUB_ENV}
+        "makefile=makefile_windows" >> $env:GITHUB_ENV
+        "TOOLCHAIN=${{ matrix.toolchain }}" >> $env:GITHUB_ENV
+        "BUILD_DIR=${{ env.build_dir }}" >> $env:GITHUB_ENV
+        "PARALLEL=ON" >> $env:GITHUB_ENV
+        "LIT=ON" >> $env:GITHUB_ENV
+        "CODE_COVERAGE=OFF" >> $env:GITHUB_ENV
+        "VALGRIND=OFF" >> $env:GITHUB_ENV
+        "BUILD_TYPE=${{ matrix.build_type }}" >> $env:GITHUB_ENV
         "DOCKER_ISOLATION=process" >> $env:GITHUB_ENV
-        "make_in_docker=make --file makefile_windows in_docker DOCKER_COMMAND=" >> $env:GITHUB_ENV
+    - name: Download and start container
+      run: make --file ${{ env.makefile }} cpp_contests_container
+    - name: Configure cmake
+      run: make --file ${{ env.makefile }} in_docker TARGET=config
+    - name: Build
+      run: make --file ${{ env.makefile }} in_docker TARGET=build
+    - name: Test
+      run: make --file ${{ env.makefile }} in_docker TARGET=test
+    - name: Install
+      run: make --file ${{ env.makefile }} in_docker TARGET=install
     - name: Download and start container
       run: make --file makefile_windows cpp_contests_container
-    - name: Configure cmake
-      run: ${{ env.make_in_docker }}"cmake -DPARALLEL_TESTING=ON -DLIT=ON -S . -B ${{ env.build_dir }} -T ${{ env.toolset }}"
-    - name: Build
-      run: ${{ env.make_in_docker }}"cmake --build ${{ env.build_dir }} --config ${{ matrix.build_type }} --parallel ${{ env.cores }}"
-    - name: Test
-      run: ${{ env.make_in_docker }}"ctest --test-dir ${{ env.build_dir }} --parallel ${{ env.cores }} --verbose --build-config ${{ matrix.build_type }}"
