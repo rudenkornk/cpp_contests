@@ -12,73 +12,28 @@ env:
   build_dir: build
 
 jobs:
-  clang-format:
-    name: clang-format
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-20.04
-    container:
-      image: rudenkornk/docker_cpp:0.1.3
-    defaults:
-      run:
-        shell: bash
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-    - name: Workaround "unsafe repository" issue
-      run: |
-        # See also https://github.com/actions/checkout/issues/760
-        git config --global --add safe.directory "$PWD"
-    - name: Run clang-format for the patch
-      run: |
-        git diff -U0 --no-color --relative HEAD^ | clang-format-diff -p1 > clang-format.patch
-        if [ -s clang-format.patch ]; then
-          cat clang-format.patch
-          exit 1
-        fi
-
-  clang-tidy:
-    name: clang-tidy
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-20.04
-    container:
-      image: rudenkornk/docker_cpp:0.1.3
-    env:
-      cores: 2
-    defaults:
-      run:
-        shell: bash
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-    - name: Workaround "unsafe repository" issue
-      run: |
-        # See also https://github.com/actions/checkout/issues/760
-        git config --global --add safe.directory "$PWD"
-    - name: Configure cmake
-      run: |
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S . -B ${{ env.build_dir }}
-    - name: Run clang-tidy
-      run: |
-        git diff -U0 --no-color --relative HEAD^ | clang-tidy-diff.py -j${{ env.cores }} -p1 -path ${{ env.build_dir }} -export-fixes clang-tidy.patch
-        if [ -s clang-tidy.patch ]; then
-          cat clang-tidy.patch
-          exit 1
-        fi
-
-  build_linux:
-    name: linux
-    runs-on: ubuntu-20.04
+  main:
     strategy:
       matrix:
-        toolchain: [gcc, llvm]
+        os: [ubuntu-20.04, windows-2019]
         build_type: [Debug, Release]
+        toolchain: [gcc, llvm, msvc]
+        exclude:
+          - os: ubuntu-20.04
+            toolchain: msvc
+          - os: windows-2019
+            toolchain: gcc
+        include:
+          - os: ubuntu-20.04
+            shell: bash
+            github_env: $GITHUB_ENV
+          - os: windows-2019
+            shell: pwsh
+            github_env: $env:GITHUB_ENV
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash
+        shell: ${{ matrix.shell }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -89,63 +44,59 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        echo "makefile=makefile" >> $GITHUB_ENV
-        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
-        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
-        echo "PARALLEL=ON" >> $GITHUB_ENV
-        echo "LIT=ON" >> $GITHUB_ENV
-        echo "CODE_COVERAGE=OFF" >> $GITHUB_ENV
-        echo "VALGRIND=OFF" >> $GITHUB_ENV
-        echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
+        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> ${{ matrix.github_env}}
+        echo "BUILD_DIR=${{ env.build_dir }}" >> ${{ matrix.github_env}}
+        echo "PARALLEL=ON" >> ${{ matrix.github_env}}
+        echo "LIT=ON" >> ${{ matrix.github_env}}
+        echo "CODE_COVERAGE=OFF" >> ${{ matrix.github_env}}
+        echo "VALGRIND=OFF" >> ${{ matrix.github_env}}
+        echo "BUILD_TYPE=${{ matrix.build_type }}" >> ${{ matrix.github_env}}
+        echo "DOCKER_ISOLATION=process" >> ${{ matrix.github_env}}
     - name: Download and start container
-      run: make --file ${{ env.makefile }} cpp_contests_container
-    - name: Configure cmake
-      run: make --file ${{ env.makefile }} in_docker TARGET=config
+      # See https://github.com/rudenkornk/docker_cpp
+      # See https://github.com/rudenkornk/docker_cpp_windows
+      run: make cpp_contests_container
+    - name: Configure
+      run: make in_docker TARGET=config
     - name: Build
-      run: make --file ${{ env.makefile }} in_docker TARGET=build
+      run: make in_docker TARGET=build
     - name: Test
-      run: make --file ${{ env.makefile }} in_docker TARGET=test
+      run: make in_docker TARGET=test
     - name: Install
-      run: make --file ${{ env.makefile }} in_docker TARGET=install
+      run: make in_docker TARGET=install
 
-  build_windows:
-    name: windows
-    runs-on: windows-2019
+  lint:
+    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
-        toolchain: [msvc, llvm]
-        build_type: [Debug, Release]
+        fail-fast: [false]
+        tool: [clang-format, clang-tidy]
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-    - name: "Login to Docker Hub"
-      # Container is private due to Visual Studio policy
-      # But you can view source and compile it from
-      # https://github.com/rudenkornk/docker_cpp_windows
-      uses: docker/login-action@v1
       with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
+        fetch-depth: 2
+    - name: Workaround "unsafe repository" issue
+      run: |
+        # See also https://github.com/actions/checkout/issues/760
+        git config --global --add safe.directory "$PWD"
     - name: Set environment
       run: |
-        "makefile=makefile_windows" >> $env:GITHUB_ENV
-        "TOOLCHAIN=${{ matrix.toolchain }}" >> $env:GITHUB_ENV
-        "BUILD_DIR=${{ env.build_dir }}" >> $env:GITHUB_ENV
-        "PARALLEL=ON" >> $env:GITHUB_ENV
-        "LIT=ON" >> $env:GITHUB_ENV
-        "CODE_COVERAGE=OFF" >> $env:GITHUB_ENV
-        "VALGRIND=OFF" >> $env:GITHUB_ENV
-        "BUILD_TYPE=${{ matrix.build_type }}" >> $env:GITHUB_ENV
-        "DOCKER_ISOLATION=process" >> $env:GITHUB_ENV
+        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "CLANG_FORMAT_OUTPUT=patch" >> $GITHUB_ENV
+        echo "CLANG_TIDY_OUTPUT=patch" >> $GITHUB_ENV
     - name: Download and start container
-      run: make --file ${{ env.makefile }} cpp_contests_container
-    - name: Configure cmake
-      run: make --file ${{ env.makefile }} in_docker TARGET=config
-    - name: Build
-      run: make --file ${{ env.makefile }} in_docker TARGET=build
-    - name: Test
-      run: make --file ${{ env.makefile }} in_docker TARGET=test
-    - name: Install
-      run: make --file ${{ env.makefile }} in_docker TARGET=install
-    - name: Download and start container
-      run: make --file makefile_windows cpp_contests_container
+      # See https://github.com/rudenkornk/docker_cpp
+      run: make cpp_contests_container
+    - name: Run linter
+      run: make in_docker TARGET=${{ matrix.tool }}
+    - name: Check
+      run: |
+        if [ -s patch ]; then
+          cat patch
+          exit 1
+        fi
