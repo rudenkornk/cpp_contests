@@ -19,7 +19,6 @@ TOOLSET := $(shell \
              elseif("$(TOOLCHAIN)" -eq "llvm"){return "ClangCL"} \
              else{throw "Unknown toolchain!"} \
             )
-MAKEFILE := $(firstword $(MAKEFILE_LIST))
 
 .PHONY: config
 config:
@@ -76,5 +75,5 @@ $(DOCKER_CONTAINER_NAME): $(DOCKER_CONTAINER)
 
 .PHONY: in_docker
 in_docker: $(DOCKER_CONTAINER)
-	docker exec $(DOCKER_CONTAINER_NAME) pwsh -Command "make --file $(MAKEFILE) $(TARGET)"
+	docker exec $(DOCKER_CONTAINER_NAME) pwsh -Command "make $(TARGET)"
 
