@@ -1,7 +1,6 @@
 # This makefile only has helper targets, it is not meant to handle dependencies --- this is cmake's job
 SHELL = /usr/bin/env bash
 
-PROJECT_NAME := cpp_contests
 TOOLCHAIN ?= gcc
 BUILD_DIR ?= build
 GENERATOR ?= Ninja Multi-Config

@@ -1,3 +1,5 @@
+PROJECT_NAME := cpp_contests
+
 ifeq ($(OS),Windows_NT)
   detected_os := Windows
 else
