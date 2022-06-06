@@ -2,7 +2,6 @@
 SHELL := pwsh.exe
 .SHELLFLAGS := -Command
 
-PROJECT_NAME := cpp_contests
 TOOLCHAIN ?= msvc
 BUILD_DIR ?= build
 GENERATOR ?= Visual Studio 17 2022
