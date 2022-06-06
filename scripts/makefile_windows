@@ -31,6 +31,7 @@ build:
 .PHONY: test
 test:
 	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) --verbose
+
 .PHONY: install
 install: # not implemented yet
 
