@@ -1,23 +1,47 @@
-function(get_all_targets out_var)
+function(get_targets out_var)
   # Credit:
   # https://discourse.cmake.org/t/cmake-list-of-all-project-targets/1077/17
-  if(NOT DEFINED ARGV1)
-    set(current_dir ${CMAKE_SOURCE_DIR})
-  else()
-    set(current_dir ${ARGV1})
+  set(options LIVE) # Only return non-imported non-interface targets
+  set(oneValueArgs DIRECTORY)
+  set(multiValueArgs)
+  cmake_parse_arguments(PARSE_ARGV 1 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+
+  if(NOT DEFINED out_var)
+    message(FATAL_ERROR "OUTPUT_VARIABLE argument is mandatory")
   endif()
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Too many arguments")
+  endif()
+  if(NOT DEFINED ARG_DIRECTORY)
+    set(ARG_DIRECTORY ${CMAKE_SOURCE_DIR})
+  endif()
+  if(ARG_LIVE)
+    set(LIVE LIVE)
+  endif()
+
   get_property(
-    targets
-    DIRECTORY ${current_dir}
+    all_targets
+    DIRECTORY ${ARG_DIRECTORY}
     PROPERTY BUILDSYSTEM_TARGETS)
   get_property(
     subdirs
-    DIRECTORY ${current_dir}
+    DIRECTORY ${ARG_DIRECTORY}
     PROPERTY SUBDIRECTORIES)
 
   foreach(subdir ${subdirs})
-    get_all_targets(subdir_targets ${subdir})
-    list(APPEND targets ${subdir_targets})
+    get_targets(subdir_targets DIRECTORY ${subdir} ${LIVE})
+    list(APPEND all_targets ${subdir_targets})
+  endforeach()
+
+  foreach(target ${all_targets})
+    if(ARG_LIVE)
+      get_target_property(type ${target} TYPE)
+      get_target_property(imported ${target} IMPORTED)
+      if((${type} STREQUAL "INTERFACE_LIBRARY") OR imported)
+        continue()
+      endif()
+    endif()
+    list(APPEND targets ${target})
   endforeach()
 
   set(${out_var}
@@ -25,7 +49,7 @@ function(get_all_targets out_var)
       PARENT_SCOPE)
 endfunction()
 
-function(get_all_tests out_var)
+function(get_tests out_var)
   if(NOT DEFINED ARGV1)
     set(current_dir ${CMAKE_SOURCE_DIR})
   else()
@@ -41,7 +65,7 @@ function(get_all_tests out_var)
     PROPERTY SUBDIRECTORIES)
 
   foreach(subdir ${subdirs})
-    get_all_tests(subdir_tests ${subdir})
+    get_tests(subdir_tests ${subdir})
     list(APPEND tests ${subdir_tests})
   endforeach()
 
