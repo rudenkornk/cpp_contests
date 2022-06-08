@@ -2,7 +2,6 @@ include(ProcessorCount)
 include(Utils)
 
 define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
-define_property(TARGET PROPERTY VALGRIND_ENABLED)
 
 function(enable_parallel_testing)
   if(${ARGC} GREATER 1)
@@ -80,11 +79,7 @@ function(add_unit_tests)
   if(NOT DEFINED TEST_TARGET)
     message(FATAL_ERROR "TARGET is required argument.")
   endif()
-  get_property(
-    target_valgrind_enabled
-    TARGET ${TEST_TARGET}
-    PROPERTY VALGRIND)
-  if(target_valgrind_enabled)
+  if(valgrind_testing_enabled)
     add_test(NAME ${TEST_NAME} COMMAND valgrind $<TARGET_FILE:${TEST_TARGET}> ${TEST_COMMAND_ARGUMENTS}
                                        ${TEST_UNPARSED_ARGUMENTS})
   else()
@@ -128,11 +123,7 @@ function(add_lit_tests)
       cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "$(basename %s.profraw)" OUTPUT_VARIABLE llvm_profile)
       set(target_environment "LLVM_PROFILE_FILE=\\\"${llvm_profile}\\\" ")
     endif()
-    get_property(
-      target_valgrind_enabled
-      TARGET ${target}
-      PROPERTY VALGRIND)
-    if(target_valgrind_enabled)
+    if(valgrind_testing_enabled)
       set(valgrind_if_enabled "valgrind ")
     endif()
 
@@ -180,13 +171,6 @@ function(target_enable_code_coverage TARGET)
   set_property(TARGET ${TARGET} PROPERTY CODE_COVERAGE_ENABLED ON)
 endfunction()
 
-function(target_enable_valgrind TARGET)
-  if(${ARGC} LESS 1)
-    message(FATAL_ERROR "Provide exactly one target.")
-  endif()
-  set_property(TARGET ${TARGET} PROPERTY VALGRIND ON)
-endfunction()
-
 function(enable_code_coverage)
   get_targets(targets LIVE)
   foreach(target ${targets})
@@ -212,7 +196,4 @@ function(enable_lit_tests)
 endfunction()
 
 function(target_enable_instrumentation TARGET)
-  if(valgrind_testing_enabled)
-    target_enable_valgrind(${TARGET})
-  endif()
 endfunction()
