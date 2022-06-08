@@ -23,17 +23,10 @@ jobs:
             toolchain: msvc
           - os: windows-2019
             toolchain: gcc
-        include:
-          - os: ubuntu-20.04
-            shell: bash
-            github_env: $GITHUB_ENV
-          - os: windows-2019
-            shell: pwsh
-            github_env: $env:GITHUB_ENV
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: ${{ matrix.shell }}
+        shell: bash
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -44,14 +37,14 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> ${{ matrix.github_env}}
-        echo "BUILD_DIR=${{ env.build_dir }}" >> ${{ matrix.github_env}}
-        echo "PARALLEL=ON" >> ${{ matrix.github_env}}
-        echo "LIT=ON" >> ${{ matrix.github_env}}
-        echo "CODE_COVERAGE=OFF" >> ${{ matrix.github_env}}
-        echo "VALGRIND=OFF" >> ${{ matrix.github_env}}
-        echo "BUILD_TYPE=${{ matrix.build_type }}" >> ${{ matrix.github_env}}
-        echo "DOCKER_ISOLATION=process" >> ${{ matrix.github_env}}
+        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
+        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "PARALLEL=ON" >> $GITHUB_ENV
+        echo "LIT=ON" >> $GITHUB_ENV
+        echo "CODE_COVERAGE=OFF" >> $GITHUB_ENV
+        echo "VALGRIND=OFF" >> $GITHUB_ENV
+        echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
+        echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
