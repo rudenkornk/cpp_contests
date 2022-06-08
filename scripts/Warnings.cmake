@@ -1,3 +1,5 @@
+include(Utils)
+
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
     message(FATAL_ERROR "Provide exactly one target.")
@@ -32,14 +34,8 @@ function(target_disable_warnings TARGET)
 endfunction()
 
 function(enable_warnings)
-  if((CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
-  elseif((CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC") OR (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"))
-    add_compile_options(/W4 /WX)
-  else()
-    message(
-      WARNING
-        "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variant \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
-    )
-  endif()
+  get_targets(targets LIVE)
+  foreach(target ${targets})
+    target_enable_warnings(${target})
+  endforeach()
 endfunction()
