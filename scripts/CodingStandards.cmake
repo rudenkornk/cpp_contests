@@ -39,6 +39,6 @@ endfunction()
 
 function(target_enable_coding_standards TARGET)
   if(warnings_enabled)
-    target_enable_warnings(${target})
+    target_enable_warnings(${TARGET})
   endif()
 endfunction()
