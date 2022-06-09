@@ -188,11 +188,9 @@ function(target_enable_valgrind TARGET)
 endfunction()
 
 function(enable_code_coverage)
-  get_targets(targets LIVE)
-  foreach(target ${targets})
-    target_enable_code_coverage(${target})
-  endforeach()
-  add_code_coverage_test()
+  set(code_coverage_enabled
+      ON
+      PARENT_SCOPE)
 endfunction()
 
 function(enable_valgrind_testing)
@@ -212,6 +210,9 @@ function(enable_lit_tests)
 endfunction()
 
 function(target_enable_instrumentation TARGET)
+  if(code_coverage_enabled)
+    target_enable_code_coverage(${TARGET})
+  endif()
   if(valgrind_testing_enabled)
     target_enable_valgrind(${TARGET})
   endif()
