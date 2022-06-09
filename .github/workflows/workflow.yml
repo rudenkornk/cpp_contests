@@ -42,7 +42,7 @@ jobs:
           - os: ubuntu-20.04 # looks like latest llvm emit debug info, not supported by valgrind
             build_type: Debug
             toolchain: llvm
-            mode: valgrind 
+            mode: valgrind
     runs-on: ${{ matrix.os }}
     defaults:
       run:
