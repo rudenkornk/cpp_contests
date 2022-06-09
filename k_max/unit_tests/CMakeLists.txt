@@ -11,4 +11,6 @@ file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(k_max_unit_tests PRIVATE ${unit_tests_sources})
 target_add_headers_as_sources(k_max_unit_tests k_max)
 
+target_enable_instrumentation(k_max_unit_tests)
+
 add_unit_tests(NAME k_max_unit_tests TARGET k_max_unit_tests)
