@@ -1,5 +1,5 @@
 add_library(code_coverage_test)
-target_include_directories(code_coverage_test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(code_coverage_test PUBLIC .)
 target_sources(code_coverage_test PRIVATE
   solution.hpp
   solution.cpp
