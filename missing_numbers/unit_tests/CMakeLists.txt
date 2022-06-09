@@ -1,11 +1,9 @@
 add_executable(missing_numbers_unit_tests)
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS headers)
 
 target_link_libraries(missing_numbers_unit_tests PRIVATE missing_numbers)
-
-target_include_directories(missing_numbers_unit_tests SYSTEM
-                           PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(missing_numbers_unit_tests PRIVATE Boost::headers)
 
 file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(missing_numbers_unit_tests PRIVATE ${unit_tests_sources})

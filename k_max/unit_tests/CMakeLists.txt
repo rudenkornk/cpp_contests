@@ -1,11 +1,10 @@
 add_executable(k_max_unit_tests)
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS headers)
 
 target_link_libraries(k_max_unit_tests PRIVATE k_max)
+target_link_libraries(k_max_unit_tests PRIVATE Boost::headers)
 
-target_include_directories(k_max_unit_tests SYSTEM
-                           PRIVATE ${Boost_INCLUDE_DIRS})
 
 file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(k_max_unit_tests PRIVATE ${unit_tests_sources})
