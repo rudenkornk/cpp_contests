@@ -1,5 +1,3 @@
-include(Utils)
-
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
     message(FATAL_ERROR "Provide exactly one target.")
@@ -34,8 +32,13 @@ function(target_disable_warnings TARGET)
 endfunction()
 
 function(enable_warnings)
-  get_targets(targets LIVE)
-  foreach(target ${targets})
+  set(warnings_enabled
+      ON
+      PARENT_SCOPE)
+endfunction()
+
+function(target_enable_coding_standards TARGET)
+  if(warnings_enabled)
     target_enable_warnings(${target})
-  endforeach()
+  endif()
 endfunction()
