@@ -1,11 +1,9 @@
 add_executable(reverse_list_unit_tests)
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS headers)
 
 target_link_libraries(reverse_list_unit_tests PRIVATE reverse_list)
-
-target_include_directories(reverse_list_unit_tests SYSTEM
-                           PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(reverse_list_unit_tests PRIVATE Boost::headers)
 
 file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
 target_sources(reverse_list_unit_tests PRIVATE ${unit_tests_sources})
