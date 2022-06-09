@@ -1,3 +1,5 @@
+define_property(TARGET PROPERTY WARNINGS_ENABLED)
+
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
     message(FATAL_ERROR "Provide exactly one target.")
@@ -12,6 +14,7 @@ function(target_enable_warnings TARGET)
         "Compiler with id \"${CMAKE_CXX_COMPILER_ID}\" and variant \"${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}\" is not implemented here. Warnings will not be enabled."
     )
   endif()
+  set_property(TARGET ${TARGET} PROPERTY WARNINGS_ENABLED ON)
 endfunction()
 
 function(target_disable_warnings TARGET)
@@ -29,6 +32,7 @@ function(target_disable_warnings TARGET)
     list(APPEND target_options /w)
     set_property(TARGET ${TARGET} PROPERTY COMPILE_OPTIONS ${target_options})
   endif()
+  set_property(TARGET ${TARGET} PROPERTY WARNINGS_ENABLED OFF)
 endfunction()
 
 function(enable_warnings)
