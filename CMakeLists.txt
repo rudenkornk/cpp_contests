@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
 
 include(Utils)
 include(Testing)
-include(Warnings)
+include(CodingStandards)
 
 option(WARNINGS "Enable strict warnings" OFF)
 option(CODE_COVERAGE "Enable code coverage tests" OFF)
