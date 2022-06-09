@@ -5,9 +5,7 @@ find_package(Boost REQUIRED COMPONENTS headers)
 target_link_libraries(k_max_unit_tests PRIVATE k_max)
 target_link_libraries(k_max_unit_tests PRIVATE Boost::headers)
 
-
-file(GLOB unit_tests_sources CONFIGURE_DEPENDS *.[hcm]pp)
-target_sources(k_max_unit_tests PRIVATE ${unit_tests_sources})
+target_sources(k_max_unit_tests PRIVATE test_1.cpp)
 target_add_headers_as_sources(k_max_unit_tests k_max)
 
 target_enable_instrumentation(k_max_unit_tests)
