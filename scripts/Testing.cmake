@@ -194,3 +194,6 @@ function(enable_lit_tests)
       ON
       PARENT_SCOPE)
 endfunction()
+
+function(target_enable_instrumentation TARGET)
+endfunction()
