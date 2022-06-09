@@ -69,6 +69,7 @@ clang-tidy:
 KEEP_CI_USER_SUDO ?= false
 KEEP_CI_USER_SUDO := $(KEEP_CI_USER_SUDO)
 TARGET ?=
+COMMAND ?=
 DOCKER_IMAGE_TAG ?= rudenkornk/docker_cpp:0.1.7
 DOCKER_IMAGE_TAG := $(DOCKER_IMAGE_TAG)
 DOCKER_CONTAINER_NAME ?= $(PROJECT_NAME)_container
@@ -111,5 +112,9 @@ $(DOCKER_CONTAINER_NAME): $(DOCKER_CONTAINER)
 
 .PHONY: in_docker
 in_docker: $(DOCKER_CONTAINER)
+ifneq ($(COMMAND),)
+	docker exec $(DOCKER_CONTAINER_NAME) bash -c "$(COMMAND)"
+else
 	docker exec $(DOCKER_CONTAINER_NAME) bash -c "make $(TARGET)"
+endif
 
