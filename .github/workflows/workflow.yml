@@ -95,10 +95,6 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 2
-    - name: Workaround "unsafe repository" issue
-      run: |
-        # See also https://github.com/actions/checkout/issues/760
-        git config --global --add safe.directory "$PWD"
     - name: Set environment
       run: |
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
