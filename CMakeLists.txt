@@ -4,6 +4,8 @@ project(cpp_contests)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
 
+find_package(Boost REQUIRED COMPONENTS headers)
+
 include(Utils)
 include(Testing)
 include(CodingStandards)

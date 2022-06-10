@@ -1,7 +1,5 @@
 add_executable(missing_numbers_unit_tests)
 
-find_package(Boost REQUIRED COMPONENTS headers)
-
 target_link_libraries(missing_numbers_unit_tests PRIVATE missing_numbers)
 target_link_libraries(missing_numbers_unit_tests PRIVATE Boost::headers)
 

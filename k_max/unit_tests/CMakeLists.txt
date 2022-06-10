@@ -1,7 +1,5 @@
 add_executable(k_max_unit_tests)
 
-find_package(Boost REQUIRED COMPONENTS headers)
-
 target_link_libraries(k_max_unit_tests PRIVATE k_max)
 target_link_libraries(k_max_unit_tests PRIVATE Boost::headers)
 

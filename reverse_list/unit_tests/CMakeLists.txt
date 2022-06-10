@@ -1,7 +1,5 @@
 add_executable(reverse_list_unit_tests)
 
-find_package(Boost REQUIRED COMPONENTS headers)
-
 target_link_libraries(reverse_list_unit_tests PRIVATE reverse_list)
 target_link_libraries(reverse_list_unit_tests PRIVATE Boost::headers)
 
