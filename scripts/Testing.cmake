@@ -2,24 +2,25 @@ include(ProcessorCount)
 include(Utils)
 
 define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
+define_property(GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
 define_property(TARGET PROPERTY VALGRIND_ENABLED)
+define_property(GLOBAL PROPERTY VALGRIND_ENABLED)
+define_property(GLOBAL PROPERTY LIT_TESTS_ENABLED)
+define_property(GLOBAL PROPERTY TEST_WORKERS)
 
 function(enable_parallel_testing)
   if(${ARGC} GREATER 1)
     message(FATAL_ERROR "This function accepts at most 1 argument.")
   endif()
   if(${ARGC} EQUAL 1)
-    set(test_workers
-        ${ARGV0}
-        PARENT_SCOPE)
+    set_property(GLOBAL PROPERTY TEST_WORKERS ${ARGV0})
   else()
     ProcessorCount(PC)
     if(NOT PC EQUAL 0)
-      set(test_workers
-          ${PC}
-          PARENT_SCOPE)
+      set_property(GLOBAL PROPERTY TEST_WORKERS ${PC})
     endif()
   endif()
+  get_property(test_workers GLOBAL PROPERTY TEST_WORKERS)
   set(CTEST_BUILD_FLAGS
       -j${test_workers}
       PARENT_SCOPE)
@@ -98,6 +99,7 @@ function(add_lit_tests)
   set(multiValueArgs COMMAND TARGETS)
   cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
+  get_property(lit_tests_enabled GLOBAL PROPERTY LIT_TESTS_ENABLED)
   if(NOT lit_tests_enabled)
     return()
   endif()
@@ -154,7 +156,8 @@ function(add_lit_tests)
   configure_file(${TEST_LIT_CONFIG} ${lit_config_out} @ONLY)
 
   list(APPEND lit_options --verbose)
-  if(DEFINED test_workers)
+  get_property(test_workers GLOBAL PROPERTY TEST_WORKERS)
+  if(test_workers)
     list(APPEND lit_options --workers ${test_workers})
   endif()
   add_test(
@@ -188,31 +191,27 @@ function(target_enable_valgrind TARGET)
 endfunction()
 
 function(enable_code_coverage)
-  set(code_coverage_enabled
-      ON
-      PARENT_SCOPE)
+  set_property(GLOBAL PROPERTY CODE_COVERAGE_ENABLED ON)
 endfunction()
 
 function(enable_valgrind_testing)
   find_program(valgrind valgrind REQUIRED)
-  set(valgrind_testing_enabled
-      ON
-      PARENT_SCOPE)
+  set_property(GLOBAL PROPERTY VALGRIND_ENABLED ON)
 endfunction()
 
 function(enable_lit_tests)
   find_package(Python3 REQUIRED)
   find_program(lit lit REQUIRED)
   find_program(filecheck FileCheck REQUIRED)
-  set(lit_tests_enabled
-      ON
-      PARENT_SCOPE)
+  set_property(GLOBAL PROPERTY LIT_TESTS_ENABLED ON)
 endfunction()
 
 function(target_enable_instrumentation TARGET)
+  get_property(code_coverage_enabled GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
   if(code_coverage_enabled)
     target_enable_code_coverage(${TARGET})
   endif()
+  get_property(valgrind_testing_enabled GLOBAL PROPERTY VALGRIND_ENABLED)
   if(valgrind_testing_enabled)
     target_enable_valgrind(${TARGET})
   endif()
