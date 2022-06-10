@@ -1,4 +1,5 @@
 define_property(TARGET PROPERTY WARNINGS_ENABLED)
+define_property(GLOBAL PROPERTY WARNINGS_ENABLED)
 
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
@@ -36,12 +37,11 @@ function(target_disable_warnings TARGET)
 endfunction()
 
 function(enable_warnings)
-  set(warnings_enabled
-      ON
-      PARENT_SCOPE)
+  set_property(GLOBAL PROPERTY WARNINGS_ENABLED ON)
 endfunction()
 
 function(target_enable_coding_standards TARGET)
+  get_property(warnings_enabled GLOBAL PROPERTY WARNINGS_ENABLED)
   if(warnings_enabled)
     target_enable_warnings(${TARGET})
   endif()
