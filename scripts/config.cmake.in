@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+include(@PACKAGE_CMAKE_INSTALL_CMAKEDIR@/@CMAKE_PROJECT_NAME@_targets.cmake)
+check_required_components(@CMAKE_PROJECT_NAME@)
