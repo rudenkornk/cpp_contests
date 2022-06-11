@@ -30,10 +30,10 @@ function(add_code_coverage_test)
   get_targets(targets LIVE)
   get_tests(tests)
   foreach(target ${targets})
-    get_property(
+    get_target_property(
       target_code_coverage_enabled
-      TARGET ${target}
-      PROPERTY CODE_COVERAGE_ENABLED)
+      ${target}
+      CODE_COVERAGE_ENABLED)
     if(target_code_coverage_enabled)
       list(APPEND code_coveraged_targets ${target})
     endif()
@@ -81,10 +81,10 @@ function(add_unit_tests)
   if(NOT DEFINED TEST_TARGET)
     message(FATAL_ERROR "TARGET is required argument.")
   endif()
-  get_property(
+  get_target_property(
     target_valgrind_enabled
-    TARGET ${TEST_TARGET}
-    PROPERTY VALGRIND_ENABLED)
+    ${TEST_TARGET}
+    VALGRIND_ENABLED)
   if(target_valgrind_enabled)
     add_test(NAME ${TEST_NAME} COMMAND valgrind $<TARGET_FILE:${TEST_TARGET}> ${TEST_COMMAND_ARGUMENTS}
                                        ${TEST_UNPARSED_ARGUMENTS})
@@ -118,22 +118,22 @@ function(add_lit_tests)
   endif()
 
   foreach(target ${TEST_TARGETS})
-    get_property(
+    get_target_property(
       target_name
-      TARGET ${target}
-      PROPERTY OUTPUT_NAME)
-    get_property(
+      ${target}
+      OUTPUT_NAME)
+    get_target_property(
       target_code_coverage_enabled
-      TARGET ${target}
-      PROPERTY CODE_COVERAGE_ENABLED)
+      ${target}
+      CODE_COVERAGE_ENABLED)
     if((target_code_coverage_enabled) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
       cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "$(basename %s.profraw)" OUTPUT_VARIABLE llvm_profile)
       set(target_environment "LLVM_PROFILE_FILE=\\\"${llvm_profile}\\\" ")
     endif()
-    get_property(
+    get_target_property(
       target_valgrind_enabled
-      TARGET ${target}
-      PROPERTY VALGRIND_ENABLED)
+      ${target}
+      VALGRIND_ENABLED)
     if(target_valgrind_enabled)
       set(valgrind_if_enabled "valgrind ")
     endif()
@@ -180,14 +180,14 @@ function(target_enable_code_coverage TARGET)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(${TARGET} PRIVATE /fsanitize-coverage)
   endif()
-  set_property(TARGET ${TARGET} PROPERTY CODE_COVERAGE_ENABLED ON)
+  set_target_properties(${TARGET} PROPERTIES CODE_COVERAGE_ENABLED ON)
 endfunction()
 
 function(target_enable_valgrind TARGET)
   if(${ARGC} LESS 1)
     message(FATAL_ERROR "Provide exactly one target.")
   endif()
-  set_property(TARGET ${TARGET} PROPERTY VALGRIND_ENABLED ON)
+  set_target_properties(${TARGET} PROPERTIES VALGRIND_ENABLED ON)
 endfunction()
 
 function(enable_code_coverage)
