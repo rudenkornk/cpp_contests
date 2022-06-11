@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(cpp_contests)
+project(
+  cpp_contests
+  VERSION 0.1.0
+  DESCRIPTION "One-file solutions for C++ problems"
+  HOMEPAGE_URL https://github.com/rudenkornk/cpp_contests
+  )
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
 
