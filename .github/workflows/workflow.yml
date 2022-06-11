@@ -10,6 +10,7 @@ on:
 
 env:
   build_dir: build
+  install_dir: build/install
 
 jobs:
   main:
@@ -61,6 +62,7 @@ jobs:
         VALGRIND=$([[ '${{ matrix.mode }}' == 'valgrind' ]] && echo ON || echo OFF)
         echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
         echo "PARALLEL=ON" >> $GITHUB_ENV
         echo "LIT=ON" >> $GITHUB_ENV
         echo "CODE_COVERAGE=$CODE_COVERAGE" >> $GITHUB_ENV
