@@ -1,16 +1,15 @@
 function(get_targets out_var)
-  # Credit:
-  # https://discourse.cmake.org/t/cmake-list-of-all-project-targets/1077/17
+  # Credit: https://discourse.cmake.org/t/cmake-list-of-all-project-targets/1077/17
   set(options LIVE) # Only return non-imported non-interface targets
   set(oneValueArgs DIRECTORY)
   set(multiValueArgs)
   cmake_parse_arguments(PARSE_ARGV 1 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
   if(NOT DEFINED out_var)
-    message(FATAL_ERROR "OUTPUT_VARIABLE argument is mandatory")
+    message(FATAL_ERROR "OUTPUT_VARIABLE argument is mandatory.")
   endif()
   if(ARG_UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Too many arguments")
+    message(FATAL_ERROR "Too many arguments.")
   endif()
   if(NOT DEFINED ARG_DIRECTORY)
     set(ARG_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -64,7 +63,9 @@ function(get_tests out_var)
 endfunction()
 
 # Normally we do not add sources of one target to another target
+#
 # But this might be useful in two cases:
+#
 # 1. A closely related target, such as command-line wrapper for library
 # 2. Unit test, testing specifically this library
 function(target_add_headers_as_sources TARGET FROM)
