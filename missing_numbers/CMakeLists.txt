@@ -1,5 +1,16 @@
 add_library(missing_numbers INTERFACE)
-target_include_directories(missing_numbers INTERFACE .)
+target_sources(
+  missing_numbers
+  INTERFACE FILE_SET
+            missing_numbers_headers
+            TYPE
+            HEADERS
+            BASE_DIRS
+            include
+            FILES
+            include/missing_numbers/solution.hpp)
+target_include_directories(missing_numbers INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                                                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_features(missing_numbers INTERFACE cxx_std_20)
 
 add_executable(missing_numbers_cli)

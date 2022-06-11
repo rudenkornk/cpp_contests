@@ -12,6 +12,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
 find_package(Boost REQUIRED COMPONENTS headers)
 
 include(CodingStandards)
+include(GNUInstallDirs)
 include(Testing)
 include(Utils)
 

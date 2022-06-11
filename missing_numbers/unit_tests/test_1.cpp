@@ -7,7 +7,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "solution.hpp"
+#include "missing_numbers/solution.hpp"
 
 BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST((std::pair(0u, 1u) == missing_numbers({})));

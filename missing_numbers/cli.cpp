@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "solution.hpp"
+#include "missing_numbers/solution.hpp"
 
 int main(int argc, char **argv) {
   if (argc < 2) {
