@@ -44,7 +44,7 @@ function(add_code_coverage_test)
       NAME merge_code_coverage_data
       COMMAND bash -c "llvm-profdata merge --output profdata $(find -name *.profraw)"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}")
+    set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}" FIXTURES_SETUP merge_code_coverage_data)
 
     foreach(target ${code_coveraged_targets})
       list(APPEND objects -object $<TARGET_FILE:${target}>)
@@ -53,7 +53,7 @@ function(add_code_coverage_test)
       NAME code_coverage_report
       COMMAND llvm-cov report --instr-profile profdata ${objects}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    set_tests_properties(code_coverage_report PROPERTIES DEPENDS merge_code_coverage_data)
+    set_tests_properties(code_coverage_report PROPERTIES FIXTURES_REQUIRED merge_code_coverage_data)
 
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # also can be done with lcov: lcov --directory ${CMAKE_BINARY_DIR} --capture --output-file
