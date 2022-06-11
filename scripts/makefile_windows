@@ -11,6 +11,7 @@ LIT ?= ON
 CODE_COVERAGE ?= OFF
 VALGRIND := OFF
 BUILD_TYPE ?= Debug
+INSTALL_PREFIX ?= $(BUILD_DIR)/install
 
 CORES := $(shell (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors)
 PARALLEL_OPTION := $(shell if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)})
@@ -33,7 +34,8 @@ test:
 	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) --verbose
 
 .PHONY: install
-install: # not implemented yet
+install:
+	cmake --install "$(BUILD_DIR)" --config $(BUILD_TYPE) --prefix $(INSTALL_PREFIX)
 
 ###################### docker support ######################
 TARGET ?=
