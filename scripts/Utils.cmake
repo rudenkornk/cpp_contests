@@ -19,14 +19,8 @@ function(get_targets out_var)
     set(LIVE LIVE)
   endif()
 
-  get_property(
-    all_targets
-    DIRECTORY ${ARG_DIRECTORY}
-    PROPERTY BUILDSYSTEM_TARGETS)
-  get_property(
-    subdirs
-    DIRECTORY ${ARG_DIRECTORY}
-    PROPERTY SUBDIRECTORIES)
+  get_directory_property(all_targets DIRECTORY "${ARG_DIRECTORY}" BUILDSYSTEM_TARGETS)
+  get_directory_property(subdirs DIRECTORY "${ARG_DIRECTORY}" SUBDIRECTORIES)
 
   foreach(subdir ${subdirs})
     get_targets(subdir_targets DIRECTORY ${subdir} ${LIVE})
@@ -55,14 +49,9 @@ function(get_tests out_var)
   else()
     set(current_dir ${ARGV1})
   endif()
-  get_property(
-    tests
-    DIRECTORY ${current_dir}
-    PROPERTY TESTS)
-  get_property(
-    subdirs
-    DIRECTORY ${current_dir}
-    PROPERTY SUBDIRECTORIES)
+
+  get_directory_property(tests DIRECTORY "${current_dir}" TESTS)
+  get_directory_property(subdirs DIRECTORY "${current_dir}" SUBDIRECTORIES)
 
   foreach(subdir ${subdirs})
     get_tests(subdir_tests ${subdir})
