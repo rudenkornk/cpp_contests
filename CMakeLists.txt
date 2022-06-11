@@ -33,7 +33,6 @@ if(LIT)
   enable_lit_tests()
 endif()
 
-add_subdirectory(code_coverage_test)
 add_subdirectory(k_max)
 add_subdirectory(missing_numbers)
 add_subdirectory(reverse_list)
