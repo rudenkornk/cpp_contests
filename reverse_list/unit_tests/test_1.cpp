@@ -8,7 +8,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "solution.hpp"
+#include "reverse_list/solution.hpp"
 
 void test_reverse_list(std::initializer_list<int> init) {
   // Use vector as container to avoid memory leaks

@@ -5,7 +5,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "solution.hpp"
+#include "k_max/solution.hpp"
 
 BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST((std::vector{5} == k_max({5}, 1)));
