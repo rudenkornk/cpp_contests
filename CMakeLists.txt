@@ -13,6 +13,7 @@ find_package(Boost REQUIRED COMPONENTS headers)
 
 include(CodingStandards)
 include(GNUInstallDirs)
+include(Installing)
 include(Testing)
 include(Utils)
 
@@ -47,3 +48,5 @@ add_subdirectory(valid_parenthesis)
 if(CODE_COVERAGE)
   add_code_coverage_test()
 endif()
+
+generic_install()
