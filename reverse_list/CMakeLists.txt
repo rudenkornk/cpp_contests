@@ -12,5 +12,6 @@ target_sources(
 target_include_directories(reverse_list INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                                   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_features(reverse_list INTERFACE cxx_std_20)
+target_register_for_install(reverse_list)
 
 add_subdirectory(unit_tests)

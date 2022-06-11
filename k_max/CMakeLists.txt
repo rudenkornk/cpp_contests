@@ -12,5 +12,6 @@ target_sources(
 target_include_directories(k_max INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_features(k_max INTERFACE cxx_std_20)
+target_register_for_install(k_max)
 
 add_subdirectory(unit_tests)
