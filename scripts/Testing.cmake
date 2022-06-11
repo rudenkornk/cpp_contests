@@ -30,10 +30,7 @@ function(add_code_coverage_test)
   get_targets(targets LIVE)
   get_tests(tests)
   foreach(target ${targets})
-    get_target_property(
-      target_code_coverage_enabled
-      ${target}
-      CODE_COVERAGE_ENABLED)
+    get_target_property(target_code_coverage_enabled ${target} CODE_COVERAGE_ENABLED)
     if(target_code_coverage_enabled)
       list(APPEND code_coveraged_targets ${target})
     endif()
@@ -48,6 +45,7 @@ function(add_code_coverage_test)
       COMMAND bash -c "llvm-profdata merge --output profdata $(find -name *.profraw)"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}")
+
     foreach(target ${code_coveraged_targets})
       list(APPEND objects -object $<TARGET_FILE:${target}>)
     endforeach()
@@ -56,6 +54,7 @@ function(add_code_coverage_test)
       COMMAND llvm-cov report --instr-profile profdata ${objects}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(code_coverage_report PROPERTIES DEPENDS merge_code_coverage_data)
+
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # also can be done with lcov: lcov --directory ${CMAKE_BINARY_DIR} --capture --output-file
     # ${CMAKE_BINARY_DIR}/coverage_report/coverage.info lcov --summary ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
@@ -64,6 +63,7 @@ function(add_code_coverage_test)
       COMMAND gcovr ${CMAKE_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     set_tests_properties(code_coverage_report PROPERTIES DEPENDS "${tests}")
+
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(WARNING "Code coverage test not implemented for MSVC.")
   endif()
@@ -81,10 +81,7 @@ function(add_unit_tests)
   if(NOT DEFINED TEST_TARGET)
     message(FATAL_ERROR "TARGET is required argument.")
   endif()
-  get_target_property(
-    target_valgrind_enabled
-    ${TEST_TARGET}
-    VALGRIND_ENABLED)
+  get_target_property(target_valgrind_enabled ${TEST_TARGET} VALGRIND_ENABLED)
   if(target_valgrind_enabled)
     add_test(NAME ${TEST_NAME} COMMAND valgrind $<TARGET_FILE:${TEST_TARGET}> ${TEST_COMMAND_ARGUMENTS}
                                        ${TEST_UNPARSED_ARGUMENTS})
@@ -118,22 +115,13 @@ function(add_lit_tests)
   endif()
 
   foreach(target ${TEST_TARGETS})
-    get_target_property(
-      target_name
-      ${target}
-      OUTPUT_NAME)
-    get_target_property(
-      target_code_coverage_enabled
-      ${target}
-      CODE_COVERAGE_ENABLED)
+    get_target_property(target_name ${target} OUTPUT_NAME)
+    get_target_property(target_code_coverage_enabled ${target} CODE_COVERAGE_ENABLED)
     if((target_code_coverage_enabled) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
       cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "$(basename %s.profraw)" OUTPUT_VARIABLE llvm_profile)
       set(target_environment "LLVM_PROFILE_FILE=\\\"${llvm_profile}\\\" ")
     endif()
-    get_target_property(
-      target_valgrind_enabled
-      ${target}
-      VALGRIND_ENABLED)
+    get_target_property(target_valgrind_enabled ${target} VALGRIND_ENABLED)
     if(target_valgrind_enabled)
       set(valgrind_if_enabled "valgrind ")
     endif()
