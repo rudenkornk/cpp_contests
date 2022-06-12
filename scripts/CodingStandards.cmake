@@ -1,5 +1,7 @@
 define_property(TARGET PROPERTY WARNINGS_ENABLED)
 define_property(GLOBAL PROPERTY WARNINGS_ENABLED)
+define_property(TARGET PROPERTY CLANG_TIDY_ENABLED)
+define_property(GLOBAL PROPERTY CLANG_TIDY_ENABLED)
 
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
@@ -36,8 +38,17 @@ function(target_disable_warnings TARGET)
   set_property(TARGET ${TARGET} PROPERTY WARNINGS_ENABLED OFF)
 endfunction()
 
+function(target_enable_clang_tidy TARGET)
+  set_property(TARGET ${TARGET} PROPERTY CLANG_TIDY_ENABLED ON)
+  set_property(TARGET ${TARGET} PROPERTY CXX_CLANG_TIDY clang-tidy)
+endfunction()
+
 function(enable_warnings)
   set_property(GLOBAL PROPERTY WARNINGS_ENABLED ON)
+endfunction()
+
+function(enable_clang_tidy)
+  set_property(GLOBAL PROPERTY CLANG_TIDY_ENABLED ON)
 endfunction()
 
 function(target_enable_coding_standards TARGET)
@@ -45,4 +56,10 @@ function(target_enable_coding_standards TARGET)
   if(warnings_enabled)
     target_enable_warnings(${TARGET})
   endif()
+
+  get_property(clang_tidy_enabled GLOBAL PROPERTY CLANG_TIDY_ENABLED)
+  if(clang_tidy_enabled)
+    target_enable_clang_tidy(${TARGET})
+  endif()
+
 endfunction()
