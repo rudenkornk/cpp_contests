@@ -3,13 +3,13 @@ SHELL = /usr/bin/env bash
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
-CLANG_TIDY ?= ON
-CODE_COVERAGE ?= ON
 GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
+TOOLCHAIN ?= gcc
+CLANG_TIDY ?= ON
+CODE_COVERAGE ?= ON
 LIT ?= ON
 PARALLEL ?= ON
-TOOLCHAIN ?= gcc
 VALGRIND ?= OFF
 WARNINGS ?= ON
 
