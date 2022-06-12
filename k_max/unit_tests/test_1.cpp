@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Test
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS // NOLINT
 
 #include <vector>
 
