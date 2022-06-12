@@ -1,3 +1,16 @@
 ---
-Checks:          '-*'
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  llvm-include-order,
+  llvm-namespace-comment,
+  misc-misleading-identifier,
+  misc-misplaced-const,
+  misc-new-delete-overloads,
+  misc-non-copyable-objects,
+  misc-throw-by-value-catch-by-reference,
+  modernize-*,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -modernize-use-trailing-return-type,
 
