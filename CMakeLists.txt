@@ -50,3 +50,4 @@ if(CODE_COVERAGE)
 endif()
 
 generic_install()
+configure_test_install_project()
