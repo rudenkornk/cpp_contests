@@ -9,8 +9,6 @@ target_sources(
             include
             FILES
             include/missing_numbers/solution.hpp)
-target_include_directories(missing_numbers INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                                                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_features(missing_numbers INTERFACE cxx_std_20)
 target_register_for_install(missing_numbers)
 
