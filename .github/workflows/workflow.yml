@@ -19,31 +19,55 @@ jobs:
         os: [ubuntu-20.04, windows-2019]
         build_type: [Debug, Release]
         toolchain: [gcc, llvm, msvc]
-        mode: [normal, code_coverage, valgrind]
+        clang_tidy: [clang_tidy_off]
+        code_coverage: [code_coverage_off]
+        valgrind: [valgrind_off]
         exclude:
           - os: windows-2019
             toolchain: gcc
-          - os: windows-2019
-            mode: valgrind
-          - os: windows-2019
-            mode: code_coverage
 
           - os: ubuntu-20.04
             toolchain: msvc
-          - os: ubuntu-20.04
-            build_type: Release
-            mode: valgrind
-          - os: ubuntu-20.04
-            build_type: Release
-            mode: code_coverage
+
           - os: ubuntu-20.04
             build_type: Debug
-            mode: normal
+            clang_tidy: clang_tidy_off
+            code_coverage: code_coverage_off
+            valgrind: valgrind_off
 
-          - os: ubuntu-20.04 # looks like latest llvm emit debug info, not supported by valgrind
+        include:
+          # clang_tidy
+          - os: ubuntu-20.04
             build_type: Debug
             toolchain: llvm
-            mode: valgrind
+            clang_tidy: clang_tidy_on
+            code_coverage: code_coverage_off
+            valgrind: valgrind_off
+
+          # code_coverage
+          - os: ubuntu-20.04
+            build_type: Debug
+            toolchain: llvm
+            clang_tidy: clang_tidy_off
+            code_coverage: code_coverage_on
+            valgrind: valgrind_off
+
+          # code_coverage
+          - os: ubuntu-20.04
+            build_type: Debug
+            toolchain: gcc
+            clang_tidy: clang_tidy_off
+            code_coverage: code_coverage_on
+            valgrind: valgrind_off
+
+          # valgrind
+          - os: ubuntu-20.04
+            build_type: Debug
+            toolchain: gcc
+            clang_tidy: clang_tidy_off
+            code_coverage: code_coverage_off
+            valgrind: valgrind_on
+
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -58,16 +82,19 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        CODE_COVERAGE=$([[ '${{ matrix.mode }}' == 'code_coverage' ]] && echo ON || echo OFF)
-        VALGRIND=$([[ '${{ matrix.mode }}' == 'valgrind' ]] && echo ON || echo OFF)
-        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
+        CLANG_TIDY=$([[ '${{ matrix.clang_tidy }}' == 'clang_tidy_on' ]] && echo ON || echo OFF)
+        CODE_COVERAGE=$([[ '${{ matrix.code_coverage }}' == 'code_coverage_on' ]] && echo ON || echo OFF)
+        VALGRIND=$([[ '${{ matrix.valgrind }}' == 'valgrind_on' ]] && echo ON || echo OFF)
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
-        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
-        echo "PARALLEL=ON" >> $GITHUB_ENV
-        echo "LIT=ON" >> $GITHUB_ENV
-        echo "CODE_COVERAGE=$CODE_COVERAGE" >> $GITHUB_ENV
-        echo "VALGRIND=$VALGRIND" >> $GITHUB_ENV
         echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
+        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
+        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
+        echo "CLANG_TIDY=$CLANG_TIDY" >> $GITHUB_ENV
+        echo "CODE_COVERAGE=$CODE_COVERAGE" >> $GITHUB_ENV
+        echo "LIT=ON" >> $GITHUB_ENV
+        echo "PARALLEL=ON" >> $GITHUB_ENV
+        echo "VALGRIND=$VALGRIND" >> $GITHUB_ENV
+        echo "WARNINGS=ON" >> $GITHUB_ENV
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
