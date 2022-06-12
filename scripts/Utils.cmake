@@ -114,3 +114,31 @@ function(target_add_headers_as_sources TARGET FROM)
     target_sources(${TARGET} PRIVATE ${header_files})
   endforeach()
 endfunction()
+
+# Helper for HEADER_SET where there is multiple possible base directories for a certain header
+function(get_relative_path out_var)
+  set(options)
+  set(oneValueArgs PATH)
+  set(multiValueArgs BASE_DIRS)
+  cmake_parse_arguments(PARSE_ARGV 1 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+
+  if(NOT DEFINED out_var)
+    message(FATAL_ERROR "OUTPUT_VARIABLE argument is mandatory.")
+  endif()
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Too many arguments.")
+  endif()
+
+  foreach(base_dir ${ARG_BASE_DIRS})
+    cmake_path(IS_PREFIX base_dir "${ARG_PATH}" result)
+    if(result)
+      cmake_path(RELATIVE_PATH ARG_PATH BASE_DIRECTORY "${base_dir}")
+      cmake_path(NORMAL_PATH ARG_PATH)
+      set(${out_var}
+          ${ARG_PATH}
+          PARENT_SCOPE)
+      return()
+    endif()
+  endforeach()
+  message(FATAL_ERROR "Cannot find appropriate BASE_DIR from (${ARG_BASE_DIRS}) for a given PATH (${ARG_PATH}).")
+endfunction()
