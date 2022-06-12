@@ -14,7 +14,7 @@ BUILD_TYPE ?= Debug
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 
 CORES := $(shell (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors)
-PARALLEL_OPTION := $(shell if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)})
+PARALLEL_OPTION := $(shell if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"})
 TOOLSET := $(shell \
              if("$(TOOLCHAIN)" -eq "msvc"){return "v143"} \
              elseif("$(TOOLCHAIN)" -eq "llvm"){return "ClangCL"} \
