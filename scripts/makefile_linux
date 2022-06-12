@@ -3,6 +3,7 @@ SHELL = /usr/bin/env bash
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
+CLANG_TIDY ?= ON
 CODE_COVERAGE ?= ON
 GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
@@ -40,6 +41,7 @@ config:
 		 -S . \
 		 -B "$(BUILD_DIR)" \
 		 -G "$(GENERATOR)" \
+		 -DCLANG_TIDY=$(CLANG_TIDY) \
 		 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		 -DCODE_COVERAGE=$(CODE_COVERAGE) \
 		 -DLIT=$(LIT) \

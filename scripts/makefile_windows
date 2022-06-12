@@ -4,6 +4,7 @@ SHELL := pwsh.exe
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
+CLANG_TIDY ?= ON
 CODE_COVERAGE ?= OFF
 GENERATOR ?= Visual Studio 17 2022
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
@@ -28,6 +29,7 @@ config:
 		#> -B "$(BUILD_DIR)" <#\
 		#> -G "$(GENERATOR)" <#\
 		#> -T "$(TOOLSET)" <#\
+		#> -DCLANG_TIDY=$(CLANG_TIDY) <#\
 		#> -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <#\
 		#> -DCODE_COVERAGE=$(CODE_COVERAGE) <#\
 		#> -DLIT=$(LIT) <#\
