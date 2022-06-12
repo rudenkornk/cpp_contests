@@ -2,16 +2,16 @@
 SHELL := pwsh.exe
 .SHELLFLAGS := -Command
 
-TOOLCHAIN ?= msvc
 BUILD_DIR ?= build
-GENERATOR ?= Visual Studio 17 2022
-PARALLEL ?= ON
-WARNINGS ?= ON
-LIT ?= ON
-CODE_COVERAGE ?= OFF
-VALGRIND := OFF
 BUILD_TYPE ?= Debug
+CODE_COVERAGE ?= OFF
+GENERATOR ?= Visual Studio 17 2022
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
+LIT ?= ON
+PARALLEL ?= ON
+TOOLCHAIN ?= msvc
+VALGRIND := OFF
+WARNINGS ?= ON
 
 CORES := $(shell (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors)
 PARALLEL_OPTION := $(shell if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"})
