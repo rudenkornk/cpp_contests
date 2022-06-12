@@ -23,7 +23,18 @@ TOOLSET := $(shell \
 
 .PHONY: config
 config:
-	cmake -S . -B "$(BUILD_DIR)" -G "$(GENERATOR)" -T "$(TOOLSET)" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DWARNINGS=$(WARNINGS) -DPARALLEL_TESTING=$(PARALLEL) -DLIT=$(LIT) -DVALGRIND=$(VALGRIND) -DCODE_COVERAGE=$(CODE_COVERAGE)
+	cmake <#\
+		#> -S . <#\
+		#> -B "$(BUILD_DIR)" <#\
+		#> -G "$(GENERATOR)" <#\
+		#> -T "$(TOOLSET)" <#\
+		#> -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <#\
+		#> -DCODE_COVERAGE=$(CODE_COVERAGE) <#\
+		#> -DLIT=$(LIT) <#\
+		#> -DPARALLEL_TESTING=$(PARALLEL) <#\
+		#> -DVALGRIND=$(VALGRIND) <#\
+		#> -DWARNINGS=$(WARNINGS) <#\
+		#>
 
 .PHONY: build
 build:
