@@ -56,7 +56,7 @@ test_install:
 	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
 ###################### linters ######################
-COMMIT ?= HEAD^
+COMMIT ?= origin/main
 CLANG_FORMAT_OUTPUT ?= in_place
 CLANG_TIDY_OUTPUT ?= patch
 

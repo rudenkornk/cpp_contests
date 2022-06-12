@@ -104,9 +104,13 @@ jobs:
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
         echo "CLANG_FORMAT_OUTPUT=patch" >> $GITHUB_ENV
         echo "CLANG_TIDY_OUTPUT=patch" >> $GITHUB_ENV
+        echo "COMMIT=HEAD^" >> $GITHUB_ENV
+        echo "PARALLEL=ON" >> $GITHUB_ENV
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       run: make cpp_contests_container
+    - name: Configure
+      run: make in_docker TARGET=config
     - name: Run linter
       run: make in_docker TARGET=${{ matrix.tool }}
     - name: Check
