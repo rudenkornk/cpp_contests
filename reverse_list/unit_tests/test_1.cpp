@@ -13,7 +13,7 @@
 void test_reverse_list(std::initializer_list<int> init) {
   // Use vector as container to avoid memory leaks
   std::vector<list_node<int>> container;
-  size_t n = init.size();
+  std::size_t n = init.size();
   container.reserve(n);
 
   list_node<int> *head = nullptr;
