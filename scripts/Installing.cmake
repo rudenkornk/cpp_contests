@@ -1,8 +1,28 @@
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+include(GenerateExportHeader)
 include(Utils)
 
 define_property(TARGET PROPERTY ADD_TO_INSTALLATION)
+
+function(target_setup_symbols_visibility TARGET)
+  set_property(TARGET ${TARGET} PROPERTY VISIBILITY_INLINES_HIDDEN ON)
+  set_property(TARGET ${TARGET} PROPERTY CXX_VISIBILITY_PRESET hidden)
+  generate_export_header(${TARGET})
+
+  set(base_dir ${CMAKE_CURRENT_BINARY_DIR}/..)
+  cmake_path(NORMAL_PATH base_dir)
+  target_sources(
+    ${TARGET}
+    PUBLIC FILE_SET
+           ${TARGET}_export_header
+           TYPE
+           HEADERS
+           BASE_DIRS
+           ${base_dir}
+           FILES
+           ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_export.h)
+endfunction()
 
 function(target_register_for_install TARGET)
   set_property(TARGET ${TARGET} PROPERTY ADD_TO_INSTALLATION ON)
