@@ -25,6 +25,7 @@ Config your system using provided scripts from docker repo:
 cmake -B build
 cmake --build build
 ctest --test-dir build
+ctest --install build --prefix build/install/
 ```
 
 ### Option 2: Use make wrapper with preconfigured recommended settings
@@ -32,4 +33,5 @@ ctest --test-dir build
 make config
 make build
 make test
+make install
 ```
