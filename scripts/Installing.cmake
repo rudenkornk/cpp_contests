@@ -6,8 +6,8 @@ include(Utils)
 define_property(TARGET PROPERTY ADD_TO_INSTALLATION)
 
 function(target_setup_symbols_visibility TARGET)
-  set_property(TARGET ${TARGET} PROPERTY VISIBILITY_INLINES_HIDDEN ON)
-  set_property(TARGET ${TARGET} PROPERTY CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(${TARGET} PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+  set_target_properties(${TARGET} PROPERTIES CXX_VISIBILITY_PRESET hidden)
   generate_export_header(${TARGET})
 
   set(base_dir ${CMAKE_CURRENT_BINARY_DIR}/..)
@@ -25,7 +25,7 @@ function(target_setup_symbols_visibility TARGET)
 endfunction()
 
 function(target_register_for_install TARGET)
-  set_property(TARGET ${TARGET} PROPERTY ADD_TO_INSTALLATION ON)
+  set_target_properties(${TARGET} PROPERTIES ADD_TO_INSTALLATION ON)
 endfunction()
 
 function(generic_install)
