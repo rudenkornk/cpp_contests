@@ -1,16 +1,16 @@
 # This makefile only has helper targets, it is not meant to handle dependencies --- this is cmake's job
 SHELL = /usr/bin/env bash
 
-TOOLCHAIN ?= gcc
 BUILD_DIR ?= build
-GENERATOR ?= Ninja Multi-Config
-PARALLEL ?= ON
-WARNINGS ?= ON
-LIT ?= ON
-CODE_COVERAGE ?= ON
-VALGRIND ?= OFF
 BUILD_TYPE ?= Debug
+CODE_COVERAGE ?= ON
+GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
+LIT ?= ON
+PARALLEL ?= ON
+TOOLCHAIN ?= gcc
+VALGRIND ?= OFF
+WARNINGS ?= ON
 
 CORES := $(shell nproc --all)
 PARALLEL_OPTION := $(shell [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)")
