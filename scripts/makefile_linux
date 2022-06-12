@@ -50,6 +50,10 @@ test:
 install:
 	cmake --install "$(BUILD_DIR)" --config $(BUILD_TYPE) --prefix $(INSTALL_PREFIX)
 
+.PHONY: test_install
+test_install:
+	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" CC=$(CC) CXX=$(CXX) cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR)"
+	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
 ###################### linters ######################
 COMMIT ?= HEAD^
