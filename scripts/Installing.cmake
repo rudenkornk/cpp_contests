@@ -5,6 +5,10 @@ include(Utils)
 
 define_property(TARGET PROPERTY ADD_TO_INSTALLATION)
 
+if(NOT APPLE)
+  set(CMAKE_INSTALL_RPATH $ORIGIN)
+endif()
+
 function(target_setup_symbols_visibility TARGET)
   set_target_properties(${TARGET} PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
   set_target_properties(${TARGET} PROPERTIES CXX_VISIBILITY_PRESET hidden)
