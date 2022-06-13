@@ -106,13 +106,13 @@ ifneq ($(DOCKER_CONTAINER_ID),)
 endif
 	docker run --interactive --tty --detach <#\
 		#> --env BUILD_DIR="$(BUILD_DIR)" <#\
-		#> --env GENERATOR="$(GENERATOR)" <#\
 		#> --env BUILD_TYPE="$(BUILD_TYPE)" <#\
-		#> --env PARALLEL="$(PARALLEL)" <#\
-		#> --env LIT="$(PARALLEL)" <#\
-		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
-		#> --env VALGRIND="$(VALGRIND)" <#\
+		#> --env GENERATOR="$(GENERATOR)" <#\
 		#> --env TOOLCHAIN="$(TOOLCHAIN)" <#\
+		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
+		#> --env LIT="$(PARALLEL)" <#\
+		#> --env PARALLEL="$(PARALLEL)" <#\
+		#> --env VALGRIND="$(VALGRIND)" <#\
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
 		#> --user ContainerUser <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
