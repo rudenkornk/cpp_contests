@@ -1,12 +1,12 @@
 include(ProcessorCount)
 include(Utils)
 
-define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
 define_property(GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
-define_property(TARGET PROPERTY VALGRIND_ENABLED)
-define_property(GLOBAL PROPERTY VALGRIND_ENABLED)
 define_property(GLOBAL PROPERTY LIT_TESTS_ENABLED)
 define_property(GLOBAL PROPERTY TEST_WORKERS)
+define_property(GLOBAL PROPERTY VALGRIND_ENABLED)
+define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
+define_property(TARGET PROPERTY VALGRIND_ENABLED)
 
 function(enable_parallel_testing)
   if(${ARGC} GREATER 1)
