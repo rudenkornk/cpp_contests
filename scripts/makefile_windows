@@ -4,7 +4,7 @@ SHELL := pwsh.exe
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
-GENERATOR ?= Visual Studio 17 2022
+GENERATOR ?= vs
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= msvc
 CLANG_TIDY ?= ON
@@ -21,9 +21,14 @@ TOOLSET := $(shell \
              elseif("$(TOOLCHAIN)" -eq "llvm"){return "ClangCL"} \
              else{throw "Unknown toolchain!"} \
             )
+GENERATOR_FULL := $(shell \
+                if("$(GENERATOR)" -eq "vs"){return "Visual Studio 17 2022"} \
+                elseif("$(GENERATOR)" -eq "ninja"){return "Ninja Multi-Config"} \
+                else{throw "Unknown generator!"} \
+               )
 TOOLSET_OPTION := $(shell \
-                if("$(GENERATOR)" -eq "Visual Studio 17 2022"){return "-T `"$(TOOLSET)`""} \
-                elseif("$(GENERATOR)" -eq "Ninja Multi-Config"){return ""} \
+                if("$(GENERATOR)" -eq "vs"){return "-T `"$(TOOLSET)`""} \
+                elseif("$(GENERATOR)" -eq "ninja"){return ""} \
                 else{throw "Unknown generator!"} \
                )
 CC := $(shell \
@@ -37,8 +42,8 @@ CXX := $(shell \
          else{throw "Unknown toolchain!"} \
         )
 CONFIG_ENV := $(shell \
-                if("$(GENERATOR)" -eq "Visual Studio 17 2022"){return ""} \
-                elseif("$(GENERATOR)" -eq "Ninja Multi-Config"){return "`$$env:CC=`"$(CC)`";`$$env:CXX=`"$(CXX)`"; "} \
+                if("$(GENERATOR)" -eq "vs"){return ""} \
+                elseif("$(GENERATOR)" -eq "ninja"){return "`$$env:CC=`"$(CC)`";`$$env:CXX=`"$(CXX)`"; "} \
                 else{throw "Unknown generator!"} \
                )
 
@@ -47,7 +52,7 @@ config:
 	$(CONFIG_ENV) cmake <#\
 		#> -S . <#\
 		#> -B "$(BUILD_DIR)" <#\
-		#> -G "$(GENERATOR)" <#\
+		#> -G "$(GENERATOR_FULL)" <#\
 		#> $(TOOLSET_OPTION) <#\
 		#> -DCLANG_TIDY=$(CLANG_TIDY) <#\
 		#> -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <#\
@@ -72,7 +77,7 @@ install:
 
 .PHONY: test_install
 test_install:
-	$$env:$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)"; cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR)" -T "$(TOOLSET)"
+	$$env:$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)"; cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR_FULL)" -T "$(TOOLSET)"
 	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
 .PHONY: package

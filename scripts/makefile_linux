@@ -3,7 +3,7 @@ SHELL = /usr/bin/env bash
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
-GENERATOR ?= Ninja Multi-Config
+GENERATOR ?= ninja
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= gcc
 CLANG_TIDY ?= ON
@@ -34,13 +34,20 @@ CXX := $(shell \
           echo "unknown_toolchain"; \
         fi \
        )
+GENERATOR_FULL := $(shell \
+                    if [[ "$(GENERATOR)" == "ninja" ]]; then \
+                      echo "Ninja Multi-Config"; \
+                    else \
+                      echo "unknown_generator"; \
+                    fi \
+                   )
 
 .PHONY: config
 config:
 	CC=$(CC) CXX=$(CXX) cmake \
 		 -S . \
 		 -B "$(BUILD_DIR)" \
-		 -G "$(GENERATOR)" \
+		 -G "$(GENERATOR_FULL)" \
 		 -DCLANG_TIDY=$(CLANG_TIDY) \
 		 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		 -DCODE_COVERAGE=$(CODE_COVERAGE) \
@@ -63,7 +70,7 @@ install:
 
 .PHONY: test_install
 test_install:
-	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" CC=$(CC) CXX=$(CXX) cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR)"
+	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" CC=$(CC) CXX=$(CXX) cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR_FULL)"
 	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
 .PHONY: package
