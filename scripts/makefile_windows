@@ -21,14 +21,34 @@ TOOLSET := $(shell \
              elseif("$(TOOLCHAIN)" -eq "llvm"){return "ClangCL"} \
              else{throw "Unknown toolchain!"} \
             )
+TOOLSET_OPTION := $(shell \
+                if("$(GENERATOR)" -eq "Visual Studio 17 2022"){return "-T `"$(TOOLSET)`""} \
+                elseif("$(GENERATOR)" -eq "Ninja Multi-Config"){return ""} \
+                else{throw "Unknown generator!"} \
+               )
+CC := $(shell \
+        if("$(TOOLCHAIN)" -eq "llvm"){return "clang"} \
+        elseif("$(TOOLCHAIN)" -eq "msvc"){return "cl"} \
+        else{throw "Unknown toolchain!"} \
+       )
+CXX := $(shell \
+         if("$(TOOLCHAIN)" -eq "llvm"){return "clang++"} \
+         elseif("$(TOOLCHAIN)" -eq "msvc"){return "cl"} \
+         else{throw "Unknown toolchain!"} \
+        )
+CONFIG_ENV := $(shell \
+                if("$(GENERATOR)" -eq "Visual Studio 17 2022"){return ""} \
+                elseif("$(GENERATOR)" -eq "Ninja Multi-Config"){return "`$$env:CC=`"$(CC)`";`$$env:CXX=`"$(CXX)`"; "} \
+                else{throw "Unknown generator!"} \
+               )
 
 .PHONY: config
 config:
-	cmake <#\
+	$(CONFIG_ENV) cmake <#\
 		#> -S . <#\
 		#> -B "$(BUILD_DIR)" <#\
 		#> -G "$(GENERATOR)" <#\
-		#> -T "$(TOOLSET)" <#\
+		#> $(TOOLSET_OPTION) <#\
 		#> -DCLANG_TIDY=$(CLANG_TIDY) <#\
 		#> -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <#\
 		#> -DCODE_COVERAGE=$(CODE_COVERAGE) <#\
