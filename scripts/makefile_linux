@@ -7,10 +7,13 @@ GENERATOR ?= ninja
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= gcc
 
+ASAN ?= OFF
 CLANG_TIDY ?= ON
 CODE_COVERAGE ?= ON
 LIT ?= ON
 PARALLEL ?= ON
+TSAN ?= OFF
+UBSAN ?= OFF
 VALGRIND ?= OFF
 WARNINGS ?= ON
 
@@ -49,11 +52,14 @@ config:
 		 -S . \
 		 -B "$(BUILD_DIR)" \
 		 -G "$(GENERATOR_FULL)" \
+		 -DASAN=$(ASAN) \
 		 -DCLANG_TIDY=$(CLANG_TIDY) \
 		 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		 -DCODE_COVERAGE=$(CODE_COVERAGE) \
 		 -DLIT=$(LIT) \
 		 -DPARALLEL_TESTING=$(PARALLEL) \
+		 -DTSAN=$(TSAN) \
+		 -DUBSAN=$(UBSAN) \
 		 -DVALGRIND=$(VALGRIND) \
 		 -DWARNINGS=$(WARNINGS) \
 
@@ -123,10 +129,13 @@ endif
 		--env INSTALL_PREFIX="$(INSTALL_PREFIX)" \
 		--env TOOLCHAIN="$(TOOLCHAIN)" \
 		\
+		--env ASAN="$(ASAN)" \
 		--env CLANG_TIDY="$(CLANG_TIDY)" \
 		--env CODE_COVERAGE="$(CODE_COVERAGE)" \
 		--env LIT="$(PARALLEL)" \
 		--env PARALLEL="$(PARALLEL)" \
+		--env TSAN="$(TSAN)" \
+		--env UBSAN="$(UBSAN)" \
 		--env VALGRIND="$(VALGRIND)" \
 		--env WARNINGS="$(WARNINGS)" \
 		\
