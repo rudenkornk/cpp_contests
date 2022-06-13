@@ -120,13 +120,17 @@ endif
 		--env BUILD_DIR="$(BUILD_DIR)" \
 		--env BUILD_TYPE="$(BUILD_TYPE)" \
 		--env GENERATOR="$(GENERATOR)" \
+		--env INSTALL_PREFIX="$(INSTALL_PREFIX)" \
 		--env TOOLCHAIN="$(TOOLCHAIN)" \
 		\
+		--env CLANG_TIDY="$(CLANG_TIDY)" \
 		--env CODE_COVERAGE="$(CODE_COVERAGE)" \
 		--env LIT="$(PARALLEL)" \
 		--env PARALLEL="$(PARALLEL)" \
 		--env VALGRIND="$(VALGRIND)" \
+		--env WARNINGS="$(WARNINGS)" \
 		\
+		--env COMMIT="$(COMMIT)" \
 		--env CLANG_FORMAT_OUTPUT="$(CLANG_FORMAT_OUTPUT)" \
 		--env CLANG_TIDY_OUTPUT="$(CLANG_TIDY_OUTPUT)" \
 		\
