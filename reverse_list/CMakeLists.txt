@@ -10,6 +10,6 @@ target_sources(
             FILES
             include/reverse_list/solution.hpp)
 target_compile_features(reverse_list INTERFACE cxx_std_20)
-target_register_for_install(reverse_list)
+target_setup_for_install(reverse_list)
 
 add_subdirectory(unit_tests)
