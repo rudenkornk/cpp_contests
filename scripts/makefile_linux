@@ -66,6 +66,10 @@ test_install:
 	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" CC=$(CC) CXX=$(CXX) cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR)"
 	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
+.PHONY: package
+package:
+	cd build && cpack -C CPackConfig.cmake
+
 ###################### linters ######################
 COMMIT ?= origin/main
 CLANG_FORMAT_OUTPUT ?= in_place
