@@ -44,6 +44,15 @@ jobs:
 
         include:
           # clang_tidy
+          - os: windows-2019
+            build_type: Debug
+            toolchain: msvc
+            generator: ninja
+            clang_tidy: clang_tidy_on
+            code_coverage: code_coverage_off
+            valgrind: valgrind_off
+
+          # clang_tidy
           - os: ubuntu-20.04
             build_type: Debug
             toolchain: llvm
