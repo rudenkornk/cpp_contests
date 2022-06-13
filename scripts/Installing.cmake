@@ -28,7 +28,7 @@ function(target_setup_symbols_visibility TARGET)
            ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_export.h)
 endfunction()
 
-function(target_register_for_install TARGET)
+function(target_setup_for_install TARGET)
   string(REGEX MATCH "^[0-9]+" soversion ${CMAKE_PROJECT_VERSION})
   set_target_properties(${TARGET} PROPERTIES SOVERSION ${soversion} VERSION ${CMAKE_PROJECT_VERSION})
   set_target_properties(${TARGET} PROPERTIES ADD_TO_INSTALLATION ON)
