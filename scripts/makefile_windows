@@ -78,7 +78,12 @@ install:
 
 .PHONY: test_install
 test_install:
-	$$env:$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)"; cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR_FULL)" -T "$(TOOLSET)"
+	$$env:$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)"; $(CONFIG_ENV); cmake <#\
+		#> -S "$(BUILD_DIR)/test_install" <#\
+		#> -B "$(BUILD_DIR)/test_install/build" <#\
+		#> -G "$(GENERATOR_FULL)" <#\
+		#> $(TOOLSET_OPTION) <#\
+		#>
 	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
 
 .PHONY: package
