@@ -55,3 +55,6 @@ endif()
 
 generic_install()
 configure_test_install_project()
+configure_cpack_options(EMAIL "rudenkornk@gmail.com")
+
+include(CPack)
