@@ -21,11 +21,11 @@ jobs:
         toolchain: [gcc, llvm, msvc]
         generator: [ninja, vs]
         asan: [asan_off]
-        clang_tidy: [clang_tidy_off]
-        code_coverage: [code_coverage_off]
+        clang_tidy: [tidy_off]
+        code_coverage: [cov_off]
         tsan: [tsan_off]
         ubsan: [ubsan_off]
-        valgrind: [valgrind_off]
+        valgrind: [valg_off]
         exclude:
           - os: windows-2019
             toolchain: gcc
@@ -46,11 +46,11 @@ jobs:
             toolchain: msvc
             generator: ninja
             asan: asan_on
-            clang_tidy: clang_tidy_on
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_on
+            code_coverage: cov_off
             tsan: tsan_off
             ubsan: ubsan_off
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # llvm + clang_tidy + asan + ubsan
           - os: ubuntu-20.04
@@ -58,11 +58,11 @@ jobs:
             toolchain: llvm
             generator: ninja
             asan: asan_on
-            clang_tidy: clang_tidy_on
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_on
+            code_coverage: cov_off
             tsan: tsan_off
             ubsan: ubsan_on
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # gcc + clang_tidy + asan + ubsan
           - os: ubuntu-20.04
@@ -70,11 +70,11 @@ jobs:
             toolchain: gcc
             generator: ninja
             asan: asan_on
-            clang_tidy: clang_tidy_on
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_on
+            code_coverage: cov_off
             tsan: tsan_off
             ubsan: ubsan_on
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # llvm + tsan
           - os: ubuntu-20.04
@@ -82,11 +82,11 @@ jobs:
             toolchain: llvm
             generator: ninja
             asan: asan_off
-            clang_tidy: clang_tidy_off
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_off
+            code_coverage: cov_off
             tsan: tsan_on
             ubsan: ubsan_off
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # gcc + tsan
           - os: ubuntu-20.04
@@ -94,11 +94,11 @@ jobs:
             toolchain: gcc
             generator: ninja
             asan: asan_off
-            clang_tidy: clang_tidy_off
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_off
+            code_coverage: cov_off
             tsan: tsan_on
             ubsan: ubsan_off
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # llvm + code_coverage
           - os: ubuntu-20.04
@@ -106,11 +106,11 @@ jobs:
             toolchain: llvm
             generator: ninja
             asan: asan_off
-            clang_tidy: clang_tidy_off
-            code_coverage: code_coverage_on
+            clang_tidy: tidy_off
+            code_coverage: cov_on
             tsan: tsan_off
             ubsan: ubsan_off
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # gcc + code_coverage
           - os: ubuntu-20.04
@@ -118,11 +118,11 @@ jobs:
             toolchain: gcc
             generator: ninja
             asan: asan_off
-            clang_tidy: clang_tidy_off
-            code_coverage: code_coverage_on
+            clang_tidy: tidy_off
+            code_coverage: cov_on
             tsan: tsan_off
             ubsan: ubsan_off
-            valgrind: valgrind_off
+            valgrind: valg_off
 
           # valgrind
           - os: ubuntu-20.04
@@ -130,11 +130,11 @@ jobs:
             toolchain: gcc
             generator: ninja
             asan: asan_off
-            clang_tidy: clang_tidy_off
-            code_coverage: code_coverage_off
+            clang_tidy: tidy_off
+            code_coverage: cov_off
             tsan: tsan_off
             ubsan: ubsan_off
-            valgrind: valgrind_on
+            valgrind: valg_on
 
     runs-on: ${{ matrix.os }}
     defaults:
@@ -151,11 +151,11 @@ jobs:
     - name: Set environment
       run: |
         ASAN=$([[ '${{ matrix.asan }}' == 'asan_on' ]] && echo ON || echo OFF)
-        CLANG_TIDY=$([[ '${{ matrix.clang_tidy }}' == 'clang_tidy_on' ]] && echo ON || echo OFF)
-        CODE_COVERAGE=$([[ '${{ matrix.code_coverage }}' == 'code_coverage_on' ]] && echo ON || echo OFF)
+        CLANG_TIDY=$([[ '${{ matrix.clang_tidy }}' == 'tidy_on' ]] && echo ON || echo OFF)
+        CODE_COVERAGE=$([[ '${{ matrix.code_coverage }}' == 'cov_on' ]] && echo ON || echo OFF)
         TSAN=$([[ '${{ matrix.tsan }}' == 'tsan_on' ]] && echo ON || echo OFF)
         UBSAN=$([[ '${{ matrix.ubsan }}' == 'ubsan_on' ]] && echo ON || echo OFF)
-        VALGRIND=$([[ '${{ matrix.valgrind }}' == 'valgrind_on' ]] && echo ON || echo OFF)
+        VALGRIND=$([[ '${{ matrix.valgrind }}' == 'valg_on' ]] && echo ON || echo OFF)
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
         echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
         echo "GENERATOR=${{ matrix.generator }}" >> $GITHUB_ENV
