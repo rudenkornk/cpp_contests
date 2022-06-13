@@ -114,3 +114,23 @@ function(configure_test_install_project)
                  ${CMAKE_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/scripts/test_install/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)
 endfunction()
+
+function(configure_cpack_options)
+  set(options)
+  set(oneValueArgs EMAIL)
+  set(multiValueArgs)
+  cmake_parse_arguments(PARSE_ARGV 0 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Too many arguments.")
+  endif()
+  if(NOT DEFINED ARG_EMAIL)
+    message(FATAL_ERROR "EMAIL is required argument.")
+  endif()
+
+  set(EMAIL ${ARG_EMAIL})
+  configure_file("${PROJECT_SOURCE_DIR}/scripts/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake" @ONLY)
+  set(CPACK_PROJECT_CONFIG_FILE
+      "${PROJECT_BINARY_DIR}/CPackOptions.cmake"
+      PARENT_SCOPE)
+endfunction()
