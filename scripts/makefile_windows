@@ -7,6 +7,7 @@ BUILD_TYPE ?= Debug
 GENERATOR ?= vs
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= msvc
+
 CLANG_TIDY ?= ON
 CODE_COVERAGE ?= OFF
 LIT ?= ON
@@ -109,10 +110,12 @@ endif
 		#> --env BUILD_TYPE="$(BUILD_TYPE)" <#\
 		#> --env GENERATOR="$(GENERATOR)" <#\
 		#> --env TOOLCHAIN="$(TOOLCHAIN)" <#\
+		#> <#\
 		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
 		#> --env LIT="$(PARALLEL)" <#\
 		#> --env PARALLEL="$(PARALLEL)" <#\
 		#> --env VALGRIND="$(VALGRIND)" <#\
+		#> <#\
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
 		#> --user ContainerUser <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
