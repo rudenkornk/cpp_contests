@@ -42,7 +42,7 @@ function(add_code_coverage_test)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_test(
       NAME merge_code_coverage_data
-      COMMAND bash -c "llvm-profdata merge --output profdata $(find -name *.profraw)"
+      COMMAND bash -c "llvm-profdata merge --sparse --output profdata $(find -name *.profraw)"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}" FIXTURES_SETUP merge_code_coverage_data)
 
