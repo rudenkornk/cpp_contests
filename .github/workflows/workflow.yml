@@ -110,6 +110,8 @@ jobs:
       run: make in_docker TARGET=install
     - name: Test install
       run: make in_docker TARGET=test_install
+    - name: Create package
+      run: make in_docker TARGET=package
 
   lint:
     if: ${{ github.event_name == 'pull_request' }}
