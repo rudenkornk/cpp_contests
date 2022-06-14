@@ -1,7 +1,9 @@
-define_property(TARGET PROPERTY WARNINGS_ENABLED)
-define_property(GLOBAL PROPERTY WARNINGS_ENABLED)
+include(Utils)
+
+define_property(GLOBAL PROPERTY CLANG_TIDY_ACTIVATED)
+define_property(GLOBAL PROPERTY WARNINGS_ACTIVATED)
 define_property(TARGET PROPERTY CLANG_TIDY_ENABLED)
-define_property(GLOBAL PROPERTY CLANG_TIDY_ENABLED)
+define_property(TARGET PROPERTY WARNINGS_ENABLED)
 
 function(target_enable_warnings TARGET)
   if(NOT ${ARGC} EQUAL 1)
@@ -48,23 +50,33 @@ function(target_enable_clang_tidy TARGET)
   set_target_properties(${TARGET} PROPERTIES CLANG_TIDY_ENABLED ON)
 endfunction()
 
-function(enable_warnings)
-  set_property(GLOBAL PROPERTY WARNINGS_ENABLED ON)
+# Enable warnings for targets, which called target_enable_coding_standards
+function(activate_warnings)
+  set_property(GLOBAL PROPERTY WARNINGS_ACTIVATED ON)
 endfunction()
 
-function(enable_clang_tidy)
-  set_property(GLOBAL PROPERTY CLANG_TIDY_ENABLED ON)
+# Enable clang-tidy for targets, which called target_enable_coding_standards
+function(activate_clang_tidy)
+  set_property(GLOBAL PROPERTY CLANG_TIDY_ACTIVATED ON)
 endfunction()
 
 function(target_enable_coding_standards TARGET)
-  get_property(warnings_enabled GLOBAL PROPERTY WARNINGS_ENABLED)
-  if(warnings_enabled)
+  get_property(warnings_activated GLOBAL PROPERTY WARNINGS_ACTIVATED)
+  if(warnings_activated)
     target_enable_warnings(${TARGET})
   endif()
 
-  get_property(clang_tidy_enabled GLOBAL PROPERTY CLANG_TIDY_ENABLED)
-  if(clang_tidy_enabled)
+  get_property(clang_tidy_activated GLOBAL PROPERTY CLANG_TIDY_ACTIVATED)
+  if(clang_tidy_activated)
     target_enable_clang_tidy(${TARGET})
   endif()
 
+endfunction()
+
+# Enable coding standards for ALL targets, even if they do not ask for
+function(force_coding_standards)
+  get_targets(targets LIVE)
+  foreach(target ${targets})
+    target_enable_coding_standards(target)
+  endforeach()
 endfunction()
