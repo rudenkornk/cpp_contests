@@ -1,13 +1,16 @@
 include(ProcessorCount)
 include(Utils)
 
-define_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ENABLED)
-define_property(GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
+# ACTIVATED means that property will be enabled for those targets, which explicitly asked for it
+#
+# ENABLED means that the property is actually enabled
+define_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED)
+define_property(GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED)
 define_property(GLOBAL PROPERTY LIT_TESTS_ENABLED)
 define_property(GLOBAL PROPERTY TEST_WORKERS)
-define_property(GLOBAL PROPERTY THREAD_SANITIZER_ENABLED)
-define_property(GLOBAL PROPERTY UB_SANITIZER_ENABLED)
-define_property(GLOBAL PROPERTY VALGRIND_ENABLED)
+define_property(GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED)
+define_property(GLOBAL PROPERTY UB_SANITIZER_ACTIVATED)
+define_property(GLOBAL PROPERTY VALGRIND_ACTIVATED)
 define_property(TARGET PROPERTY ADDRESS_SANITIZER_ENABLED)
 define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
 define_property(TARGET PROPERTY THREAD_SANITIZER_ENABLED)
@@ -255,25 +258,30 @@ function(target_enable_valgrind TARGET)
   set_target_properties(${TARGET} PROPERTIES VALGRIND_ENABLED ON)
 endfunction()
 
-function(enable_address_sanitizer)
-  set_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ENABLED ON)
+# Enable address sanitizer for targets, which called target_enable_instrumentation
+function(activate_address_sanitizer)
+  set_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED ON)
 endfunction()
 
-function(enable_code_coverage)
-  set_property(GLOBAL PROPERTY CODE_COVERAGE_ENABLED ON)
+# Enable code coverage for targets, which called target_enable_instrumentation
+function(activate_code_coverage)
+  set_property(GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED ON)
 endfunction()
 
-function(enable_thread_sanitizer)
-  set_property(GLOBAL PROPERTY THREAD_SANITIZER_ENABLED ON)
+# Enable thread sanitizer for targets, which called target_enable_instrumentation
+function(activate_thread_sanitizer)
+  set_property(GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED ON)
 endfunction()
 
-function(enable_ub_sanitizer)
-  set_property(GLOBAL PROPERTY UB_SANITIZER_ENABLED ON)
+# Enable ub sanitizer for targets, which called target_enable_instrumentation
+function(activate_ub_sanitizer)
+  set_property(GLOBAL PROPERTY UB_SANITIZER_ACTIVATED ON)
 endfunction()
 
-function(enable_valgrind_testing)
+# Run tests under valgrind for targets, which called target_enable_instrumentation
+function(activate_valgrind_testing)
   find_program(valgrind valgrind REQUIRED)
-  set_property(GLOBAL PROPERTY VALGRIND_ENABLED ON)
+  set_property(GLOBAL PROPERTY VALGRIND_ACTIVATED ON)
 endfunction()
 
 function(enable_lit_tests)
@@ -284,28 +292,36 @@ function(enable_lit_tests)
 endfunction()
 
 function(target_enable_instrumentation TARGET)
-  get_property(address_sanitizer_enabled GLOBAL PROPERTY ADDRESS_SANITIZER_ENABLED)
-  if(address_sanitizer_enabled)
+  get_property(address_sanitizer_activated GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED)
+  if(address_sanitizer_activated)
     target_enable_address_sanitizer(${TARGET})
   endif()
 
-  get_property(code_coverage_enabled GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
-  if(code_coverage_enabled)
+  get_property(code_coverage_activated GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED)
+  if(code_coverage_activated)
     target_enable_code_coverage(${TARGET})
   endif()
 
-  get_property(thread_sanitizer_enabled GLOBAL PROPERTY THREAD_SANITIZER_ENABLED)
-  if(thread_sanitizer_enabled)
+  get_property(thread_sanitizer_activated GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED)
+  if(thread_sanitizer_activated)
     target_enable_thread_sanitizer(${TARGET})
   endif()
 
-  get_property(ub_sanitizer_enabled GLOBAL PROPERTY UB_SANITIZER_ENABLED)
-  if(ub_sanitizer_enabled)
+  get_property(ub_sanitizer_activated GLOBAL PROPERTY UB_SANITIZER_ACTIVATED)
+  if(ub_sanitizer_activated)
     target_enable_ub_sanitizer(${TARGET})
   endif()
 
-  get_property(valgrind_testing_enabled GLOBAL PROPERTY VALGRIND_ENABLED)
-  if(valgrind_testing_enabled)
+  get_property(valgrind_testing_activated GLOBAL PROPERTY VALGRIND_ACTIVATED)
+  if(valgrind_testing_activated)
     target_enable_valgrind(${TARGET})
   endif()
+endfunction()
+
+# Enable instrumentation for ALL targets, even if they do not ask for
+function(force_instumentation)
+  get_targets(targets LIVE)
+  foreach(target ${targets})
+    target_enable_instrumentation(target)
+  endforeach()
 endfunction()
