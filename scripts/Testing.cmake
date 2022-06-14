@@ -33,6 +33,18 @@ function(enable_parallel_testing)
 endfunction()
 
 function(add_code_coverage_test)
+  set(options)
+  set(oneValueArgs THRESHOLD)
+  set(multiValueArgs)
+  cmake_parse_arguments(PARSE_ARGV 0 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Too many arguments.")
+  endif()
+  if(NOT DEFINED ARG_THRESHOLD)
+    message(FATAL_ERROR "THRESHOLD is required argument.")
+  endif()
+
   get_targets(targets LIVE)
   get_tests(tests)
   foreach(target ${targets})
@@ -53,22 +65,42 @@ function(add_code_coverage_test)
     set_tests_properties(merge_code_coverage_data PROPERTIES DEPENDS "${tests}" FIXTURES_SETUP merge_code_coverage_data)
 
     foreach(target ${code_coveraged_targets})
-      list(APPEND objects -object $<TARGET_FILE:${target}>)
+      string(APPEND objects "-object $<TARGET_FILE:${target}> ")
     endforeach()
     add_test(
       NAME code_coverage_report
-      COMMAND llvm-cov report --instr-profile profdata ${objects}
+      COMMAND bash -c "llvm-cov report --instr-profile profdata ${objects} | tee ${CMAKE_BINARY_DIR}/code_coverage_report"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(code_coverage_report PROPERTIES FIXTURES_REQUIRED merge_code_coverage_data)
+    set_tests_properties(code_coverage_report PROPERTIES FIXTURES_SETUP code_coverage_report)
+
+    add_test(
+      NAME code_coverage_check
+      COMMAND
+        bash -c
+        "(( $(grep --only-matching --perl-regexp \"TOTAL(\\s+\\d+(\\.\\d+)?%?){8}\\s+\\K\\d+\" ${CMAKE_BINARY_DIR}/code_coverage_report) >= ${ARG_THRESHOLD} ))"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_tests_properties(code_coverage_check PROPERTIES FIXTURES_REQUIRED code_coverage_report)
 
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # also can be done with lcov: lcov --directory ${CMAKE_BINARY_DIR} --capture --output-file
-    # ${CMAKE_BINARY_DIR}/coverage_report/coverage.info lcov --summary ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
+    # ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
+    #
+    # lcov --summary ${CMAKE_BINARY_DIR}/coverage_report/coverage.info
     add_test(
       NAME code_coverage_report
-      COMMAND gcovr ${CMAKE_BINARY_DIR}
+      COMMAND bash -c "gcovr ${CMAKE_BINARY_DIR} | tee ${CMAKE_BINARY_DIR}/code_coverage_report"
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     set_tests_properties(code_coverage_report PROPERTIES DEPENDS "${tests}")
+    set_tests_properties(code_coverage_report PROPERTIES FIXTURES_SETUP code_coverage_report)
+
+    add_test(
+      NAME code_coverage_check
+      COMMAND
+        bash -c
+        "(( $(grep --only-matching --perl-regexp \"TOTAL(\\s+\\d+){2}\\s+\\K\\d+\" ${CMAKE_BINARY_DIR}/code_coverage_report) >= ${ARG_THRESHOLD} ))"
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    set_tests_properties(code_coverage_check PROPERTIES FIXTURES_REQUIRED code_coverage_report)
 
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(WARNING "Code coverage test not implemented for MSVC.")

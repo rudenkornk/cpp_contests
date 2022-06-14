@@ -62,7 +62,7 @@ add_subdirectory(reverse_list)
 add_subdirectory(valid_parenthesis)
 
 if(CODE_COVERAGE)
-  add_code_coverage_test()
+  add_code_coverage_test(THRESHOLD 80)
 endif()
 
 generic_install()
