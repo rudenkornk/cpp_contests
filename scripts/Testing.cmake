@@ -157,8 +157,8 @@ function(add_lit_tests)
 
   foreach(target ${TEST_TARGETS})
     get_target_property(target_name ${target} OUTPUT_NAME)
-    get_target_property(target_code_coverage_enabled ${target} CODE_COVERAGE_ENABLED)
-    if((target_code_coverage_enabled) AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+      # Code coverage support. If it is not enabled, LLVM_PROFILE_FILE variable does nothing
       cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "$(basename %s.profraw)" OUTPUT_VARIABLE llvm_profile)
       set(target_environment "LLVM_PROFILE_FILE=\\\"${llvm_profile}\\\" ")
     endif()
@@ -319,6 +319,8 @@ function(target_enable_instrumentation TARGET)
 endfunction()
 
 # Enable instrumentation for ALL targets, even if they do not ask for
+#
+# This will not work for valgrind though
 function(force_instumentation)
   get_targets(targets LIVE)
   foreach(target ${targets})
