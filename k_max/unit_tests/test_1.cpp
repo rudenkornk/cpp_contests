@@ -1,4 +1,7 @@
-#define BOOST_TEST_MODULE Test
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+
+#define BOOST_TEST_MODULE Test // NOLINT
 #define _CRT_SECURE_NO_WARNINGS // NOLINT
 
 #include <vector>
@@ -18,3 +21,6 @@ BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST((std::vector{6, 2, 2, 4, 6, 6, 6, 6, 5, 8, 8, 8, 8} ==
               k_max({6, 1, 2, 0, 0, 2, 4, 6, 1, 2, 3, 5, 8, 8, 8, 3}, 4)));
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTEND(cppcoreguidelines-pro-type-vararg)

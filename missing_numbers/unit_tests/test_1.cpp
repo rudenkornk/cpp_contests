@@ -1,4 +1,7 @@
-#define BOOST_TEST_MODULE Test
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+
+#define BOOST_TEST_MODULE Test // NOLINT
 #define _CRT_SECURE_NO_WARNINGS // NOLINT
 
 #include <cassert>
@@ -19,3 +22,6 @@ BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST(
       (std::pair(2u, 5u) == missing_numbers({7, 4, 1, 0, 3, 6, 9, 11, 10, 8})));
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTEND(cppcoreguidelines-pro-type-vararg)

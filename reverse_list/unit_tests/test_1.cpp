@@ -1,4 +1,7 @@
-#define BOOST_TEST_MODULE Test
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+
+#define BOOST_TEST_MODULE Test // NOLINT
 #define _CRT_SECURE_NO_WARNINGS // NOLINT
 
 #include <cassert>
@@ -39,3 +42,6 @@ BOOST_AUTO_TEST_CASE(main_test) {
   test_reverse_list({0});
   test_reverse_list({0, 1, 2, 3, 4});
 }
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTEND(cppcoreguidelines-pro-type-vararg)
