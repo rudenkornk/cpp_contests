@@ -4,17 +4,11 @@ include(Utils)
 # ACTIVATED means that property will be enabled for those targets, which explicitly asked for it
 #
 # ENABLED means that the property is actually enabled
-define_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED)
 define_property(GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED)
 define_property(GLOBAL PROPERTY LIT_TESTS_ENABLED)
 define_property(GLOBAL PROPERTY TEST_WORKERS)
-define_property(GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED)
-define_property(GLOBAL PROPERTY UB_SANITIZER_ACTIVATED)
 define_property(GLOBAL PROPERTY VALGRIND_ACTIVATED)
-define_property(TARGET PROPERTY ADDRESS_SANITIZER_ENABLED)
 define_property(TARGET PROPERTY CODE_COVERAGE_ENABLED)
-define_property(TARGET PROPERTY THREAD_SANITIZER_ENABLED)
-define_property(TARGET PROPERTY UB_SANITIZER_ENABLED)
 define_property(TARGET PROPERTY VALGRIND_ENABLED)
 
 function(enable_parallel_testing)
@@ -195,19 +189,6 @@ function(add_lit_tests)
     WORKING_DIRECTORY ${TEST_WORKING_DIRECTORY} ${TEST_UNPARSED_ARGUMENTS})
 endfunction()
 
-function(target_enable_address_sanitizer TARGET)
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Provide exactly one target.")
-  endif()
-  if((CMAKE_CXX_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-    target_compile_options(${TARGET} PRIVATE -fsanitize=address)
-    target_link_options(${TARGET} PRIVATE -fsanitize=address)
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${TARGET} PRIVATE /fsanitize=address)
-  endif()
-  set_target_properties(${TARGET} PROPERTIES ADDRESS_SANITIZER_ENABLED ON)
-endfunction()
-
 function(target_enable_code_coverage TARGET)
   if(NOT ${ARGC} EQUAL 1)
     message(FATAL_ERROR "Provide exactly one target.")
@@ -225,32 +206,6 @@ function(target_enable_code_coverage TARGET)
   set_target_properties(${TARGET} PROPERTIES CODE_COVERAGE_ENABLED ON)
 endfunction()
 
-function(target_enable_thread_sanitizer TARGET)
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Provide exactly one target.")
-  endif()
-  if((CMAKE_CXX_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-    target_compile_options(${TARGET} PRIVATE -fsanitize=thread)
-    target_link_options(${TARGET} PRIVATE -fsanitize=thread)
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    message(FATAL_ERROR "Thread sanitizer is not implemented for MSVC")
-  endif()
-  set_target_properties(${TARGET} PROPERTIES THREAD_SANITIZER_ENABLED ON)
-endfunction()
-
-function(target_enable_ub_sanitizer TARGET)
-  if(NOT ${ARGC} EQUAL 1)
-    message(FATAL_ERROR "Provide exactly one target.")
-  endif()
-  if((CMAKE_CXX_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-    target_compile_options(${TARGET} PRIVATE -fsanitize=undefined)
-    target_link_options(${TARGET} PRIVATE -fsanitize=undefined)
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    message(FATAL_ERROR "UB sanitizer is not implemented for MSVC")
-  endif()
-  set_target_properties(${TARGET} PROPERTIES UB_SANITIZER_ENABLED ON)
-endfunction()
-
 function(target_enable_valgrind TARGET)
   if(NOT ${ARGC} EQUAL 1)
     message(FATAL_ERROR "Provide exactly one target.")
@@ -258,24 +213,9 @@ function(target_enable_valgrind TARGET)
   set_target_properties(${TARGET} PROPERTIES VALGRIND_ENABLED ON)
 endfunction()
 
-# Enable address sanitizer for targets, which called target_enable_instrumentation
-function(activate_address_sanitizer)
-  set_property(GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED ON)
-endfunction()
-
 # Enable code coverage for targets, which called target_enable_instrumentation
 function(activate_code_coverage)
   set_property(GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED ON)
-endfunction()
-
-# Enable thread sanitizer for targets, which called target_enable_instrumentation
-function(activate_thread_sanitizer)
-  set_property(GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED ON)
-endfunction()
-
-# Enable ub sanitizer for targets, which called target_enable_instrumentation
-function(activate_ub_sanitizer)
-  set_property(GLOBAL PROPERTY UB_SANITIZER_ACTIVATED ON)
 endfunction()
 
 # Run tests under valgrind for targets, which called target_enable_instrumentation
@@ -292,24 +232,9 @@ function(enable_lit_tests)
 endfunction()
 
 function(target_enable_instrumentation TARGET)
-  get_property(address_sanitizer_activated GLOBAL PROPERTY ADDRESS_SANITIZER_ACTIVATED)
-  if(address_sanitizer_activated)
-    target_enable_address_sanitizer(${TARGET})
-  endif()
-
   get_property(code_coverage_activated GLOBAL PROPERTY CODE_COVERAGE_ACTIVATED)
   if(code_coverage_activated)
     target_enable_code_coverage(${TARGET})
-  endif()
-
-  get_property(thread_sanitizer_activated GLOBAL PROPERTY THREAD_SANITIZER_ACTIVATED)
-  if(thread_sanitizer_activated)
-    target_enable_thread_sanitizer(${TARGET})
-  endif()
-
-  get_property(ub_sanitizer_activated GLOBAL PROPERTY UB_SANITIZER_ACTIVATED)
-  if(ub_sanitizer_activated)
-    target_enable_ub_sanitizer(${TARGET})
   endif()
 
   get_property(valgrind_testing_activated GLOBAL PROPERTY VALGRIND_ACTIVATED)

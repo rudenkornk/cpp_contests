@@ -3,7 +3,7 @@ SHELL = /usr/bin/env bash
 
 BUILD_DIR ?= build
 BUILD_TYPE ?= Debug
-GENERATOR ?= ninja
+GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= gcc
 
@@ -15,79 +15,89 @@ PARALLEL ?= ON
 TSAN ?= OFF
 UBSAN ?= OFF
 VALGRIND ?= OFF
+VERBOSE ?= ON
 WARNINGS ?= ON
 
 CORES := $(shell nproc --all)
 PARALLEL_OPTION := $(shell [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)")
 JPARALLEL_OPTION := $(shell [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)")
-CC := $(shell \
-        if [[ "$(TOOLCHAIN)" == "gcc" ]]; then \
-          echo "gcc"; \
-        elif [[ "$(TOOLCHAIN)" == "llvm" ]]; then \
-          echo "clang"; \
-        else \
-          echo "unknown_toolchain"; \
-        fi \
-       )
-CXX := $(shell \
-        if [[ "$(TOOLCHAIN)" == "gcc" ]]; then \
-          echo "g++"; \
-        elif [[ "$(TOOLCHAIN)" == "llvm" ]]; then \
-          echo "clang++"; \
-        else \
-          echo "unknown_toolchain"; \
-        fi \
-       )
-GENERATOR_FULL := $(shell \
-                    if [[ "$(GENERATOR)" == "ninja" ]]; then \
-                      echo "Ninja Multi-Config"; \
-                    else \
-                      echo "unknown_generator"; \
-                    fi \
-                   )
+VERBOSE_OPTION := $(shell [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose")
+
+.PHONY: conan
+conan:
+	ASAN=$(ASAN) \
+	TSAN=$(TSAN) \
+	UBSAN=$(UBSAN) \
+	conan install \
+		--profile:host $(TOOLCHAIN).jinja \
+		--profile:build $(TOOLCHAIN).jinja \
+		--settings build_type=$(BUILD_TYPE) \
+		--build missing \
+		--install-folder $(BUILD_DIR) \
+		scripts/conanfile.py \
 
 .PHONY: config
 config:
-	CC=$(CC) CXX=$(CXX) cmake \
+	cmake \
 		 -S . \
 		 -B "$(BUILD_DIR)" \
-		 -G "$(GENERATOR_FULL)" \
-		 -DASAN=$(ASAN) \
+		 -G "$(GENERATOR)" \
 		 -DCLANG_TIDY=$(CLANG_TIDY) \
-		 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		 -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" \
 		 -DCODE_COVERAGE=$(CODE_COVERAGE) \
 		 -DLIT=$(LIT) \
 		 -DPARALLEL_TESTING=$(PARALLEL) \
-		 -DTSAN=$(TSAN) \
-		 -DUBSAN=$(UBSAN) \
 		 -DVALGRIND=$(VALGRIND) \
 		 -DWARNINGS=$(WARNINGS) \
 
+.PHONY: compile_commands
+compile_commands:
+	cmake \
+		 -S . \
+		 -B "$(BUILD_DIR)/compile_commands" \
+		 -G "$(GENERATOR)" \
+		 -DCLANG_TIDY=$(CLANG_TIDY) \
+		 -DCMAKE_CONFIGURATION_TYPES=$(BUILD_TYPE) \
+		 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		 -DCMAKE_TOOLCHAIN_FILE="$(BUILD_DIR)/conan_toolchain.cmake" \
+		 -DWARNINGS=$(WARNINGS) \
+	
+	ln --symbolic "$(BUILD_DIR)/compile_commands/compile_commands.json" compile_commands.json
+
 .PHONY: build
 build:
-	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
+	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) $(PARALLEL_OPTION) $(VERBOSE_OPTION)
 
 .PHONY: test
 test:
-	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) --verbose
+	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) $(VERBOSE_OPTION)
 
 .PHONY: install
 install:
-	cmake --install "$(BUILD_DIR)" --config $(BUILD_TYPE) --prefix $(INSTALL_PREFIX)
+	cmake --install "$(BUILD_DIR)" --config $(BUILD_TYPE) --prefix $(INSTALL_PREFIX) $(VERBOSE_OPTION)
 
 .PHONY: test_install
 test_install:
-	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" CC=$(CC) CXX=$(CXX) cmake -S "$(BUILD_DIR)/test_install" -B "$(BUILD_DIR)/test_install/build" -G "$(GENERATOR_FULL)"
-	cmake --build "$(BUILD_DIR)/test_install/build" --config $(BUILD_TYPE) $(PARALLEL_OPTION)
+	$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)" \
+	cmake \
+		-S "$(BUILD_DIR)/test_install" \
+		-B "$(BUILD_DIR)/test_install/build" \
+		-G "$(GENERATOR)" \
+	
+	cmake \
+		--build "$(BUILD_DIR)/test_install/build" \
+		--config $(BUILD_TYPE) \
+		$(PARALLEL_OPTION) \
+		$(VERBOSE_OPTION) \
 
 .PHONY: package
 package:
 	cd build && cpack -C CPackConfig.cmake
 
 ###################### linters ######################
-COMMIT ?= origin/main
 CLANG_FORMAT_OUTPUT ?= in_place
 CLANG_TIDY_OUTPUT ?= patch
+COMMIT ?= origin/main
 
 CLANG_FORMAT_OUTPUT_ARG := $(shell [[ "$(CLANG_FORMAT_OUTPUT)" == "in_place" ]] && echo "-i" || echo "> $(CLANG_FORMAT_OUTPUT)")
 CLANG_TIDY_OUTPUT_ARG := $(shell [[ "$(CLANG_TIDY_OUTPUT)" == "in_place" ]] && echo "-fix" || echo "-export-fixes $(CLANG_TIDY_OUTPUT)")
@@ -98,18 +108,15 @@ clang-format:
 
 .PHONY: clang-tidy
 clang-tidy:
-	git diff -U0 --no-color --relative $(COMMIT) | clang-tidy-diff.py $(JPARALLEL_OPTION) -p1 -path $(BUILD_DIR) $(CLANG_TIDY_OUTPUT_ARG)
+	git diff -U0 --no-color --relative $(COMMIT) | clang-tidy-diff.py $(JPARALLEL_OPTION) -p1 -path $(BUILD_DIR)/compile_commands $(CLANG_TIDY_OUTPUT_ARG)
 
 
 ###################### docker support ######################
 KEEP_CI_USER_SUDO ?= false
-KEEP_CI_USER_SUDO := $(KEEP_CI_USER_SUDO)
 TARGET ?=
 COMMAND ?=
-DOCKER_IMAGE_TAG ?= rudenkornk/docker_cpp:0.1.7
-DOCKER_IMAGE_TAG := $(DOCKER_IMAGE_TAG)
-DOCKER_CONTAINER_NAME ?= $(PROJECT_NAME)_container
-DOCKER_CONTAINER_NAME := $(DOCKER_CONTAINER_NAME)
+DOCKER_IMAGE_TAG := rudenkornk/docker_cpp:0.2.2
+DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 
 IF_DOCKERD_UP := command -v docker &> /dev/null && pidof dockerd &> /dev/null
@@ -137,6 +144,7 @@ endif
 		--env TSAN="$(TSAN)" \
 		--env UBSAN="$(UBSAN)" \
 		--env VALGRIND="$(VALGRIND)" \
+		--env VERBOSE="$(VERBOSE)" \
 		--env WARNINGS="$(WARNINGS)" \
 		\
 		--env COMMIT="$(COMMIT)" \
