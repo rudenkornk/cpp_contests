@@ -16,10 +16,9 @@ jobs:
   main:
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019]
+        os: [ubuntu-20.04, windows-2022]
         build_type: [Debug, Release]
         toolchain: [gcc, llvm, msvc]
-        generator: [ninja, vs]
         asan: [asan_off]
         clang_tidy: [tidy_off]
         code_coverage: [cov_off]
@@ -27,51 +26,31 @@ jobs:
         ubsan: [ubsan_off]
         valgrind: [valg_off]
         exclude:
-          - os: windows-2019
+          - os: windows-2022
             toolchain: gcc
 
-          - os: windows-2019
-            generator: ninja
-
           - os: ubuntu-20.04
             toolchain: msvc
-
-          - os: ubuntu-20.04
-            generator: vs
 
         include:
-          # msvc + clang_tidy + asan
-          - os: windows-2019
-            build_type: Debug
-            toolchain: msvc
-            generator: ninja
-            asan: asan_on
-            clang_tidy: tidy_on
-            code_coverage: cov_off
-            tsan: tsan_off
-            ubsan: ubsan_off
-            valgrind: valg_off
-
-          # llvm + clang_tidy + asan + ubsan
+          # llvm + clang_tidy + asan + ubsan + code_coverage
           - os: ubuntu-20.04
             build_type: Debug
             toolchain: llvm
-            generator: ninja
             asan: asan_on
             clang_tidy: tidy_on
-            code_coverage: cov_off
+            code_coverage: cov_on
             tsan: tsan_off
             ubsan: ubsan_on
             valgrind: valg_off
 
-          # gcc + clang_tidy + asan + ubsan
+          # gcc + clang_tidy + asan + ubsan + code_coverage
           - os: ubuntu-20.04
             build_type: Debug
             toolchain: gcc
-            generator: ninja
             asan: asan_on
             clang_tidy: tidy_on
-            code_coverage: cov_off
+            code_coverage: cov_on
             tsan: tsan_off
             ubsan: ubsan_on
             valgrind: valg_off
@@ -80,7 +59,6 @@ jobs:
           - os: ubuntu-20.04
             build_type: Release
             toolchain: llvm
-            generator: ninja
             asan: asan_off
             clang_tidy: tidy_off
             code_coverage: cov_off
@@ -92,7 +70,6 @@ jobs:
           - os: ubuntu-20.04
             build_type: Release
             toolchain: gcc
-            generator: ninja
             asan: asan_off
             clang_tidy: tidy_off
             code_coverage: cov_off
@@ -100,35 +77,10 @@ jobs:
             ubsan: ubsan_off
             valgrind: valg_off
 
-          # llvm + code_coverage
-          - os: ubuntu-20.04
-            build_type: Debug
-            toolchain: llvm
-            generator: ninja
-            asan: asan_off
-            clang_tidy: tidy_off
-            code_coverage: cov_on
-            tsan: tsan_off
-            ubsan: ubsan_off
-            valgrind: valg_off
-
-          # gcc + code_coverage
-          - os: ubuntu-20.04
-            build_type: Debug
-            toolchain: gcc
-            generator: ninja
-            asan: asan_off
-            clang_tidy: tidy_off
-            code_coverage: cov_on
-            tsan: tsan_off
-            ubsan: ubsan_off
-            valgrind: valg_off
-
           # valgrind
           - os: ubuntu-20.04
             build_type: Debug
             toolchain: gcc
-            generator: ninja
             asan: asan_off
             clang_tidy: tidy_off
             code_coverage: cov_off
@@ -150,17 +102,17 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
+        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
+        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
+        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
+
         ASAN=$([[ '${{ matrix.asan }}' == 'asan_on' ]] && echo ON || echo OFF)
         CLANG_TIDY=$([[ '${{ matrix.clang_tidy }}' == 'tidy_on' ]] && echo ON || echo OFF)
         CODE_COVERAGE=$([[ '${{ matrix.code_coverage }}' == 'cov_on' ]] && echo ON || echo OFF)
         TSAN=$([[ '${{ matrix.tsan }}' == 'tsan_on' ]] && echo ON || echo OFF)
         UBSAN=$([[ '${{ matrix.ubsan }}' == 'ubsan_on' ]] && echo ON || echo OFF)
         VALGRIND=$([[ '${{ matrix.valgrind }}' == 'valg_on' ]] && echo ON || echo OFF)
-        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
-        echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
-        echo "GENERATOR=${{ matrix.generator }}" >> $GITHUB_ENV
-        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
-        echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
         echo "ASAN=$ASAN" >> $GITHUB_ENV
         echo "CLANG_TIDY=$CLANG_TIDY" >> $GITHUB_ENV
         echo "CODE_COVERAGE=$CODE_COVERAGE" >> $GITHUB_ENV
@@ -169,12 +121,16 @@ jobs:
         echo "TSAN=$TSAN" >> $GITHUB_ENV
         echo "UBSAN=$UBSAN" >> $GITHUB_ENV
         echo "VALGRIND=$VALGRIND" >> $GITHUB_ENV
+        echo "VERBOSE=ON" >> $GITHUB_ENV
         echo "WARNINGS=ON" >> $GITHUB_ENV
+
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
       run: make cpp_contests_container
+    - name: Install dependecies
+      run: make in_docker TARGET=conan
     - name: Configure
       run: make in_docker TARGET=config
     - name: Build
@@ -206,15 +162,26 @@ jobs:
     - name: Set environment
       run: |
         echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "BUILD_TYPE=Release" >> $GITHUB_ENV
+        echo "TOOLCHAIN=llvm" >> $GITHUB_ENV
+
+        echo "CLANG_TIDY=ON" >> $GITHUB_ENV
+        echo "PARALLEL=ON" >> $GITHUB_ENV
+        echo "VERBOSE=ON" >> $GITHUB_ENV
+        echo "WARNINGS=ON" >> $GITHUB_ENV
+
         echo "CLANG_FORMAT_OUTPUT=patch" >> $GITHUB_ENV
         echo "CLANG_TIDY_OUTPUT=patch" >> $GITHUB_ENV
         echo "COMMIT=HEAD^" >> $GITHUB_ENV
-        echo "PARALLEL=ON" >> $GITHUB_ENV
+
+        echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       run: make cpp_contests_container
+    - name: Install dependecies
+      run: make in_docker TARGET=conan
     - name: Configure
-      run: make in_docker TARGET=config
+      run: make in_docker TARGET=compile_commands
     - name: Run linter
       run: make in_docker TARGET=${{ matrix.tool }}
     - name: Check
