@@ -79,6 +79,7 @@ package:
 ###################### docker support ######################
 TARGET ?=
 COMMAND ?=
+DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_ISOLATION ?= hyperv # process or hyperv
 
 DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.1
@@ -95,6 +96,7 @@ $(DOCKER_CONTAINER): $(DOCKER_CONTAINER_RUN_STATUS)
 ifneq ($(DOCKER_CONTAINER_ID),)
 	docker container rename $(DOCKER_CONTAINER_NAME) $(DOCKER_CONTAINER_NAME)_$(DOCKER_CONTAINER_ID)
 endif
+	New-Item -Force -ItemType "directory" -Path "$(DOCKER_CONAN_CACHE)"
 	docker run --interactive --tty --detach <#\
 		#> --env BUILD_DIR="$(BUILD_DIR)" <#\
 		#> --env BUILD_TARGET="$(BUILD_TARGET)" <#\
@@ -111,6 +113,7 @@ endif
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
 		#> --user ContainerUser <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
+		#> --mount type=bind,source="$$(Resolve-Path $(DOCKER_CONAN_CACHE))",target=C:\Users\ContainerUser\.conan\data <#\
 		#> --isolation=$(DOCKER_ISOLATION) <#\
 		#> --memory 8G <#\
 		#> $(DOCKER_IMAGE_TAG)
