@@ -19,10 +19,10 @@ VALGRIND ?= OFF
 VERBOSE ?= ON
 WARNINGS ?= ON
 
-CORES := $(shell nproc --all)
-PARALLEL_OPTION := $(shell [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)")
-JPARALLEL_OPTION := $(shell [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)")
-VERBOSE_OPTION := $(shell [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose")
+CORES != nproc --all
+PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)"
+JPARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)"
+VERBOSE_OPTION != [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose"
 
 .PHONY: conan
 conan:
@@ -105,8 +105,8 @@ CLANG_FORMAT_OUTPUT ?= in_place
 CLANG_TIDY_OUTPUT ?= patch
 COMMIT ?= origin/main
 
-CLANG_FORMAT_OUTPUT_ARG := $(shell [[ "$(CLANG_FORMAT_OUTPUT)" == "in_place" ]] && echo "-i" || echo "> $(CLANG_FORMAT_OUTPUT)")
-CLANG_TIDY_OUTPUT_ARG := $(shell [[ "$(CLANG_TIDY_OUTPUT)" == "in_place" ]] && echo "-fix" || echo "-export-fixes $(CLANG_TIDY_OUTPUT)")
+CLANG_FORMAT_OUTPUT_ARG != [[ "$(CLANG_FORMAT_OUTPUT)" == "in_place" ]] && echo "-i" || echo "> $(CLANG_FORMAT_OUTPUT)"
+CLANG_TIDY_OUTPUT_ARG != [[ "$(CLANG_TIDY_OUTPUT)" == "in_place" ]] && echo "-fix" || echo "-export-fixes $(CLANG_TIDY_OUTPUT)"
 
 .PHONY: clang-format
 clang-format:
@@ -128,9 +128,9 @@ DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 
 IF_DOCKERD_UP := command -v docker &> /dev/null && pidof dockerd &> /dev/null
 
-DOCKER_CONTAINER_ID := $(shell $(IF_DOCKERD_UP) && docker container ls --quiet --all --filter name=^/$(DOCKER_CONTAINER_NAME)$)
-DOCKER_CONTAINER_STATE := $(shell $(IF_DOCKERD_UP) && docker container ls --format {{.State}} --all --filter name=^/$(DOCKER_CONTAINER_NAME)$)
-DOCKER_CONTAINER_RUN_STATUS := $(shell [[ "$(DOCKER_CONTAINER_STATE)" != "running" ]] && echo "$(DOCKER_CONTAINER)_not_running")
+DOCKER_CONTAINER_ID != $(IF_DOCKERD_UP) && docker container ls --quiet --all --filter name=^/$(DOCKER_CONTAINER_NAME)$
+DOCKER_CONTAINER_STATE != $(IF_DOCKERD_UP) && docker container ls --format {{.State}} --all --filter name=^/$(DOCKER_CONTAINER_NAME)$
+DOCKER_CONTAINER_RUN_STATUS != [[ "$(DOCKER_CONTAINER_STATE)" != "running" ]] && echo "$(DOCKER_CONTAINER)_not_running"
 .PHONY: $(DOCKER_CONTAINER)_not_running
 $(DOCKER_CONTAINER): $(DOCKER_CONTAINER_RUN_STATUS)
 ifneq ($(DOCKER_CONTAINER_ID),)

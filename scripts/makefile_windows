@@ -14,9 +14,9 @@ PARALLEL ?= ON
 VERBOSE ?= ON
 WARNINGS ?= ON
 
-CORES := $(shell (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors)
-PARALLEL_OPTION := $(shell if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"})
-VERBOSE_OPTION := $(shell if("$(VERBOSE)" -eq "ON"){return "--verbose"})
+CORES != (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors
+PARALLEL_OPTION != if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"}
+VERBOSE_OPTION != if("$(VERBOSE)" -eq "ON"){return "--verbose"}
 
 .PHONY: conan
 conan:
@@ -85,11 +85,11 @@ DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.1
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 
-DOCKERD_UP := $(shell try{Set-Variable -Name ErrorActionPreference -Value stop -Scope Private; if((Get-Command docker) -and (Get-Process dockerd)){return $$true}}Catch{return $$false})
+DOCKERD_UP != try{Set-Variable -Name ErrorActionPreference -Value stop -Scope Private; if((Get-Command docker) -and (Get-Process dockerd)){return $$true}}Catch{return $$false}
 
-DOCKER_CONTAINER_ID := $(shell if($$$(DOCKERD_UP)){return (docker container ls --quiet --all --filter name="^/$(DOCKER_CONTAINER_NAME)$$")})
-DOCKER_CONTAINER_STATE := $(shell if($$$(DOCKERD_UP)){return (docker container ls --format "{{.State}}" --all --filter name="^/$(DOCKER_CONTAINER_NAME)$$")})
-DOCKER_CONTAINER_RUN_STATUS := $(shell if("$(DOCKER_CONTAINER_STATE)" -ne "running"){return "$(DOCKER_CONTAINER)_not_running"})
+DOCKER_CONTAINER_ID != if($$$(DOCKERD_UP)){return (docker container ls --quiet --all --filter name="^/$(DOCKER_CONTAINER_NAME)$$")}
+DOCKER_CONTAINER_STATE != if($$$(DOCKERD_UP)){return (docker container ls --format "{{.State}}" --all --filter name="^/$(DOCKER_CONTAINER_NAME)$$")}
+DOCKER_CONTAINER_RUN_STATUS != if("$(DOCKER_CONTAINER_STATE)" -ne "running"){return "$(DOCKER_CONTAINER)_not_running"}
 .PHONY: $(DOCKER_CONTAINER)_not_running
 $(DOCKER_CONTAINER): $(DOCKER_CONTAINER_RUN_STATUS)
 ifneq ($(DOCKER_CONTAINER_ID),)
