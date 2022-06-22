@@ -121,6 +121,12 @@ jobs:
         echo "WARNINGS=ON" >> $GITHUB_ENV
 
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
+        echo "DOCKER_CONAN_CACHE=conan/data" >> $GITHUB_ENV
+    - name: Load cached dependecies
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.DOCKER_CONAN_CACHE }}
+        key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
@@ -161,8 +167,11 @@ jobs:
         echo "BUILD_TYPE=Release" >> $GITHUB_ENV
         echo "TOOLCHAIN=llvm" >> $GITHUB_ENV
 
+        echo "ASAN=OFF" >> $GITHUB_ENV
         echo "CLANG_TIDY=ON" >> $GITHUB_ENV
         echo "PARALLEL=ON" >> $GITHUB_ENV
+        echo "TSAN=OFF" >> $GITHUB_ENV
+        echo "UBSAN=OFF" >> $GITHUB_ENV
         echo "VERBOSE=ON" >> $GITHUB_ENV
         echo "WARNINGS=ON" >> $GITHUB_ENV
 
@@ -171,6 +180,12 @@ jobs:
         echo "COMMIT=HEAD^" >> $GITHUB_ENV
 
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
+        echo "DOCKER_CONAN_CACHE=conan/data" >> $GITHUB_ENV
+    - name: Load cached dependecies
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.DOCKER_CONAN_CACHE }}
+        key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       run: make cpp_contests_container
