@@ -8,10 +8,6 @@ on:
     branches:
       - main
 
-env:
-  build_dir: build
-  install_dir: build/install
-
 jobs:
   main:
     strategy:
@@ -102,9 +98,9 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
     - name: Set environment
       run: |
-        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "BUILD_DIR=build" >> $GITHUB_ENV
         echo "BUILD_TYPE=${{ matrix.build_type }}" >> $GITHUB_ENV
-        echo "INSTALL_PREFIX=${{ env.install_dir }}" >> $GITHUB_ENV
+        echo "INSTALL_PREFIX=build/install" >> $GITHUB_ENV
         echo "TOOLCHAIN=${{ matrix.toolchain }}" >> $GITHUB_ENV
 
         ASAN=$([[ '${{ matrix.asan }}' == 'asan_on' ]] && echo ON || echo OFF)
@@ -161,7 +157,7 @@ jobs:
         fetch-depth: 2
     - name: Set environment
       run: |
-        echo "BUILD_DIR=${{ env.build_dir }}" >> $GITHUB_ENV
+        echo "BUILD_DIR=build" >> $GITHUB_ENV
         echo "BUILD_TYPE=Release" >> $GITHUB_ENV
         echo "TOOLCHAIN=llvm" >> $GITHUB_ENV
 
