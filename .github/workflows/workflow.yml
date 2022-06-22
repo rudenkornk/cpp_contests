@@ -121,7 +121,7 @@ jobs:
         echo "WARNINGS=ON" >> $GITHUB_ENV
 
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
-        echo "DOCKER_CONAN_CACHE=conan/data" >> $GITHUB_ENV
+        echo "DOCKER_CONAN_CACHE=build/conan/data" >> $GITHUB_ENV
     - name: Load cached dependecies
       uses: actions/cache@v3
       with:
@@ -180,7 +180,7 @@ jobs:
         echo "COMMIT=HEAD^" >> $GITHUB_ENV
 
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
-        echo "DOCKER_CONAN_CACHE=conan/data" >> $GITHUB_ENV
+        echo "DOCKER_CONAN_CACHE=build/conan/data" >> $GITHUB_ENV
     - name: Load cached dependecies
       uses: actions/cache@v3
       with:
