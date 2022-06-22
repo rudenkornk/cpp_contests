@@ -31,6 +31,7 @@ cd build && cpack -C CPackConfig.cmake
 
 ### Option 2 (for developers): Use make wrapper with preconfigured recommended settings
 ```bash
+make conan
 make config
 make build
 make test
