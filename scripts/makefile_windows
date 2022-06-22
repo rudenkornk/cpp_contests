@@ -111,9 +111,9 @@ endif
 		#> --env WARNINGS="$(WARNINGS)" <#\
 		#> <#\
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
-		#> --user ContainerUser <#\
+		#> --user ContainerAdministrator <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
-		#> --mount type=bind,source="$$(Resolve-Path $(DOCKER_CONAN_CACHE))",target=C:\Users\ContainerUser\.conan\data <#\
+		#> --mount type=bind,source="$$(Resolve-Path $(DOCKER_CONAN_CACHE))",target=C:\Users\ContainerAdministrator\.conan\data <#\
 		#> --isolation=$(DOCKER_ISOLATION) <#\
 		#> --memory 8G <#\
 		#> $(DOCKER_IMAGE_TAG)
