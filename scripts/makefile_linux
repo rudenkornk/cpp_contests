@@ -120,6 +120,7 @@ clang-tidy:
 ###################### docker support ######################
 TARGET ?=
 COMMAND ?=
+DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_KEEP_CI_USER_SUDO ?= false
 
 DOCKER_IMAGE_TAG := rudenkornk/docker_cpp:0.2.2
@@ -136,6 +137,7 @@ $(DOCKER_CONTAINER): $(DOCKER_CONTAINER_RUN_STATUS)
 ifneq ($(DOCKER_CONTAINER_ID),)
 	docker container rename $(DOCKER_CONTAINER_NAME) $(DOCKER_CONTAINER_NAME)_$(DOCKER_CONTAINER_ID)
 endif
+	mkdir --parents "$(DOCKER_CONAN_CACHE)"
 	docker run --interactive --tty --detach \
 		--env BUILD_DIR="$(BUILD_DIR)" \
 		--env BUILD_TYPE="$(BUILD_TYPE)" \
@@ -165,6 +167,7 @@ endif
 		--user ci_user \
 		--name $(DOCKER_CONTAINER_NAME) \
 		--mount type=bind,source="$$(pwd)",target=/home/repo \
+		--mount type=bind,source="$$(realpath $(DOCKER_CONAN_CACHE))",target=/home/ci_user/.conan/data \
 		$(DOCKER_IMAGE_TAG)
 	sleep 1
 	mkdir --parents $(BUILD_DIR) && touch $@
