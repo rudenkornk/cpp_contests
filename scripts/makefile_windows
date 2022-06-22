@@ -3,6 +3,7 @@ SHELL := pwsh.exe
 .SHELLFLAGS := -Command
 
 BUILD_DIR ?= build
+BUILD_TARGET ?= ALL_BUILD
 BUILD_TYPE ?= Debug
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= msvc
@@ -42,7 +43,13 @@ config:
 
 .PHONY: build
 build:
-	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) $(PARALLEL_OPTION) $(VERBOSE_OPTION)
+	cmake <#\
+		#> --build "$(BUILD_DIR)" <#\
+		#> --config $(BUILD_TYPE) <#\
+		#> --target "$(BUILD_TARGET)" <#\
+		#> $(PARALLEL_OPTION) <#\
+		#> $(VERBOSE_OPTION) <#\
+		#>
 
 .PHONY: test
 test:
@@ -90,6 +97,7 @@ ifneq ($(DOCKER_CONTAINER_ID),)
 endif
 	docker run --interactive --tty --detach <#\
 		#> --env BUILD_DIR="$(BUILD_DIR)" <#\
+		#> --env BUILD_TARGET="$(BUILD_TARGET)" <#\
 		#> --env BUILD_TYPE="$(BUILD_TYPE)" <#\
 		#> --env INSTALL_PREFIX="$(INSTALL_PREFIX)" <#\
 		#> --env TOOLCHAIN="$(TOOLCHAIN)" <#\

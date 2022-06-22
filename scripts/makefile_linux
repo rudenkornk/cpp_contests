@@ -2,6 +2,7 @@
 SHELL = /usr/bin/env bash
 
 BUILD_DIR ?= build
+BUILD_TARGET ?= all
 BUILD_TYPE ?= Debug
 GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
@@ -66,7 +67,12 @@ compile_commands:
 
 .PHONY: build
 build:
-	cmake --build "$(BUILD_DIR)" --config $(BUILD_TYPE) $(PARALLEL_OPTION) $(VERBOSE_OPTION)
+	cmake \
+		--build "$(BUILD_DIR)" \
+		--config $(BUILD_TYPE) \
+		--target $(BUILD_TARGET) \
+		$(PARALLEL_OPTION) \
+		$(VERBOSE_OPTION) \
 
 .PHONY: test
 test:
@@ -133,6 +139,7 @@ endif
 	docker run --interactive --tty --detach \
 		--env BUILD_DIR="$(BUILD_DIR)" \
 		--env BUILD_TYPE="$(BUILD_TYPE)" \
+		--env BUILD_TARGET="$(BUILD_TARGET)" \
 		--env GENERATOR="$(GENERATOR)" \
 		--env INSTALL_PREFIX="$(INSTALL_PREFIX)" \
 		--env TOOLCHAIN="$(TOOLCHAIN)" \
