@@ -133,10 +133,9 @@ jobs:
       # See https://github.com/rudenkornk/docker_cpp_windows
       run: make container
     - name: Cache permissions workaround
+      if: ${{ runner.os == 'Windows' }}
       run: |
-        if [[ '${{ matrix.os }}' =~ 'windows' ]]; then
           make in_docker DOCKER_ADMIN=true COMMAND="icacls $DOCKER_CONAN_CACHE /q /c /t /grant ContainerUser:F"
-        fi
     - name: Install dependecies
       run: make in_docker TARGET=conan
     - name: Configure
