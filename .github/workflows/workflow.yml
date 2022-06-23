@@ -122,10 +122,6 @@ jobs:
 
         echo "DOCKER_ISOLATION=process" >> $GITHUB_ENV
         echo "DOCKER_CONAN_CACHE=build/conan/data" >> $GITHUB_ENV
-        if [[ '${{ matrix.os }}' =~ 'windows' ]]; then
-          # Workaround for cached conan dependecies
-          echo "DOCKER_ADMIN=true" >> $GITHUB_ENV
-        fi
     - name: Load cached dependecies
       uses: actions/cache@v3
       with:
@@ -136,6 +132,11 @@ jobs:
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
       run: make container
+    - name: Cache permissions workaround
+      run: |
+        if [[ '${{ matrix.os }}' =~ 'windows' ]]; then
+          make in_docker DOCKER_ADMIN=true COMMAND="icacls $DOCKER_CONAN_CACHE /q /c /t /grant ContainerUser:F"
+        fi
     - name: Install dependecies
       run: make in_docker TARGET=conan
     - name: Configure
