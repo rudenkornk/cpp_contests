@@ -5,7 +5,6 @@ from conans import ConanFile, CMake
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.cmake import CMakeDeps
 
-
 class CPPContestsConan(ConanFile):
     settings = [
         "arch",
