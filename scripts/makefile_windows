@@ -81,10 +81,12 @@ TARGET ?=
 COMMAND ?=
 DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_ISOLATION ?= hyperv # process or hyperv
+DOCKER_ADMIN ?= false
 
 DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.1
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
+DOCKER_CONTAINER_USER != if("$(DOCKER_ADMIN)".ToLower() -ne "true"){return "ContainerUser"}else{return "ContainerAdministrator"}
 
 DOCKERD_UP != try{Set-Variable -Name ErrorActionPreference -Value stop -Scope Private; if((Get-Command docker) -and (Get-Process dockerd)){return $$true}}Catch{return $$false}
 
@@ -111,9 +113,9 @@ endif
 		#> --env WARNINGS="$(WARNINGS)" <#\
 		#> <#\
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
-		#> --user ContainerAdministrator <#\
+		#> --user $(DOCKER_CONTAINER_USER) <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
-		#> --mount type=bind,source="$$(Resolve-Path $(DOCKER_CONAN_CACHE))",target=C:\Users\ContainerAdministrator\.conan\data <#\
+		#> --mount type=bind,source="$$(Resolve-Path $(DOCKER_CONAN_CACHE))",target=C:\Users\$(DOCKER_CONTAINER_USER)\.conan\data <#\
 		#> --isolation=$(DOCKER_ISOLATION) <#\
 		#> --memory 8G <#\
 		#> $(DOCKER_IMAGE_TAG)
