@@ -83,7 +83,7 @@ DOCKER_ADMIN ?= false
 DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_ISOLATION ?= hyperv # process or hyperv
 
-DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.1
+DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.2
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 DOCKER_CONTAINER_USER != if("$(DOCKER_ADMIN)".ToLower() -ne "true"){return "ContainerUser"}else{return "ContainerAdministrator"}
