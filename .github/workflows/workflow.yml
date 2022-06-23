@@ -131,7 +131,7 @@ jobs:
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
-      run: make cpp_contests_container
+      run: make container
     - name: Install dependecies
       run: make in_docker TARGET=conan
     - name: Configure
@@ -190,7 +190,7 @@ jobs:
         restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
-      run: make cpp_contests_container
+      run: make container
     - name: Install dependecies
       run: make in_docker TARGET=conan
     - name: Configure

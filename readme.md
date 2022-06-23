@@ -6,7 +6,7 @@ Repository with one-file solutions for different C++ problems
 ## Prerequisites
 ### Option 1: Use docker container interactively:
 ```bash
-make cpp_contests_container
+make container
 docker attach cpp_contests_container
 ```
 ### Option 2: Send commands to docker container:
