@@ -79,9 +79,9 @@ package:
 ###################### docker support ######################
 TARGET ?=
 COMMAND ?=
+DOCKER_ADMIN ?= false
 DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_ISOLATION ?= hyperv # process or hyperv
-DOCKER_ADMIN ?= false
 
 DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.1
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container

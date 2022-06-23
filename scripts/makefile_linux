@@ -120,9 +120,9 @@ clang-tidy:
 ###################### docker support ######################
 TARGET ?=
 COMMAND ?=
-DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
 DOCKER_ADMIN ?= false
-DOCKER_KEEP_CI_USER_SUDO := false
+DOCKER_CONAN_CACHE ?= $$HOME/.conan/data
+DOCKER_KEEP_CI_USER_SUDO ?= false
 
 DOCKER_IMAGE_TAG := rudenkornk/docker_cpp:0.2.2
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
