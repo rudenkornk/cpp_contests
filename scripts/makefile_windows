@@ -127,8 +127,8 @@ container: $(DOCKER_CONTAINER)
 .PHONY: in_docker
 in_docker: $(DOCKER_CONTAINER)
 ifneq ($(COMMAND),)
-	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) pwsh -Command "C:\vs_exec.bat $(COMMAND)"
+	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) pwsh -Command 'C:\vs_exec.bat $(COMMAND)'
 else
-	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) pwsh -Command "C:\vs_exec.bat make $(TARGET)"
+	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) pwsh -Command 'C:\vs_exec.bat make $(TARGET)'
 endif
 
