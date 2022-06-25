@@ -45,6 +45,7 @@ if(WARNINGS)
 endif()
 
 add_subdirectory(k_max)
+add_subdirectory(lru_cache)
 add_subdirectory(missing_numbers)
 add_subdirectory(perfect_cache)
 add_subdirectory(reverse_list)
