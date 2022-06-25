@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   unsigned value = 0;
   while (input >> value)
     numbers.push_back(value);
-  auto res = missing_numbers(numbers);
+  auto res = cpp_contests::missing_numbers(numbers);
   std::cout << res.first << " " << res.second;
   return 0;
 }

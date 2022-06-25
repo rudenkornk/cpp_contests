@@ -10,6 +10,8 @@
 
 #include "k_max/solution.hpp"
 
+using namespace cpp_contests;
+
 BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST((std::vector{5} == k_max({5}, 1)));
   BOOST_TEST((std::vector{0, 1, 2, 3, 4} == k_max({0, 1, 2, 3, 4}, 1)));

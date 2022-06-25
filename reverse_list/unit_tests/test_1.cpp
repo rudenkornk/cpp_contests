@@ -13,6 +13,8 @@
 
 #include "reverse_list/solution.hpp"
 
+using namespace cpp_contests;
+
 static void test_reverse_list(std::initializer_list<int> init) {
   // Use vector as container to avoid memory leaks
   std::vector<list_node<int>> container;
