@@ -1,0 +1,13 @@
+add_executable(lru_cache_unit_tests)
+
+target_link_libraries(lru_cache_unit_tests PRIVATE lru_cache)
+target_link_libraries(lru_cache_unit_tests PRIVATE perfect_cache)
+target_link_libraries(lru_cache_unit_tests PRIVATE Boost::headers)
+
+target_sources(lru_cache_unit_tests PRIVATE test_1.cpp)
+target_add_headers_as_sources(lru_cache_unit_tests lru_cache)
+
+target_enable_instrumentation(lru_cache_unit_tests)
+target_enable_coding_standards(lru_cache_unit_tests)
+
+add_unit_tests(NAME lru_cache_unit_tests TARGET lru_cache_unit_tests)
