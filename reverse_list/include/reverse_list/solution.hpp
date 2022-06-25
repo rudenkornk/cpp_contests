@@ -5,6 +5,8 @@
 #include <numeric>
 #include <vector>
 
+namespace cpp_contests {
+
 template <typename T> struct list_node final {
   T data_;
   list_node *next_;
@@ -23,3 +25,5 @@ template <typename T> list_node<T> *reverse_list(list_node<T> *head) noexcept {
   }
   return new_head;
 }
+
+} // namespace cpp_contests

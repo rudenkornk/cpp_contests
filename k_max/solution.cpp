@@ -5,7 +5,8 @@
 
 #include "k_max/solution.hpp"
 
-std::vector<int> k_max(std::vector<int> const &nums, std::size_t k) {
+std::vector<int> cpp_contests::k_max(std::vector<int> const &nums,
+                                     std::size_t k) {
   // O(n) memory, O(n * log(k)) time
   std::vector<int> result{};
   result.reserve(nums.size() + 1 - k);

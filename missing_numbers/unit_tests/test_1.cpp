@@ -12,6 +12,8 @@
 
 #include "missing_numbers/solution.hpp"
 
+using namespace cpp_contests;
+
 BOOST_AUTO_TEST_CASE(main_test) {
   BOOST_TEST((std::pair(0u, 1u) == missing_numbers({})));
   BOOST_TEST((std::pair(0u, 1u) == missing_numbers({2})));

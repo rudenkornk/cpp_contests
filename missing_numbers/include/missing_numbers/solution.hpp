@@ -5,6 +5,8 @@
 #include <numeric>
 #include <vector>
 
+namespace cpp_contests {
+
 std::pair<unsigned, unsigned> inline missing_numbers(
     std::vector<unsigned> const &nums) {
   assert(nums.size() + 2 < (1u << sizeof(unsigned) * CHAR_BIT / 2));
@@ -23,3 +25,5 @@ std::pair<unsigned, unsigned> inline missing_numbers(
   unsigned y = missing_sum - x;
   return {x, y};
 }
+
+} // namespace cpp_contests
