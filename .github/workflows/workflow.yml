@@ -127,7 +127,7 @@ jobs:
       with:
         path: ${{ env.DOCKER_CONAN_CACHE }}
         key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}_${{ hashFiles('scripts/conanfile.py') }}
-        #restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
+        restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       # See https://github.com/rudenkornk/docker_cpp_windows
@@ -191,7 +191,7 @@ jobs:
       with:
         path: ${{ env.DOCKER_CONAN_CACHE }}
         key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}_${{ hashFiles('scripts/conanfile.py') }}
-        #restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
+        restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
     - name: Download and start container
       # See https://github.com/rudenkornk/docker_cpp
       run: make container
