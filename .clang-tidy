@@ -11,6 +11,10 @@ Checks: >
   misc-non-copyable-objects,
   misc-throw-by-value-catch-by-reference,
   modernize-*,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-vararg,
   -modernize-use-trailing-return-type,
+  -modernize-use-nullptr,
 
