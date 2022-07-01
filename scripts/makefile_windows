@@ -101,18 +101,6 @@ ifneq ($(DOCKER_CONTAINER_ID),)
 endif
 	New-Item -Force -ItemType "directory" -Path "$(DOCKER_CONAN_CACHE)"
 	docker run --interactive --tty --detach <#\
-		#> --env BUILD_DIR="$(BUILD_DIR)" <#\
-		#> --env BUILD_TARGET="$(BUILD_TARGET)" <#\
-		#> --env BUILD_TYPE="$(BUILD_TYPE)" <#\
-		#> --env INSTALL_PREFIX="$(INSTALL_PREFIX)" <#\
-		#> --env TOOLCHAIN="$(TOOLCHAIN)" <#\
-		#> <#\
-		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
-		#> --env LIT="$(PARALLEL)" <#\
-		#> --env PARALLEL="$(PARALLEL)" <#\
-		#> --env VERBOSE="$(VERBOSE)" <#\
-		#> --env WARNINGS="$(WARNINGS)" <#\
-		#> <#\
 		#> --name $(DOCKER_CONTAINER_NAME) <#\
 		#> --user $(DOCKER_CONTAINER_USER) <#\
 		#> --mount type=bind,source="$$(Get-Location)",target=C:\repo <#\
@@ -127,5 +115,20 @@ container: $(DOCKER_CONTAINER)
 
 .PHONY: in_docker
 in_docker: $(DOCKER_CONTAINER)
-	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) pwsh -Command 'C:\vs_exec.bat $(DOCKER_COMMAND)'
+	docker exec <#\
+		#> --env BUILD_DIR="$(BUILD_DIR)" <#\
+		#> --env BUILD_TARGET="$(BUILD_TARGET)" <#\
+		#> --env BUILD_TYPE="$(BUILD_TYPE)" <#\
+		#> --env INSTALL_PREFIX="$(INSTALL_PREFIX)" <#\
+		#> --env TOOLCHAIN="$(TOOLCHAIN)" <#\
+		#> <#\
+		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
+		#> --env LIT="$(PARALLEL)" <#\
+		#> --env PARALLEL="$(PARALLEL)" <#\
+		#> --env VERBOSE="$(VERBOSE)" <#\
+		#> --env WARNINGS="$(WARNINGS)" <#\
+		#> <#\
+		#> --user $(DOCKER_CONTAINER_USER) <#\
+		#> $(DOCKER_CONTAINER_NAME) <#\
+		#> pwsh -Command 'C:\vs_exec.bat $(DOCKER_COMMAND)'
 
