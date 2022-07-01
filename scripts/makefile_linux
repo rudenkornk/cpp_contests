@@ -143,6 +143,23 @@ ifneq ($(DOCKER_CONTAINER_ID),)
 endif
 	mkdir --parents "$(DOCKER_CONAN_CACHE)"
 	docker run --interactive --tty --detach \
+		--env KEEP_CI_USER_SUDO="$(DOCKER_KEEP_CI_USER_SUDO)" \
+		--env CI_UID="$$(id --user)" --env CI_GID="$$(id --group)" \
+		--env "TERM=xterm-256color" \
+		--user $(DOCKER_CONTAINER_USER) \
+		--name $(DOCKER_CONTAINER_NAME) \
+		--mount type=bind,source="$$(pwd)",target=/home/repo \
+		--mount type=bind,source="$$(realpath $(DOCKER_CONAN_CACHE))",target=/home/$(DOCKER_CONTAINER_USER)/.conan/data \
+		$(DOCKER_IMAGE_TAG)
+	sleep 1
+	mkdir --parents $(BUILD_DIR) && touch $@
+
+.PHONY: container
+container: $(DOCKER_CONTAINER)
+
+.PHONY: in_docker
+in_docker: $(DOCKER_CONTAINER)
+	docker exec \
 		--env BUILD_DIR="$(BUILD_DIR)" \
 		--env BUILD_TYPE="$(BUILD_TYPE)" \
 		--env BUILD_TARGET="$(BUILD_TARGET)" \
@@ -165,21 +182,7 @@ endif
 		--env CLANG_FORMAT_OUTPUT="$(CLANG_FORMAT_OUTPUT)" \
 		--env CLANG_TIDY_OUTPUT="$(CLANG_TIDY_OUTPUT)" \
 		\
-		--env KEEP_CI_USER_SUDO="$(DOCKER_KEEP_CI_USER_SUDO)" \
-		--env CI_UID="$$(id --user)" --env CI_GID="$$(id --group)" \
-		--env "TERM=xterm-256color" \
 		--user $(DOCKER_CONTAINER_USER) \
-		--name $(DOCKER_CONTAINER_NAME) \
-		--mount type=bind,source="$$(pwd)",target=/home/repo \
-		--mount type=bind,source="$$(realpath $(DOCKER_CONAN_CACHE))",target=/home/$(DOCKER_CONTAINER_USER)/.conan/data \
-		$(DOCKER_IMAGE_TAG)
-	sleep 1
-	mkdir --parents $(BUILD_DIR) && touch $@
-
-.PHONY: container
-container: $(DOCKER_CONTAINER)
-
-.PHONY: in_docker
-in_docker: $(DOCKER_CONTAINER)
-	docker exec --user $(DOCKER_CONTAINER_USER) $(DOCKER_CONTAINER_NAME) bash -c '$(DOCKER_COMMAND)'
+		$(DOCKER_CONTAINER_NAME) \
+		bash -c '$(DOCKER_COMMAND)'
 
