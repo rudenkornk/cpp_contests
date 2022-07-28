@@ -4,13 +4,13 @@
 Repository with one-file solutions for different C++ problems
 
 ## Prerequisites
-### Option 1: Use docker container interactively:
+### Option 1: Use docker container interactively
 ```bash
 make container
 docker attach cpp_contests_container
 ```
 
-### Option 2: Send commands to docker container:
+### Option 2: Send commands to docker container
 ```bash
 make in_docker COMMAND=<command>
 ```
