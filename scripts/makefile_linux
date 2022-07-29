@@ -4,7 +4,6 @@ SHELL = /usr/bin/env bash
 BUILD_DIR ?= build
 BUILD_TARGET ?= all
 BUILD_TYPE ?= Debug
-GENERATOR ?= Ninja Multi-Config
 INSTALL_PREFIX ?= $(BUILD_DIR)/install
 TOOLCHAIN ?= gcc
 
@@ -19,6 +18,7 @@ VALGRIND ?= OFF
 VERBOSE ?= ON
 WARNINGS ?= ON
 
+GENERATOR := Ninja Multi-Config
 CORES != nproc --all
 PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)"
 JPARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)"
