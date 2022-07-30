@@ -20,9 +20,11 @@ VERBOSE_OPTION != if("$(VERBOSE)" -eq "ON"){return "--verbose"}
 
 .PHONY: conan
 conan:
-	conan install <#\
-		#> --profile:host vs_$(TOOLCHAIN).jinja <#\
-		#> --profile:build vs_$(TOOLCHAIN).jinja <#\
+	$$($$PROFILE = python .\scripts\pick_conan_profile.py "vs_$(TOOLCHAIN)") || $$(throw); <#\
+	#> echo "Conan profile picked: $$PROFILE"; <#\
+	#> conan install <#\
+		#> --profile:host $$PROFILE <#\
+		#> --profile:build $$PROFILE <#\
 		#> --settings build_type=$(BUILD_TYPE) <#\
 		#> --build missing <#\
 		#> --install-folder $(BUILD_DIR) <#\
