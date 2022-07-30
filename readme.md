@@ -17,7 +17,8 @@ make in_docker COMMAND=<command>
 
 ### Option 3: config your system
 Basic requirements include recent versions of a `C++ compiler`, `CMake` and `Conan`.
-Though their specific versions may be important, thus it is recommended to refer to scripts, which were used to create docker images:
+
+You may also want to configure conan profiles, in this case refer to scripts, which were used to create docker images:
 [Linux](https://github.com/rudenkornk/docker_cpp#3-use-scripts-from-this-repository-to-setup-your-own-system),
 [Windows](https://github.com/rudenkornk/docker_cpp_windows/#2-use-scripts-from-this-repository-to-setup-your-own-system)
 
