@@ -26,12 +26,14 @@ VERBOSE_OPTION != [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose"
 
 .PHONY: conan
 conan:
+	PROFILE=$$(./scripts/pick_conan_profile.py "$(TOOLCHAIN)") || exit 1; \
+	echo "Conan profile picked: '"$$PROFILE"'"; \
 	ASAN=$(ASAN) \
 	TSAN=$(TSAN) \
 	UBSAN=$(UBSAN) \
 	conan install \
-		--profile:host $(TOOLCHAIN).jinja \
-		--profile:build $(TOOLCHAIN).jinja \
+		--profile:host $$PROFILE \
+		--profile:build $$PROFILE \
 		--settings build_type=$(BUILD_TYPE) \
 		--build missing \
 		--install-folder $(BUILD_DIR) \
