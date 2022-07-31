@@ -1,0 +1,12 @@
+add_executable(utils_unit_tests)
+
+target_link_libraries(utils_unit_tests PRIVATE utils)
+target_link_libraries(utils_unit_tests PRIVATE Boost::headers)
+
+target_sources(utils_unit_tests PRIVATE test_1.cpp)
+target_add_headers_as_sources(utils_unit_tests utils)
+
+target_enable_instrumentation(utils_unit_tests)
+target_enable_coding_standards(utils_unit_tests)
+
+add_unit_tests(NAME utils_unit_tests TARGET utils_unit_tests)

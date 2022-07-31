@@ -10,6 +10,7 @@ project(
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
 
 find_package(Boost REQUIRED COMPONENTS headers)
+find_package(fmt REQUIRED COMPONENTS fmt)
 
 include(CodingStandards)
 include(GNUInstallDirs)
@@ -49,6 +50,7 @@ add_subdirectory(lru_cache)
 add_subdirectory(missing_numbers)
 add_subdirectory(perfect_cache)
 add_subdirectory(reverse_list)
+add_subdirectory(utils)
 add_subdirectory(valid_parenthesis)
 
 if(CODE_COVERAGE)

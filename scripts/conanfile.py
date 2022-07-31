@@ -14,6 +14,7 @@ class CPPContestsConan(ConanFile):
     ]
     requires = [
         "boost/1.79.0",
+        "fmt/9.0.0",
     ]
 
     default_options = {
