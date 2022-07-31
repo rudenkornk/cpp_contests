@@ -1,9 +1,12 @@
 add_executable(perfect_cache_unit_tests)
 
+target_link_libraries(perfect_cache_unit_tests PRIVATE lru_cache)
 target_link_libraries(perfect_cache_unit_tests PRIVATE perfect_cache)
+target_link_libraries(perfect_cache_unit_tests PRIVATE utils)
 target_link_libraries(perfect_cache_unit_tests PRIVATE Boost::headers)
+target_link_libraries(perfect_cache_unit_tests PRIVATE fmt::fmt)
 
-target_sources(perfect_cache_unit_tests PRIVATE test_1.cpp)
+target_sources(perfect_cache_unit_tests PRIVATE test.cpp)
 target_add_headers_as_sources(perfect_cache_unit_tests perfect_cache)
 
 target_enable_instrumentation(perfect_cache_unit_tests)
