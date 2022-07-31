@@ -23,10 +23,10 @@ struct KeyNextposCompare {
 
 std::size_t perfect_cache(std::vector<Key> const &keys,
                           std::size_t max_size_in_bytes,
-                          std::size_t value_size) {
-  auto const max_size =
-      std::size_t(max_size_in_bytes / (value_size + sizeof(Key)));
-  if (max_size == 0)
+                          std::size_t value_size_in_bytes) {
+  auto const max_length =
+      std::size_t(max_size_in_bytes / (value_size_in_bytes + sizeof(Key)));
+  if (max_length == 0)
     return 0;
 
   std::unordered_map<Key, std::vector<std::size_t>> positions{};
@@ -42,7 +42,7 @@ std::size_t perfect_cache(std::vector<Key> const &keys,
   std::set<KeyNextpos, KeyNextposCompare> fartherst_keys{};
 
   std::unordered_map<Key, decltype(fartherst_keys)::const_iterator> cache{};
-  cache.reserve(max_size);
+  cache.reserve(max_length);
   std::size_t hits{0};
   for (auto &&key : keys) {
     positions.at(key).pop_back();
@@ -53,8 +53,8 @@ std::size_t perfect_cache(std::vector<Key> const &keys,
       auto &&res = fartherst_keys.insert({key, nextpos});
       assert(res.second);
       cache.emplace(key, res.first);
-      if (cache.size() > max_size) {
-        assert(cache.size() == max_size + 1);
+      if (cache.size() > max_length) {
+        assert(cache.size() == max_length + 1);
         auto erase_key = (*fartherst_keys.begin()).key;
         fartherst_keys.erase(fartherst_keys.begin());
         cache.erase(erase_key);

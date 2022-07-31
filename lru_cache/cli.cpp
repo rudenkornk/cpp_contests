@@ -7,9 +7,9 @@
 #include <iterator>
 
 int main() {
-  std::size_t cache_size = 0;
+  std::size_t cache_length = 0;
   std::size_t n_elements = 0;
-  std::cin >> cache_size;
+  std::cin >> cache_length;
   std::cin >> n_elements;
   std::vector<int> elements{};
   elements.reserve(n_elements);
@@ -19,7 +19,7 @@ int main() {
     elements.push_back(n);
   }
 
-  auto lru = cpp_contests::lru_hits(elements, cache_size * sizeof(int), 0);
+  auto lru = cpp_contests::lru_hits(elements, cache_length * sizeof(int), 0);
   std::cout << lru << "\n";
   return 0;
 }
