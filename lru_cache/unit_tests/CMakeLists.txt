@@ -3,6 +3,7 @@ add_executable(lru_cache_unit_tests)
 target_link_libraries(lru_cache_unit_tests PRIVATE lru_cache)
 target_link_libraries(lru_cache_unit_tests PRIVATE perfect_cache)
 target_link_libraries(lru_cache_unit_tests PRIVATE Boost::headers)
+target_link_libraries(lru_cache_unit_tests PRIVATE fmt::fmt)
 
 target_sources(lru_cache_unit_tests PRIVATE test_1.cpp)
 target_add_headers_as_sources(lru_cache_unit_tests lru_cache)
