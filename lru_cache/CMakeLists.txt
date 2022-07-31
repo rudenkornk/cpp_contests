@@ -22,4 +22,3 @@ target_enable_instrumentation(lru_cache_cli)
 target_enable_coding_standards(lru_cache_cli)
 
 add_subdirectory(lit_tests)
-add_subdirectory(unit_tests)
