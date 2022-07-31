@@ -25,13 +25,10 @@ class LRUCache final {
 public:
   // NOLINTNEXTLINE
   LRUCache(Load const &load, std::size_t max_size_in_bytes,
-           std::size_t override_value_size)
+           std::size_t override_value_size = sizeof(Value))
       : load_(load),
         max_length_(std::size_t(max_size_in_bytes /
                                 (override_value_size + sizeof(Key)))) {}
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-  LRUCache(Load const &load, std::size_t max_size_in_bytes)
-      : LRUCache(load, max_size_in_bytes, sizeof(Value)) {}
 
   // Forbid all copy and moves, since storing references inside class fields
   // requires special handling, not supported in these methods by default
