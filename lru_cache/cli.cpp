@@ -19,7 +19,7 @@ int main() {
     elements.push_back(n);
   }
 
-  auto lru = cpp_contests::lru_hits(cache_size, elements);
+  auto lru = cpp_contests::lru_hits(elements, cache_size * sizeof(int), 0);
   std::cout << lru << "\n";
   return 0;
 }
