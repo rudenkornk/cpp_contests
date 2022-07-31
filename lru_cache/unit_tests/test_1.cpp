@@ -18,6 +18,8 @@
 
 using namespace cpp_contests;
 
+using Key = int;
+
 BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
   const double cents = 100.0;
   const std::size_t cache_size = 100;
@@ -26,7 +28,7 @@ BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
   const int max = 300;
   std::mt19937 gen{0};
   std::uniform_int_distribution<> d{min, max};
-  std::vector<int> elements{};
+  std::vector<Key> elements{};
   elements.reserve(n_elements);
   std::generate_n(std::back_inserter(elements), n_elements,
                   [&]() { return d(gen); });
@@ -51,7 +53,7 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
   const int max = 299;
   std::mt19937 gen{0};
   std::binomial_distribution<> d(max);
-  std::vector<int> elements{};
+  std::vector<Key> elements{};
   elements.reserve(n_elements);
   std::generate_n(std::back_inserter(elements), n_elements,
                   [&]() { return d(gen); });
@@ -75,7 +77,7 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
   const int lambda = 1000;
   std::mt19937 gen{0};
   std::poisson_distribution<> d(lambda);
-  std::vector<int> elements{};
+  std::vector<Key> elements{};
   elements.reserve(n_elements);
   std::generate_n(std::back_inserter(elements), n_elements,
                   [&]() { return d(gen); });
