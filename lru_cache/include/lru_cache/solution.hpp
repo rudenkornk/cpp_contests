@@ -13,14 +13,12 @@ namespace cpp_contests {
 
 template <typename Key, typename Value, std::invocable<Key> Load>
 class LRUCache final {
-  struct ValuePos {
-    Value value;
-    typename std::list<Key>::const_iterator pos;
-  };
+  using Position = typename std::list<Key>::const_iterator;
   Load load_;
   std::size_t max_length_;
   std::list<Key> keys_;
-  std::unordered_map<Key, ValuePos> data_;
+  std::unordered_map<Key, Value> data_;
+  std::unordered_map<Key, Position> key_positions_;
 
 public:
   // NOLINTNEXTLINE
@@ -42,21 +40,23 @@ public:
     if (max_length_ == 0)
       return load_(key);
 
-    if (data_.contains(key)) {
-      keys_.splice(data_.at(key).pos, keys_, std::next(data_.at(key).pos),
-                   keys_.end());
-      return data_.at(key).value;
+    if (key_positions_.contains(key)) {
+      keys_.splice(key_positions_.at(key), keys_,
+                   std::next(key_positions_.at(key)), keys_.end());
+      return data_.at(key);
     }
 
     Value value = std::invoke(load_, key);
     keys_.push_back(key);
-    data_.emplace(key, ValuePos{std::move(value), std::prev(keys_.end())});
+    data_.emplace(key, std::move(value));
+    key_positions_.emplace(key, std::prev(keys_.end()));
     if (keys_.size() > max_length_) {
       assert(keys_.size() == max_length_ + 1);
       data_.erase(keys_.front());
+      key_positions_.erase(keys_.front());
       keys_.pop_front();
     }
-    return data_.at(key).value;
+    return data_.at(key);
   }
 };
 
