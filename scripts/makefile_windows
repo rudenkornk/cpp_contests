@@ -18,6 +18,16 @@ CORES != (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProces
 PARALLEL_OPTION != if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"}
 VERBOSE_OPTION != if("$(VERBOSE)" -eq "ON"){return "--verbose"}
 
+.PHONY: all
+all: \
+	conan \
+	config \
+	build \
+	test \
+	install \
+	test_install \
+	package \
+
 .PHONY: conan
 conan:
 	$$($$PROFILE = python .\scripts\pick_conan_profile.py "vs_$(TOOLCHAIN)") || $$(throw); <#\
