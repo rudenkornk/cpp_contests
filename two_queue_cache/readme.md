@@ -1,4 +1,4 @@
-# TwoQueue cache
+# 2Q cache
 
 Implement simple 2Q cache
 * https://www.vldb.org/conf/1994/P439.PDF
