@@ -97,7 +97,7 @@ test_install:
 
 .PHONY: package
 package:
-	cd build && cpack -C CPackConfig.cmake
+	cd $(BUILD_DIR) && cpack -C CPackConfig.cmake
 
 ###################### docker support ######################
 TARGET ?=

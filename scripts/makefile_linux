@@ -122,7 +122,7 @@ test_install:
 
 .PHONY: package
 package:
-	cd build && cpack -C CPackConfig.cmake
+	cd $(BUILD_DIR) && cpack -C CPackConfig.cmake
 
 ###################### linters ######################
 CLANG_FORMAT_OUTPUT ?= in_place
