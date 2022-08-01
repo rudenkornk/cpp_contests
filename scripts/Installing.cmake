@@ -90,6 +90,8 @@ endfunction()
 
 # Create a simple project, which checks that all targets and headers were exported
 function(configure_test_install_project)
+  set(in_path ${PROJECT_SOURCE_DIR}/scripts/installing)
+
   get_targets(install_targets BOOL_PROPERTIES ADD_TO_INSTALLATION)
   if(NOT install_targets)
     message(WARNING "No install targets to test.")
@@ -113,11 +115,9 @@ function(configure_test_install_project)
     endif()
   endforeach()
 
-  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/conanfile.py.in ${CMAKE_BINARY_DIR}/test_install/conanfile.py
-                 @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/CMakeLists.txt.in
-                 ${CMAKE_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)
+  configure_file(${in_path}/conanfile.py.in ${CMAKE_BINARY_DIR}/test_install/conanfile.py @ONLY)
+  configure_file(${in_path}/CMakeLists.txt.in ${CMAKE_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
+  configure_file(${in_path}/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)
 endfunction()
 
 function(configure_cpack_options)
