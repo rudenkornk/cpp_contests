@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
   const std::size_t cache_size_in_bytes =
       100 * virtual_web_page_size_in_benchmark;
   const std::size_t n_elements = 10000;
-  const int max = 299;
+  const int max = 2999;
   std::mt19937 gen{0};
   std::binomial_distribution<> d(max);
   std::vector<Key> elements{};
