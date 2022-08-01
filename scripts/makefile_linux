@@ -24,6 +24,17 @@ PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)"
 JPARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)"
 VERBOSE_OPTION != [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose"
 
+.PHONY: all
+all: \
+	conan \
+	config \
+	compile_commands \
+	build \
+	test \
+	install \
+	test_install \
+	package \
+
 .PHONY: conan
 conan:
 	PROFILE=$$(./scripts/pick_conan_profile.py "$(TOOLCHAIN)") || exit 1; \
