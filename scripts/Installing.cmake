@@ -113,6 +113,8 @@ function(configure_test_install_project)
     endif()
   endforeach()
 
+  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/conanfile.py.in ${CMAKE_BINARY_DIR}/test_install/conanfile.py
+                 @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/CMakeLists.txt.in
                  ${CMAKE_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)

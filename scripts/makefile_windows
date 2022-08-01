@@ -73,9 +73,20 @@ install:
 
 .PHONY: test_install
 test_install:
+	$$($$PROFILE = python .\scripts\pick_conan_profile.py "vs_$(TOOLCHAIN)") || $$(throw); <#\
+	#> echo "Conan profile picked: $$PROFILE"; <#\
+	#> conan install <#\
+		#> --profile:host $$PROFILE <#\
+		#> --profile:build $$PROFILE <#\
+		#> --settings build_type=$(BUILD_TYPE) <#\
+		#> --build missing <#\
+		#> --install-folder $(BUILD_DIR)/test_install/build <#\
+		#> $(BUILD_DIR)/test_install/conanfile.py <#\
+		#>
 	$$env:$(PROJECT_NAME)_ROOT="$(INSTALL_PREFIX)"; cmake <#\
 		#> -S "$(BUILD_DIR)/test_install" <#\
 		#> -B "$(BUILD_DIR)/test_install/build" <#\
+		#> -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" <#\
 		#>
 	cmake <#\
 		#> --build "$(BUILD_DIR)/test_install/build" <#\
