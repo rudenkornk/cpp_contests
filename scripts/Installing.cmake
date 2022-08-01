@@ -53,7 +53,7 @@ function(generic_install)
   endif()
 
   configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/scripts/config.cmake.in ${CMAKE_BINARY_DIR}/${config}
+    ${PROJECT_SOURCE_DIR}/scripts/installing/config.cmake.in ${CMAKE_BINARY_DIR}/${config}
     INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKEDIR}
     PATH_VARS CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_BINDIR CMAKE_INSTALL_LIBDIR CMAKE_INSTALL_SYSCONFDIR
               CMAKE_INSTALL_CMAKEDIR)
@@ -113,9 +113,9 @@ function(configure_test_install_project)
     endif()
   endforeach()
 
-  configure_file(${PROJECT_SOURCE_DIR}/scripts/test_install/CMakeLists.txt.in
+  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/CMakeLists.txt.in
                  ${CMAKE_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/scripts/test_install/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/scripts/installing/main.cpp.in ${CMAKE_BINARY_DIR}/test_install/main.cpp @ONLY)
 endfunction()
 
 function(configure_cpack_options)
@@ -132,7 +132,8 @@ function(configure_cpack_options)
   endif()
 
   set(EMAIL ${ARG_EMAIL})
-  configure_file("${PROJECT_SOURCE_DIR}/scripts/CPackOptions.cmake.in" "${PROJECT_BINARY_DIR}/CPackOptions.cmake" @ONLY)
+  configure_file("${PROJECT_SOURCE_DIR}/scripts/installing/CPackOptions.cmake.in"
+                 "${PROJECT_BINARY_DIR}/CPackOptions.cmake" @ONLY)
   set(CPACK_PROJECT_CONFIG_FILE
       "${PROJECT_BINARY_DIR}/CPackOptions.cmake"
       PARENT_SCOPE)
