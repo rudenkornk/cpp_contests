@@ -90,6 +90,42 @@ endfunction()
 
 # Create a simple project, which checks that all targets and headers were exported
 function(configure_test_install_project)
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs COMPONENTS CONAN_PACKAGES)
+  cmake_parse_arguments(PARSE_ARGV 0 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
+
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR "Too many arguments.")
+  endif()
+
+  message(STATUS ${ARG_COMPONENTS})
+  list(SORT ARG_COMPONENTS)
+  foreach(component ${ARG_COMPONENTS})
+    string(REGEX MATCH "(.*)::(.*)" temp ${component})
+    if(NOT CMAKE_MATCH_0)
+      message(FATAL_ERROR "Dependecies must be in form <PACKAGE>::<COMPONENT>. Dependecy \"" ${component}
+                          "\" does not match this pattern")
+    endif()
+    if(NOT "${current_package}" STREQUAL "${CMAKE_MATCH_1}")
+      if(current_package)
+        string(APPEND FIND_PACKAGES ")\n")
+      endif()
+      set(current_package ${CMAKE_MATCH_1})
+      string(APPEND FIND_PACKAGES "find_package(")
+      string(APPEND FIND_PACKAGES ${current_package})
+      string(APPEND FIND_PACKAGES " REQUIRED COMPONENTS ")
+    endif()
+    string(APPEND FIND_PACKAGES ${CMAKE_MATCH_2} " ")
+  endforeach()
+  if(current_package)
+    string(APPEND FIND_PACKAGES ")\n")
+  endif()
+
+  foreach(component ${ARG_CONAN_PACKAGES})
+    string(APPEND CONAN_REQUIRES "        \"" ${component} "\",\n")
+  endforeach()
+
   set(in_path ${PROJECT_SOURCE_DIR}/scripts/installing)
 
   get_targets(install_targets BOOL_PROPERTIES ADD_TO_INSTALLATION)
