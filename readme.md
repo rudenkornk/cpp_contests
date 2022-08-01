@@ -29,12 +29,25 @@ make package
 ```
 
 ### Option 3: Manually config your system
-Basic requirements include recent versions of a `C++ compiler`, `CMake` and `Conan`.
+Basic requirements include recent versions of a `C++ compiler`, `CMake`, `Conan` and `Ninja`.
 
 `CI` in this repo also uses custom `Conan` profiles, which allow to use different compilers and sanitizers. Although it is not required, you may want to use similar profiles.
 In this case refer to scripts, which were used to create docker images:
 [Linux](https://github.com/rudenkornk/docker_cpp#3-use-scripts-from-this-repository-to-setup-your-own-system),
-[Windows](https://github.com/rudenkornk/docker_cpp_windows/#2-use-scripts-from-this-repository-to-setup-your-own-system)
+[Windows](https://github.com/rudenkornk/docker_cpp_windows/#2-use-scripts-from-this-repository-to-setup-your-own-system).
+
+```bash
+make conan
+make config
+make build
+make test
+make install
+make test_install
+make package
+```
+
+### Option 4: Manually config your system and manually run commands
+This is the same as previous option, but `Ninja` is not required.
 
 ```bash
 conan install --build missing --install-folder build scripts/conanfile.py
