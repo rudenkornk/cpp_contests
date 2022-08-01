@@ -15,6 +15,7 @@
 
 #include "lru_cache/solution.hpp"
 #include "perfect_cache/solution.hpp"
+#include "two_queue_cache/solution.hpp"
 #include "utils/utils.hpp"
 
 using namespace cpp_contests;
@@ -65,6 +66,8 @@ BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
                   [&]() { return d(gen); });
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes,
                                       virtual_web_page_size_in_benchmark);
+  auto &&two_queue = cpp_contests::two_queue_hits(
+      elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   auto &&perfect = cpp_contests::perfect_cache(
       elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   std::cout << "Cache results for uniform_int_distribution:\n";
@@ -75,6 +78,9 @@ BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
             << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
   fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  std::cout << "2Q cache hit rate: ";
+  fmt::print("{:.2f}%\n",
+             cents * double(two_queue) / n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
              cents * double(perfect) / n_elements); // TODO std::format
@@ -95,6 +101,8 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
                   [&]() { return d(gen); });
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes,
                                       virtual_web_page_size_in_benchmark);
+  auto &&two_queue = cpp_contests::two_queue_hits(
+      elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   auto &&perfect = cpp_contests::perfect_cache(
       elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   std::cout << "Cache results for binomial_distribution with perfect coin:\n";
@@ -105,6 +113,9 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
             << "\n";
   std::cout << "LRU cache hit rate: ";
   fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  std::cout << "2Q cache hit rate: ";
+  fmt::print("{:.2f}%\n",
+             cents * double(two_queue) / n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
              cents * double(perfect) / n_elements); // TODO std::format
@@ -125,6 +136,8 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
                   [&]() { return d(gen); });
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes,
                                       virtual_web_page_size_in_benchmark);
+  auto &&two_queue = cpp_contests::two_queue_hits(
+      elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   auto &&perfect = cpp_contests::perfect_cache(
       elements, cache_size_in_bytes, virtual_web_page_size_in_benchmark);
   std::cout << "Cache results for poisson_distribution:\n";
@@ -134,6 +147,9 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
             << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
   fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  std::cout << "2Q cache hit rate: ";
+  fmt::print("{:.2f}%\n",
+             cents * double(two_queue) / n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
              cents * double(perfect) / n_elements); // TODO std::format

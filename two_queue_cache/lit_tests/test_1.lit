@@ -1,0 +1,38 @@
+# RUN: echo 0 0 | %two_queue_cache | FileCheck %s --check-prefix=CHECK0
+# CHECK0: 0
+
+# RUN: echo 0 1 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK1
+# CHECK1: 0
+
+# RUN: echo 0 5 1 2 3 4 5 | %two_queue_cache | FileCheck %s --check-prefix=CHECK2
+# CHECK2: 0
+
+# RUN: echo 1 1 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK3
+# CHECK3: 0
+
+# RUN: echo 1 3 1 1 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK4
+# CHECK4: 0
+
+# RUN: echo 1 3 1 1 2 | %two_queue_cache | FileCheck %s --check-prefix=CHECK5
+# CHECK5: 0
+
+# RUN: echo 1 3 1 2 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK6
+# CHECK6: 0
+
+# RUN: echo 2 3 1 2 3 | %two_queue_cache | FileCheck %s --check-prefix=CHECK7
+# CHECK7: 0
+
+# RUN: echo 2 3 1 2 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK8
+# CHECK8: 0
+
+# RUN: echo 2 3 1 1 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK9
+# CHECK9: 1
+
+# RUN: echo 2 7 1 1 2 2 3 3 1 | %two_queue_cache | FileCheck %s --check-prefix=CHECK10
+# CHECK10: 0
+
+# RUN: echo 2 7 1 2 2 3 3 2 3 | %two_queue_cache | FileCheck %s --check-prefix=CHECK11
+# CHECK11: 2
+
+# RUN: echo 4 14 1 2 3 1 2 4 5 1 7 3 2 6 1 2 | %two_queue_cache | FileCheck %s --check-prefix=CHECK12
+# CHECK12: 4
