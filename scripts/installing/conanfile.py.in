@@ -13,7 +13,7 @@ class TestInstallCPPContestsConan(ConanFile):
         "os",
     ]
     requires = [
-        "fmt/9.0.0",
+@CONAN_REQUIRES@
     ]
 
     default_options = {

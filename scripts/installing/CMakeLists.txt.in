@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.23)
 project(test_install)
 
 find_package(@CMAKE_PROJECT_NAME@ REQUIRED)
-find_package(fmt REQUIRED COMPONENTS fmt)
+@FIND_PACKAGES@
 
 foreach(exec @INSTALLED_EXECUTABLES@)
   if(NOT TARGET ${exec})

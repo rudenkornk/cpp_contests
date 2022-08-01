@@ -59,7 +59,7 @@ if(CODE_COVERAGE)
 endif()
 
 generic_install()
-configure_test_install_project()
+configure_test_install_project(COMPONENTS fmt::fmt CONAN_PACKAGES fmt/9.0.0)
 configure_cpack_options(EMAIL "rudenkornk@gmail.com")
 
 include(CPack)
