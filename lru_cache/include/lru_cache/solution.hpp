@@ -37,9 +37,6 @@ public:
   ~LRUCache() = default;
 
   Value get(Key const &key) {
-    if (max_length_ == 0)
-      return load_(key);
-
     if (key_positions_.contains(key)) {
       keys_.splice(key_positions_.at(key), keys_,
                    std::next(key_positions_.at(key)), keys_.end());
@@ -48,7 +45,7 @@ public:
 
     Value value = std::invoke(load_, key);
     keys_.push_back(key);
-    data_.emplace(key, std::move(value));
+    data_.emplace(key, value);
     key_positions_.emplace(key, std::prev(keys_.end()));
     if (keys_.size() > max_length_) {
       assert(keys_.size() == max_length_ + 1);
@@ -56,7 +53,7 @@ public:
       key_positions_.erase(keys_.front());
       keys_.pop_front();
     }
-    return data_.at(key);
+    return value;
   }
 };
 
