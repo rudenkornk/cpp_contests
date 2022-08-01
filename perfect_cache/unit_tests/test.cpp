@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
   std::cout << "Cache size=" << size_to_string(cache_size_in_bytes)
             << ", page size="
             << size_to_string(virtual_web_page_size_in_benchmark)
-            << ", keys amplitude=" << (max + 1)
-            << ", pool size=" << n_elements << "\n";
+            << ", keys amplitude=" << (max + 1) << ", pool size=" << n_elements
+            << "\n";
   std::cout << "LRU cache hit rate: ";
   fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
