@@ -3,28 +3,22 @@
 
 Repository with one-file solutions for different C++ problems
 
-## Prerequisites
-### Option 1: Use docker container interactively
+## Config, build, test and install
+### Option 1: Send commands to docker container
+```bash
+make in_docker TARGET=conan
+make in_docker TARGET=config
+make in_docker TARGET=build
+make in_docker TARGET=test
+make in_docker TARGET=install
+make in_docker TARGET=test_install
+make in_docker TARGET=package
+```
+
+### Option 2: Use docker container interactively
 ```bash
 make container
 docker attach cpp_contests_container
-```
-
-### Option 2: Send commands to docker container
-```bash
-make in_docker COMMAND=<command>
-```
-
-### Option 3: config your system
-Basic requirements include recent versions of a `C++ compiler`, `CMake` and `Conan`.
-
-You may also want to configure conan profiles, in this case refer to scripts, which were used to create docker images:
-[Linux](https://github.com/rudenkornk/docker_cpp#3-use-scripts-from-this-repository-to-setup-your-own-system),
-[Windows](https://github.com/rudenkornk/docker_cpp_windows/#2-use-scripts-from-this-repository-to-setup-your-own-system)
-
-## Config, build, test and install
-### Option 1: Use make wrapper with preconfigured recommended settings
-```bash
 make conan
 make config
 make build
@@ -33,17 +27,15 @@ make install
 make test_install
 make package
 ```
-Note that when using docker container non-interactively there is a shortcut for these makefile targets:
-```bash
-make in_docker TARGET=<makefile target>
-# e.g.:
-make in_docker TARGET=conan
-make in_docker TARGET=config
-# <...> etc.
-```
 
+### Option 3: Manually config your system
+Basic requirements include recent versions of a `C++ compiler`, `CMake` and `Conan`.
 
-### Option 2: Manually use Conan + CMake
+`CI` in this repo also uses custom `Conan` profiles, which allow to use different compilers and sanitizers. Although it is not required, you may want to use similar profiles.
+In this case refer to scripts, which were used to create docker images:
+[Linux](https://github.com/rudenkornk/docker_cpp#3-use-scripts-from-this-repository-to-setup-your-own-system),
+[Windows](https://github.com/rudenkornk/docker_cpp_windows/#2-use-scripts-from-this-repository-to-setup-your-own-system)
+
 ```bash
 conan install --build missing --install-folder build scripts/conanfile.py
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"
