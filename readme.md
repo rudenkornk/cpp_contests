@@ -5,6 +5,8 @@ Repository with one-file solutions for different C++ problems
 
 ## Config, build, test and install
 ### Option 1: Send commands to docker container
+**Requirements:** `make`, `docker`, `python3`
+
 ```bash
 make in_docker TARGET=conan
 make in_docker TARGET=config
@@ -16,6 +18,8 @@ make in_docker TARGET=package
 ```
 
 ### Option 2: Use docker container interactively
+**Requirements:** `make`, `docker`, `python3`
+
 ```bash
 make container
 docker attach cpp_contests_container
@@ -29,7 +33,8 @@ make package
 ```
 
 ### Option 3: Manually config your system
-Basic requirements include recent versions of a `C++ compiler`, `CMake`, `Conan` and `Ninja`.
+**Requirements:** `C++ compiler`, `CMake 3.23+`, `make`, `python3`, `Conan`, `Ninja`  
+**Optional requirements:** `FileCheck`, `lit`, `llvm-profdata`, `llvm-cov`, `gcovr`, specific `Conan` profiles
 
 `CI` in this repo also uses custom `Conan` profiles, which allow to use different compilers and sanitizers. Although it is not required, you may want to use similar profiles.
 In this case refer to scripts, which were used to create docker images:
@@ -47,7 +52,7 @@ make package
 ```
 
 ### Option 4: Manually config your system and manually run commands
-This is the same as previous option, but `Ninja` is not required.
+**Requirements:** `C++ compiler`, `CMake 3.23+`, `python3`, `Conan`
 
 ```bash
 conan install --build missing --install-folder build scripts/conanfile.py
