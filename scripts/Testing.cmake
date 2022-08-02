@@ -66,7 +66,8 @@ function(add_code_coverage_test)
     endforeach()
     add_test(
       NAME code_coverage_report
-      COMMAND bash -c "llvm-cov report --instr-profile profdata ${objects} | tee ${CMAKE_BINARY_DIR}/code_coverage_report"
+      COMMAND bash -c
+              "llvm-cov report --instr-profile profdata ${objects} | tee ${CMAKE_BINARY_DIR}/code_coverage_report"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     set_tests_properties(code_coverage_report PROPERTIES FIXTURES_REQUIRED merge_code_coverage_data)
     set_tests_properties(code_coverage_report PROPERTIES FIXTURES_SETUP code_coverage_report)
