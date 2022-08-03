@@ -12,6 +12,7 @@ CLANG_TIDY ?= OFF
 CODE_COVERAGE ?= ON
 LIT ?= ON
 PARALLEL ?= ON
+SHARED_LIBS ?= OFF
 TSAN ?= OFF
 UBSAN ?= OFF
 VALGRIND ?= OFF
@@ -56,6 +57,7 @@ config:
 		 -S . \
 		 -B "$(BUILD_DIR)" \
 		 -G "$(GENERATOR)" \
+		 -DBUILD_SHARED_LIBS=$(SHARED_LIBS) \
 		 -DCLANG_TIDY=$(CLANG_TIDY) \
 		 -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" \
 		 -DCODE_COVERAGE=$(CODE_COVERAGE) \
@@ -196,6 +198,7 @@ in_docker: $(DOCKER_CONTAINER)
 		--env CODE_COVERAGE="$(CODE_COVERAGE)" \
 		--env LIT="$(PARALLEL)" \
 		--env PARALLEL="$(PARALLEL)" \
+		--env SHARED_LIBS="$(SHARED_LIBS)" \
 		--env TSAN="$(TSAN)" \
 		--env UBSAN="$(UBSAN)" \
 		--env VALGRIND="$(VALGRIND)" \

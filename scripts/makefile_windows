@@ -11,6 +11,7 @@ TOOLCHAIN ?= msvc
 CODE_COVERAGE ?= OFF
 LIT ?= ON
 PARALLEL ?= ON
+SHARED_LIBS ?= OFF
 VERBOSE ?= ON
 WARNINGS ?= ON
 
@@ -46,6 +47,7 @@ config:
 	cmake <#\
 		#> -S . <#\
 		#> -B "$(BUILD_DIR)" <#\
+		#> -DBUILD_SHARED_LIBS="$(SHARED_LIBS)" <#\
 		#> -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" <#\
 		#> -DCODE_COVERAGE=$(CODE_COVERAGE) <#\
 		#> -DLIT=$(LIT) <#\
@@ -148,6 +150,7 @@ in_docker: $(DOCKER_CONTAINER)
 		#> --env CODE_COVERAGE="$(CODE_COVERAGE)" <#\
 		#> --env LIT="$(PARALLEL)" <#\
 		#> --env PARALLEL="$(PARALLEL)" <#\
+		#> --env SHARED_LIBS="$(SHARED_LIBS)" <#\
 		#> --env VERBOSE="$(VERBOSE)" <#\
 		#> --env WARNINGS="$(WARNINGS)" <#\
 		#> <#\

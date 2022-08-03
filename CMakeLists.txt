@@ -18,6 +18,7 @@ include(Installing)
 include(Testing)
 include(Utils)
 
+option(BUILD_SHARED_LIBS "Build shared libs instead of static ones" OFF)
 option(CLANG_TIDY "Enable clang-tidy" OFF)
 option(CODE_COVERAGE "Enable code coverage tests" OFF)
 option(LIT "Run lit tests" OFF)
