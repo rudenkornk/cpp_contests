@@ -21,7 +21,7 @@ WARNINGS ?= ON
 
 GENERATOR := Ninja Multi-Config
 CORES != nproc --all
-PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)"
+PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)" || echo "--parallel 1"
 JPARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)"
 VERBOSE_OPTION != [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose"
 

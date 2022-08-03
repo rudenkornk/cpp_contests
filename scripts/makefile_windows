@@ -16,7 +16,7 @@ VERBOSE ?= ON
 WARNINGS ?= ON
 
 CORES != (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors
-PARALLEL_OPTION != if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"}
+PARALLEL_OPTION != if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"}else{return "--parallel 1"}
 VERBOSE_OPTION != if("$(VERBOSE)" -eq "ON"){return "--verbose"}
 
 .PHONY: all
