@@ -112,7 +112,7 @@ DOCKER_IMAGE_TAG := rudenkornk/docker_cpp_windows:0.2.2
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 DOCKER_CONTAINER_USER != if("$(DOCKER_ADMIN)".ToLower() -ne "true"){return "ContainerUser"}else{return "ContainerAdministrator"}
-DOCKER_COMMAND != if("$(COMMAND)"){return "$(COMMAND)"}else{return "make $(TARGET)"}
+DOCKER_COMMAND != if('$(COMMAND)'){return '$$(COMMAND)'}else{return 'make $$(TARGET)'}
 
 DOCKERD_UP != try{Set-Variable -Name ErrorActionPreference -Value stop -Scope Private; if((Get-Command docker) -and (Get-Process dockerd)){return $$true}}Catch{return $$false}
 
