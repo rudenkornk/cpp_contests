@@ -154,7 +154,7 @@ DOCKER_IMAGE_TAG := rudenkornk/docker_cpp:0.2.4
 DOCKER_CONTAINER_NAME := $(PROJECT_NAME)_container
 DOCKER_CONTAINER := $(BUILD_DIR)/$(DOCKER_CONTAINER_NAME)
 DOCKER_CONTAINER_USER != [[ "$(DOCKER_ADMIN)" != "true" ]] && echo "ci_user" || echo "root"
-DOCKER_COMMAND != [[ ! -z "$(COMMAND)" ]] && echo "$(COMMAND)" || echo "make $(TARGET)"
+DOCKER_COMMAND != [[ ! -z '$(COMMAND)' ]] && echo '$$(COMMAND)' || echo 'make $$(TARGET)'
 
 
 IF_DOCKERD_UP := command -v docker &> /dev/null && pidof dockerd &> /dev/null
