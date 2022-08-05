@@ -57,7 +57,7 @@ public:
   TwoQueueCache &operator=(TwoQueueCache &&) = delete;
   ~TwoQueueCache() = default;
 
-  Value get(Key const &key) {
+  Value lookup_update(Key const &key) {
     if (hot_positions_.contains(key)) {
       touch_hot(key);
       return data_.at(key);
@@ -135,7 +135,7 @@ inline std::size_t two_queue_hits(std::vector<int> const &elements,
   cpp_contests::TwoQueueCache<int, int, decltype(load)> cache{
       load, max_size_in_bytes, value_size};
   for (auto &&e : elements)
-    cache.get(e);
+    cache.lookup_update(e);
   return elements.size() - misses;
 }
 

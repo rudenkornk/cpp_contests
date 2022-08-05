@@ -32,7 +32,7 @@ public:
   LRUCache &operator=(LRUCache &&) = delete;
   ~LRUCache() = default;
 
-  Value get(Key const &key) {
+  Value lookup_update(Key const &key) {
     if (key_positions_.contains(key)) {
       keys_.splice(key_positions_.at(key), keys_,
                    std::next(key_positions_.at(key)), keys_.end());
@@ -64,7 +64,7 @@ inline std::size_t lru_hits(std::vector<int> const &elements,
   cpp_contests::LRUCache<int, int, decltype(load)> cache{
       load, max_size_in_bytes, value_size_in_bytes};
   for (auto &&e : elements)
-    cache.get(e);
+    cache.lookup_update(e);
   return elements.size() - misses;
 }
 
