@@ -59,48 +59,68 @@ public:
 
   Value get(Key const &key) {
     if (hot_positions_.contains(key)) {
-      auto &&pos = hot_positions_.at(key);
-      hot_.splice(pos, hot_, std::next(pos), hot_.end());
+      touch_hot(key);
       return data_.at(key);
     }
 
     // key in cold_in_ bucket
-    if (data_.contains(key)) {
+    if (data_.contains(key))
       return data_.at(key);
-    }
 
+    Value value = load_and_allocate(key);
+    if (cold_out_set_.contains(key))
+      push_hot(key);
+    else
+      push_cold(key);
+
+    verify();
+    return value;
+  }
+
+private:
+  void touch_hot(Key const &key) {
+    auto &&pos = hot_positions_.at(key);
+    hot_.splice(pos, hot_, std::next(pos), hot_.end());
+  }
+  Value load_and_allocate(Key const &key) {
+    assert(!data_.contains(key));
     Value value = std::invoke(load_, key);
     data_.emplace(key, value);
-    if (cold_out_set_.contains(key)) {
-      hot_.push_back(key);
-      if (hot_.size() > hot_max_length_) {
-        assert(hot_.size() == hot_max_length_ + 1);
-        data_.erase(hot_.front());
-        hot_positions_.erase(hot_.front());
-        hot_.pop_front();
-      }
-    } else {
-      cold_in_.push(key);
-      if (cold_in_.size() > cold_in_max_length_) {
-        assert(cold_in_.size() == cold_in_max_length_ + 1);
-        data_.erase(cold_in_.front());
-        cold_out_.push(cold_in_.front());
-        cold_out_set_.insert(cold_in_.front());
-        cold_in_.pop();
-      }
-      if (cold_out_.size() > cold_out_max_length_) {
-        assert(cold_out_.size() == cold_out_max_length_ + 1);
-        cold_out_set_.erase(cold_out_.front());
-        cold_out_.pop();
-      }
+    return value;
+  }
+  void push_hot(Key const &key) {
+    hot_.push_back(key);
+    if (hot_.size() > hot_max_length_) {
+      assert(hot_.size() == hot_max_length_ + 1);
+      data_.erase(hot_.front());
+      hot_positions_.erase(hot_.front());
+      hot_.pop_front();
     }
-
+  }
+  void push_cold(Key const &key) {
+    cold_in_.push(key);
+    if (cold_in_.size() > cold_in_max_length_) {
+      assert(cold_in_.size() == cold_in_max_length_ + 1);
+      data_.erase(cold_in_.front());
+      push_cold_out(cold_in_.front());
+      cold_in_.pop();
+    }
+  }
+  void push_cold_out(Key const &key) {
+    cold_out_.push(key);
+    cold_out_set_.insert(key);
+    if (cold_out_.size() > cold_out_max_length_) {
+      assert(cold_out_.size() == cold_out_max_length_ + 1);
+      cold_out_set_.erase(cold_out_.front());
+      cold_out_.pop();
+    }
+  }
+  void verify() const noexcept {
     assert(data_.size() <= max_length_);
     assert(hot_.size() <= hot_max_length_);
     assert(cold_in_.size() <= cold_in_max_length_);
     assert(cold_out_.size() <= cold_out_max_length_);
     assert(hot_.size() + cold_in_.size() == data_.size());
-    return value;
   }
 };
 
