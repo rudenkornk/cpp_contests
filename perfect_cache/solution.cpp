@@ -24,8 +24,8 @@ struct KeyNextposCompare {
 std::size_t perfect_cache(std::vector<Key> const &keys,
                           std::size_t max_size_in_bytes,
                           std::size_t value_size_in_bytes) {
-  auto const max_length =
-      std::size_t(max_size_in_bytes / (value_size_in_bytes + sizeof(Key)));
+  std::size_t const max_length =
+      max_size_in_bytes / (value_size_in_bytes + sizeof(Key));
   if (max_length == 0)
     return 0;
 
