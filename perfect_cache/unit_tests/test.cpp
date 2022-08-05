@@ -77,13 +77,16 @@ BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
             << ", keys amplitude=" << (max - min + 1)
             << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  fmt::print("{:.2f}%\n",
+             cents * static_cast<double>(lru) / n_elements); // TODO std::format
   std::cout << "2Q cache hit rate: ";
   fmt::print("{:.2f}%\n",
-             cents * double(two_queue) / n_elements); // TODO std::format
+             cents * static_cast<double>(two_queue) /
+                 n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
-             cents * double(perfect) / n_elements); // TODO std::format
+             cents * static_cast<double>(perfect) /
+                 n_elements); // TODO std::format
   BOOST_TEST(lru <= perfect);
 }
 
@@ -112,13 +115,16 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
             << ", keys amplitude=" << (max + 1) << ", pool size=" << n_elements
             << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  fmt::print("{:.2f}%\n",
+             cents * static_cast<double>(lru) / n_elements); // TODO std::format
   std::cout << "2Q cache hit rate: ";
   fmt::print("{:.2f}%\n",
-             cents * double(two_queue) / n_elements); // TODO std::format
+             cents * static_cast<double>(two_queue) /
+                 n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
-             cents * double(perfect) / n_elements); // TODO std::format
+             cents * static_cast<double>(perfect) /
+                 n_elements); // TODO std::format
   BOOST_TEST(lru <= perfect);
 }
 
@@ -146,13 +152,16 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
             << size_to_string(virtual_web_page_size_in_benchmark)
             << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n", cents * double(lru) / n_elements); // TODO std::format
+  fmt::print("{:.2f}%\n",
+             cents * static_cast<double>(lru) / n_elements); // TODO std::format
   std::cout << "2Q cache hit rate: ";
   fmt::print("{:.2f}%\n",
-             cents * double(two_queue) / n_elements); // TODO std::format
+             cents * static_cast<double>(two_queue) /
+                 n_elements); // TODO std::format
   std::cout << "Perfect cache hit rate: ";
   fmt::print("{:.2f}%\n\n",
-             cents * double(perfect) / n_elements); // TODO std::format
+             cents * static_cast<double>(perfect) /
+                 n_elements); // TODO std::format
   BOOST_TEST(lru <= perfect);
 }
 

@@ -41,10 +41,12 @@ public:
                 std::size_t override_value_size = sizeof(Value))
       : load_(load), max_size_(max_size_in_bytes),
         value_size_(override_value_size),
-        max_length_(std::size_t(
+        max_length_(static_cast<std::size_t>(
             max_size_ / (value_size_ + key_size_ * (1 + cold_out_ratio_)))),
-        cold_in_max_length_(std::size_t(max_length_ * cold_in_ratio_)),
-        cold_out_max_length_(std::size_t(max_length_ * cold_out_ratio_)),
+        cold_in_max_length_(
+            static_cast<std::size_t>(max_length_ * cold_in_ratio_)),
+        cold_out_max_length_(
+            static_cast<std::size_t>(max_length_ * cold_out_ratio_)),
         hot_max_length_(max_length_ - cold_in_max_length_) {}
 
   // Forbid all copies and moves, since storing references inside class fields

@@ -24,7 +24,7 @@ std::string size_to_string(size_t size) {
   bool is_exact = true;
   while (size != 0) {
     std::size_t residual = size % base;
-    result = double(residual) + result / base;
+    result = static_cast<double>(residual) + result / base;
     size /= base;
     if (residual > 0 && size > 0)
       is_exact = false;
