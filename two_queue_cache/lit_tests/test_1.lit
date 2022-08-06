@@ -36,3 +36,12 @@
 
 # RUN: echo 4 14 1 2 3 1 2 4 5 1 7 3 2 6 1 2 | %two_queue_cache | FileCheck %s --check-prefix=CHECK12
 # CHECK12: 4
+
+# RUN: echo 4 25 1 2 3 4 1 2 5 1 2 4 3 4 2 1 4 4 2 1 5 1 2 5 2 5 1  | %two_queue_cache | FileCheck %s --check-prefix=CHECK13
+# CHECK13: 12
+
+# RUN: echo 4 12 1 2 3 4 1 2 5 1 2 4 3 4 | %two_queue_cache | FileCheck %s --check-prefix=CHECK14
+# CHECK14: 0
+
+# RUN: echo 2 6 1 2 1 2 1 2 | %two_queue_cache | FileCheck %s --check-prefix=CHECK15
+# CHECK15: 0

@@ -90,6 +90,7 @@ private:
   }
   void push_hot(Key const &key) {
     hot_.push_back(key);
+    hot_positions_.emplace(key, std::prev(hot_.end()));
     if (hot_.size() > hot_max_length_) {
       assert(hot_.size() == hot_max_length_ + 1);
       data_.erase(hot_.front());
