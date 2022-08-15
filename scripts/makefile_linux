@@ -17,7 +17,7 @@ TSAN ?= OFF
 UBSAN ?= OFF
 VALGRIND ?= OFF
 VERBOSE ?= ON
-WARNINGS ?= ON
+WARNINGS ?= OFF
 
 GENERATOR := Ninja Multi-Config
 CORES != nproc --all
@@ -189,7 +189,6 @@ in_docker: $(DOCKER_CONTAINER)
 		--env BUILD_DIR="$(BUILD_DIR)" \
 		--env BUILD_TYPE="$(BUILD_TYPE)" \
 		--env BUILD_TARGET="$(BUILD_TARGET)" \
-		--env GENERATOR="$(GENERATOR)" \
 		--env INSTALL_PREFIX="$(INSTALL_PREFIX)" \
 		--env TOOLCHAIN="$(TOOLCHAIN)" \
 		\
