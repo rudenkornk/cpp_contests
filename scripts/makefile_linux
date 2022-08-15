@@ -195,7 +195,7 @@ in_docker: $(DOCKER_CONTAINER)
 		--env ASAN="$(ASAN)" \
 		--env CLANG_TIDY="$(CLANG_TIDY)" \
 		--env CODE_COVERAGE="$(CODE_COVERAGE)" \
-		--env LIT="$(PARALLEL)" \
+		--env LIT="$(LIT)" \
 		--env PARALLEL="$(PARALLEL)" \
 		--env SHARED_LIBS="$(SHARED_LIBS)" \
 		--env TSAN="$(TSAN)" \
