@@ -21,8 +21,7 @@ WARNINGS ?= OFF
 
 GENERATOR := Ninja Multi-Config
 CORES != nproc --all
-PARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "--parallel $(CORES)" || echo "--parallel 1"
-JPARALLEL_OPTION != [[ "$(PARALLEL)" == "ON" ]] && echo "-j$(CORES)"
+PARALLEL != [[ "$(PARALLEL)" == "ON" ]] && echo "$(CORES)" || echo "$(PARALLEL)"
 VERBOSE_OPTION != [[ "$(VERBOSE)" == "ON" ]] && echo "--verbose"
 
 .PHONY: all
@@ -86,12 +85,12 @@ build:
 		--build "$(BUILD_DIR)" \
 		--config $(BUILD_TYPE) \
 		--target $(BUILD_TARGET) \
-		$(PARALLEL_OPTION) \
+		--parallel $(PARALLEL) \
 		$(VERBOSE_OPTION) \
 
 .PHONY: test
 test:
-	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) $(VERBOSE_OPTION)
+	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" --parallel $(PARALLEL) $(VERBOSE_OPTION)
 
 .PHONY: install
 install:
@@ -119,7 +118,7 @@ test_install:
 	cmake \
 		--build "$(BUILD_DIR)/test_install/build" \
 		--config $(BUILD_TYPE) \
-		$(PARALLEL_OPTION) \
+		--parallel $(PARALLEL) \
 		$(VERBOSE_OPTION) \
 
 .PHONY: package
@@ -140,7 +139,7 @@ clang-format:
 
 .PHONY: clang-tidy
 clang-tidy:
-	git diff -U0 --no-color --relative $(COMMIT) | clang-tidy-diff.py $(JPARALLEL_OPTION) -p1 -path $(BUILD_DIR)/compile_commands $(CLANG_TIDY_OUTPUT_ARG)
+	git diff -U0 --no-color --relative $(COMMIT) | clang-tidy-diff.py -j$(PARALLEL) -p1 -path $(BUILD_DIR)/compile_commands $(CLANG_TIDY_OUTPUT_ARG)
 
 
 ###################### docker support ######################

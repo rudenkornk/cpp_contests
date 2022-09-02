@@ -16,7 +16,7 @@ VERBOSE ?= ON
 WARNINGS ?= ON
 
 CORES != (Get-CimInstance -ClassName Win32_ComputerSystem).NumberOfLogicalProcessors
-PARALLEL_OPTION != if("$(PARALLEL)" -eq "ON"){return "--parallel $(CORES)"}else{return "--parallel 1"}
+PARALLEL != if("$(PARALLEL)" -eq "ON"){return "$(CORES)"}else{return "$(PARALLEL)"}
 VERBOSE_OPTION != if("$(VERBOSE)" -eq "ON"){return "--verbose"}
 
 .PHONY: all
@@ -61,13 +61,13 @@ build:
 		#> --build "$(BUILD_DIR)" <#\
 		#> --config $(BUILD_TYPE) <#\
 		#> --target "$(BUILD_TARGET)" <#\
-		#> $(PARALLEL_OPTION) <#\
+		#> --parallel $(PARALLEL) <#\
 		#> $(VERBOSE_OPTION) <#\
 		#>
 
 .PHONY: test
 test:
-	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" $(PARALLEL_OPTION) $(VERBOSE_OPTION)
+	ctest --build-config $(BUILD_TYPE) --test-dir "$(BUILD_DIR)" --parallel $(PARALLEL) $(VERBOSE_OPTION)
 
 .PHONY: install
 install:
@@ -93,7 +93,7 @@ test_install:
 	cmake <#\
 		#> --build "$(BUILD_DIR)/test_install/build" <#\
 		#> --config $(BUILD_TYPE) <#\
-		#> $(PARALLEL_OPTION) <#\
+		#> --parallel $(PARALLEL) <#\
 		#> $(VERBOSE_OPTION) <#\
 		#>
 
