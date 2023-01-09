@@ -1,0 +1,25 @@
+add_executable(geometry_unit_tests)
+
+target_link_libraries(geometry_unit_tests PRIVATE geometry)
+target_link_libraries(geometry_unit_tests PRIVATE Boost::headers)
+
+target_sources(geometry_unit_tests PRIVATE test.cpp)
+target_add_headers_as_sources(geometry_unit_tests geometry)
+
+target_enable_instrumentation(geometry_unit_tests)
+target_enable_coding_standards(geometry_unit_tests)
+
+add_unit_tests(NAME geometry_unit_tests TARGET geometry_unit_tests)
+
+add_executable(geom_triangle_unit_tests)
+
+target_link_libraries(geom_triangle_unit_tests PRIVATE geometry)
+target_link_libraries(geom_triangle_unit_tests PRIVATE Boost::headers)
+
+target_sources(geom_triangle_unit_tests PRIVATE triangle.cpp)
+target_add_headers_as_sources(geom_triangle_unit_tests geometry)
+
+target_enable_instrumentation(geom_triangle_unit_tests)
+target_enable_coding_standards(geom_triangle_unit_tests)
+
+add_unit_tests(NAME geom_triangle_unit_tests TARGET geom_triangle_unit_tests)

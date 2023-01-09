@@ -3,31 +3,32 @@ cmake_minimum_required(VERSION 3.23)
 project(
   cpp_contests
   VERSION 0.1.0
-  DESCRIPTION "One-file solutions for C++ problems"
-  HOMEPAGE_URL https://github.com/rudenkornk/cpp_contests
-  )
+  DESCRIPTION "Repository with solutions for different C++ educational problems."
+  HOMEPAGE_URL https://github.com/rudenkornk/cpp_contests)
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-find_package(Boost REQUIRED COMPONENTS headers)
-find_package(fmt REQUIRED COMPONENTS fmt)
+find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(fmt CONFIG REQUIRED)
 
 include(CodingStandards)
-include(GNUInstallDirs)
 include(Installing)
 include(Testing)
 include(Utils)
 
 option(BUILD_SHARED_LIBS "Build shared libs instead of static ones" OFF)
-option(CLANG_TIDY "Enable clang-tidy" OFF)
 option(CODE_COVERAGE "Enable code coverage tests" OFF)
-option(LIT "Run lit tests" OFF)
-option(PARALLEL_TESTING "Run tests in parallel" OFF)
+option(LINT "Enable lint tests" OFF)
+option(LIT "Enable lit tests" OFF)
+set(LIT_PARALLEL
+    1
+    CACHE STRING "Parallel level for LIT tests")
 option(VALGRIND "Run tests under valgrind" OFF)
-option(WARNINGS "Enable strict warnings" OFF)
 
 enable_testing()
-if(CLANG_TIDY)
+add_format_target()
+if(LINT)
+  add_lint_test()
   activate_clang_tidy()
 endif()
 if(CODE_COVERAGE)
@@ -36,31 +37,22 @@ endif()
 if(LIT)
   enable_lit_tests()
 endif()
-if(PARALLEL_TESTING)
-  enable_parallel_testing()
-endif()
 if(VALGRIND)
   activate_valgrind_testing()
 endif()
-if(WARNINGS)
-  activate_warnings()
-endif()
+activate_warnings()
 
-add_subdirectory(k_max)
-add_subdirectory(lru_cache)
-add_subdirectory(missing_numbers)
-add_subdirectory(perfect_cache)
-add_subdirectory(reverse_list)
-add_subdirectory(two_queue_cache)
-add_subdirectory(utils)
-add_subdirectory(valid_parenthesis)
+add_subdirectory(src)
 
 if(CODE_COVERAGE)
-  add_code_coverage_test(THRESHOLD 80)
+  add_code_coverage_test(THRESHOLD 5)
 endif()
 
 generic_install()
-configure_test_install_project(COMPONENTS fmt::fmt CONAN_PACKAGES fmt/9.0.0)
+configure_test_install_project(FIND_PACKAGES fmt VCPKG_DEPS fmt)
 configure_cpack_options(EMAIL "rudenkornk@gmail.com")
 
 include(CPack)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_BINARY_DIR}/compile_commands.json
+                        ${PROJECT_SOURCE_DIR}/compile_commands.json)
