@@ -18,4 +18,3 @@ Checks: >
   -cppcoreguidelines-pro-type-vararg,
   -modernize-use-nullptr,
   -modernize-use-trailing-return-type,
-

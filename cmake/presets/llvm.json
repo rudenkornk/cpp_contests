@@ -1,0 +1,71 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "llvm_base",
+      "displayName": "Base LLVM config.",
+      "generator": "Ninja",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_COLOR_DIAGNOSTICS": "ON",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CODE_COVERAGE": "OFF",
+        "LINT": "OFF",
+        "LIT": "ON",
+        "LIT_PARALLEL": "AUTO",
+        "VALGRIND": "OFF"
+      }
+    },
+    {
+      "name": "llvm_debug",
+      "displayName": "Debug LLVM config.",
+      "inherits": ["llvm_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "llvm_release",
+      "displayName": "Release LLVM config.",
+      "inherits": ["llvm_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "llvm_debug_san",
+      "displayName": "Debug LLVM ub, asan and code coverage config.",
+      "inherits": ["llvm_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined",
+        "CODE_COVERAGE": "ON",
+        "LINT": "ON"
+      }
+    },
+    {
+      "name": "llvm_debug_valgrind",
+      "displayName": "Debug LLVM valgrind config.",
+      "inherits": ["llvm_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VALGRIND": "ON"
+      }
+    },
+    {
+      "name": "llvm_release_tsan",
+      "displayName": "Debug LLVM tsan config.",
+      "inherits": ["llvm_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-fsanitize=thread"
+      }
+    }
+  ]
+}

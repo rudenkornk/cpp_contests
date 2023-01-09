@@ -1,4 +1,4 @@
-name: Test workflow
+name: Workflow
 
 on:
   push:
@@ -8,208 +8,71 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   main:
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2022]
-        build_type: [Debug, Release]
-        toolchain: [gcc, llvm, msvc]
-        asan: [asan_off]
-        clang_tidy: [tidy_off]
-        code_coverage: [cov_off]
-        tsan: [tsan_off]
-        ubsan: [ubsan_off]
-        valgrind: [valg_off]
-        exclude:
-          - os: windows-2022
-            toolchain: gcc
+        preset:
+          - gcc_debug_san
+          - gcc_debug_valgrind
+          - gcc_release_tsan
+          - llvm_debug_san
+          - llvm_debug_valgrind
+          - llvm_release_tsan
 
-          - os: ubuntu-20.04
-            toolchain: msvc
-
-        include:
-          # llvm + clang_tidy + asan + ubsan + code_coverage
-          - os: ubuntu-20.04
-            build_type: Debug
-            toolchain: llvm
-            asan: asan_on
-            clang_tidy: tidy_on
-            code_coverage: cov_on
-            tsan: tsan_off
-            ubsan: ubsan_on
-            valgrind: valg_off
-
-          # gcc + clang_tidy + asan + ubsan + code_coverage
-          - os: ubuntu-20.04
-            build_type: Debug
-            toolchain: gcc
-            asan: asan_on
-            clang_tidy: tidy_on
-            code_coverage: cov_on
-            tsan: tsan_off
-            ubsan: ubsan_on
-            valgrind: valg_off
-
-          # llvm + tsan
-          - os: ubuntu-20.04
-            build_type: Release
-            toolchain: llvm
-            asan: asan_off
-            clang_tidy: tidy_off
-            code_coverage: cov_off
-            tsan: tsan_on
-            ubsan: ubsan_off
-            valgrind: valg_off
-
-          # gcc + tsan
-          - os: ubuntu-20.04
-            build_type: Release
-            toolchain: gcc
-            asan: asan_off
-            clang_tidy: tidy_off
-            code_coverage: cov_off
-            tsan: tsan_on
-            ubsan: ubsan_off
-            valgrind: valg_off
-
-          # valgrind
-          - os: ubuntu-20.04
-            build_type: Debug
-            toolchain: gcc
-            asan: asan_off
-            clang_tidy: tidy_off
-            code_coverage: cov_off
-            tsan: tsan_off
-            ubsan: ubsan_off
-            valgrind: valg_on
-
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
+    runs-on: ubuntu-22.04
+    container: ghcr.io/rudenkornk/cpp_ubuntu:22.0.17
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOCKEN }}
-    - name: Set environment
-      run: |
-        {
-          echo "BUILD_DIR=build"
-          echo "BUILD_TYPE=${{ matrix.build_type }}"
-          echo "INSTALL_PREFIX=build/install"
-          echo "TOOLCHAIN=${{ matrix.toolchain }}"
-        } >> "$GITHUB_ENV"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        ASAN=$([[ '${{ matrix.asan }}' == 'asan_on' ]] && echo ON || echo OFF)
-        CLANG_TIDY=$([[ '${{ matrix.clang_tidy }}' == 'tidy_on' ]] && echo ON || echo OFF)
-        CODE_COVERAGE=$([[ '${{ matrix.code_coverage }}' == 'cov_on' ]] && echo ON || echo OFF)
-        TSAN=$([[ '${{ matrix.tsan }}' == 'tsan_on' ]] && echo ON || echo OFF)
-        UBSAN=$([[ '${{ matrix.ubsan }}' == 'ubsan_on' ]] && echo ON || echo OFF)
-        VALGRIND=$([[ '${{ matrix.valgrind }}' == 'valg_on' ]] && echo ON || echo OFF)
-        {
-          echo "ASAN=$ASAN"
-          echo "CLANG_TIDY=$CLANG_TIDY"
-          echo "CODE_COVERAGE=$CODE_COVERAGE"
-          echo "LIT=ON"
-          echo "PARALLEL=ON"
-          echo "TSAN=$TSAN"
-          echo "UBSAN=$UBSAN"
-          echo "VALGRIND=$VALGRIND"
-          echo "VERBOSE=ON"
-          echo "WARNINGS=ON"
+      - name: Set safe repo
+        run: git config --global --add safe.directory "$(realpath .)"
 
-          echo "DOCKER_ISOLATION=process"
-          echo "DOCKER_CONAN_CACHE=build/conan/data"
-        } >> "$GITHUB_ENV"
-    - name: Load cached dependecies
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.DOCKER_CONAN_CACHE }}
-        key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}_${{ hashFiles('scripts/conanfile.py') }}
-        restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
-    - name: Download and start container
-      # See https://github.com/rudenkornk/docker_cpp
-      # See https://github.com/rudenkornk/docker_cpp_windows
-      run: make container
-    - name: Cache permissions workaround
-      if: ${{ runner.os == 'Windows' }}
-      run: |
-          make in_docker DOCKER_ADMIN=true COMMAND="icacls $DOCKER_CONAN_CACHE /q /c /t /grant ContainerUser:F"
-    - name: Install dependecies
-      run: make in_docker TARGET=conan
-    - name: Configure
-      run: make in_docker TARGET=config
-    - name: Build
-      run: make in_docker TARGET=build
-    - name: Test
-      run: make in_docker TARGET=test
-    - name: Install
-      run: make in_docker TARGET=install
-    - name: Test install
-      run: make in_docker TARGET=test_install
-    - name: Create package
-      run: make in_docker TARGET=package
+      - name: Set common environment
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install -r requirements.txt
+          {
+            echo "PARALLEL=$(nproc --all)"
+            echo "PATH=$PATH"
+            echo "VIRTUAL_ENV=$VIRTUAL_ENV"
+            echo "CACHE=$HOME/.cache"
+          } >> "$GITHUB_ENV"
 
-  lint:
-    if: ${{ github.event_name == 'pull_request' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        tool: [clang-format, clang-tidy]
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-    - name: Set environment
-      run: |
-        {
-          echo "BUILD_DIR=build"
-          echo "BUILD_TYPE=Release"
-          echo "TOOLCHAIN=llvm"
+      - name: Load cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHE }}
+          key: cache_ubuntu_22.04_${{ matrix.preset }}_{{ hashFiles('vcpkg.json') }}
+          restore-keys: cache_ubuntu_22.04_${{ matrix.preset }}
 
-          echo "ASAN=OFF"
-          echo "CLANG_TIDY=ON"
-          echo "PARALLEL=ON"
-          echo "TSAN=OFF"
-          echo "UBSAN=OFF"
-          echo "VERBOSE=ON"
-          echo "WARNINGS=ON"
+      - name: Configure
+        run: cmake -S . -B build --preset ${{ matrix.preset }}
+      - name: Build
+        run: cmake --build build --parallel "$PARALLEL" --verbose
+      - name: Test
+        run: ctest --test-dir build --parallel "$PARALLEL" --verbose
+      - name: Install
+        run: cmake --install build --prefix build/install --verbose
+      - name: Test install
+        run: |
+          cmake -S build/test_install/ -B build/test_install/build  \
+            --preset llvm_release -Dcpp_contests_DIR="$(realpath build/install/lib/cmake/cpp_contests/)"
+          cmake --build build/test_install/build --parallel "$PARALLEL" --verbose
+      - name: Create package
+        run: cd build && cpack -C CPackConfig.cmake
 
-          echo "CLANG_FORMAT_OUTPUT=patch"
-          echo "CLANG_TIDY_OUTPUT=patch"
-          echo "COMMIT=HEAD^"
-
-          echo "DOCKER_ISOLATION=process"
-          echo "DOCKER_CONAN_CACHE=build/conan/data"
-        } >> "$GITHUB_ENV"
-    - name: Load cached dependecies
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.DOCKER_CONAN_CACHE }}
-        key: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}_${{ hashFiles('scripts/conanfile.py') }}
-        restore-keys: conan_${{ runner.os }}_${{ env.BUILD_TYPE }}_${{ env.TOOLCHAIN }}_asan-${{ env.ASAN }}_tsan-${{ env.TSAN }}_ubsan-${{ env.UBSAN }}
-    - name: Download and start container
-      # See https://github.com/rudenkornk/docker_cpp
-      run: make container
-    - name: Install dependecies
-      run: make in_docker TARGET=conan
-    - name: Configure
-      run: make in_docker TARGET=compile_commands
-    - name: Run linter
-      run: make in_docker TARGET=${{ matrix.tool }}
-    - name: Check
-      run: |
-        if [ -s patch ]; then
-          cat patch
-          exit 1
-        fi
+      - name: Check format
+        run: |
+          cmake --build build --target format
+          if [[ -n "$(git diff)" ]]; then echo "Code is not formatted."; git diff; exit 1; fi

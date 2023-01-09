@@ -1,0 +1,9 @@
+.cache
+.makepy/artifacts
+.venv
+.mypy_cache/
+__pycache__
+build/
+CMakeUserPresets.json
+compile_commands.json
+node_modules

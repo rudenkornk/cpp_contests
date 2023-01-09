@@ -1,0 +1,70 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "gcc_base",
+      "displayName": "Base gcc config.",
+      "generator": "Ninja",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_COLOR_DIAGNOSTICS": "ON",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CODE_COVERAGE": "OFF",
+        "LINT": "OFF",
+        "LIT": "ON",
+        "LIT_PARALLEL": "AUTO",
+        "VALGRIND": "OFF"
+      }
+    },
+    {
+      "name": "gcc_debug",
+      "displayName": "Debug gcc config.",
+      "inherits": ["gcc_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "gcc_release",
+      "displayName": "Release gcc config.",
+      "inherits": ["gcc_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "gcc_debug_san",
+      "displayName": "Debug gcc ub, asan and code coverage config.",
+      "inherits": ["gcc_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined",
+        "CODE_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "gcc_debug_valgrind",
+      "displayName": "Debug gcc valgrind config.",
+      "inherits": ["gcc_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VALGRIND": "ON"
+      }
+    },
+    {
+      "name": "gcc_release_tsan",
+      "displayName": "Debug gcc tsan config.",
+      "inherits": ["gcc_base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-fsanitize=thread"
+      }
+    }
+  ]
+}

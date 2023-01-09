@@ -1,5 +1,11 @@
 /build*
 /.cache
+/.makepy/artifacts
 __pycache__
 compile_commands.json
+CMakeUserPresets.json
+.mypy_cache
+/node_modules
+clang-tidy-fixes.yaml
+/.venv
 
