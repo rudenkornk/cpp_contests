@@ -40,7 +40,7 @@ Aside from recent compiler and `CMake` versions there are some optional dependen
    You most likely want to install this dependency, since it allows to conveniently manage C++ requirements such as `boost` or `fmt`.
    Required for project's CMake presets.
 1. `ninja` for project's CMake presets (but you can inherit your local presets and choose another build system).
-1. `ccache` for compiler cache. Required for project's CMake presets on Linux (but you can inherit your own local presets and disable `ccache`).
+1. `ccache` for compiler cache. Required for project's CMake presets (but you can inherit your own local presets and disable `ccache`).
 1. `python` for `lit` tests, gcc-based code coverage, `cmake` and `yaml` linting.
 1. `valgrind` for valgrind tests.
 1. `nodejs` for `prettier` formatter.
@@ -63,13 +63,12 @@ ctest --test-dir build
 cmake --install build --prefix build/install
 ```
 
-## Format & Lint
+## Format
 
 Formatting and linting is sensitive to the tools versions, so it is recommended (but not required) to run these commands inside container.
 
 ```bash
-make format
-make lint
+cmake --build build --target format
 ```
 
 ## Test installation

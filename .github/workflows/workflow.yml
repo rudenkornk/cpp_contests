@@ -46,13 +46,12 @@ jobs:
             echo "PARALLEL=$(nproc --all)"
             echo "PATH=$PATH"
             echo "VIRTUAL_ENV=$VIRTUAL_ENV"
-            echo "CACHE=$HOME/.cache"
           } >> "$GITHUB_ENV"
 
       - name: Load cached dependencies
         uses: actions/cache@v3
         with:
-          path: ${{ env.CACHE }}
+          path: /github/home/.cache
           key: cache_ubuntu_22.04_${{ matrix.preset }}_{{ hashFiles('vcpkg.json') }}
           restore-keys: cache_ubuntu_22.04_${{ matrix.preset }}
 
