@@ -27,7 +27,7 @@ function(activate_lto)
   set_property(GLOBAL PROPERTY LTO_ACTIVATED ON)
 endfunction()
 
-function(target_enable_optimizaions TARGET)
+function(target_enable_optimizations TARGET)
   get_property(lto_activated GLOBAL PROPERTY LTO_ACTIVATED)
   if(lto_activated)
     target_enable_lto(${TARGET})

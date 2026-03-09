@@ -3,9 +3,6 @@
 
 #include "lru_cache/solution.hpp"
 
-#include <algorithm>
-#include <iterator>
-
 int main() {
   std::size_t cache_length = 0;
   std::size_t n_elements = 0;

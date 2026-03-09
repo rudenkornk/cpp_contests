@@ -50,18 +50,18 @@ function(target_enable_clang_tidy TARGET)
   set_target_properties(${TARGET} PROPERTIES CLANG_TIDY_ENABLED ON)
 endfunction()
 
-# Enable warnings for targets, which called target_enable_coding_standards
+# Enable warnings for targets, which called target_allow_coding_standards
 function(activate_warnings)
   set_property(GLOBAL PROPERTY WARNINGS_ACTIVATED ON)
 endfunction()
 
-# Enable clang-tidy for targets, which called target_enable_coding_standards
+# Enable clang-tidy for targets, which called target_allow_coding_standards
 function(activate_clang_tidy)
   find_program(clang_tidy clang-tidy REQUIRED)
   set_property(GLOBAL PROPERTY CLANG_TIDY_ACTIVATED ON)
 endfunction()
 
-function(target_enable_coding_standards TARGET)
+function(target_allow_coding_standards TARGET)
   get_property(warnings_activated GLOBAL PROPERTY WARNINGS_ACTIVATED)
   if(warnings_activated)
     target_enable_warnings(${TARGET})
@@ -75,26 +75,34 @@ function(target_enable_coding_standards TARGET)
 endfunction()
 
 function(add_lint_test)
+  find_program(bash bash REQUIRED)
   find_program(git git REQUIRED)
   find_program(cmake_lint cmake-lint REQUIRED)
   find_program(yamllint yamllint REQUIRED)
+  find_program(typos typos REQUIRED)
+  # DONT TOUCH QUOTES. Yes, they differ from seemingly same `add_format_target`. Leave it like this, otherwise ctest
+  # will go crazy.
   add_test(
     NAME cmake_lint
-    COMMAND bash -c "cmake-lint $(git ls-files *.cmake *CMakeLists.txt)"
+    COMMAND bash -c "${cmake_lint} $(${git} ls-files *.cmake *CMakeLists.txt)"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
   add_test(
     NAME yamllint
-    COMMAND yamllint --strict .github
+    COMMAND ${yamllint} --strict .github
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  add_test(
+    NAME typos
+    COMMAND ${typos}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endfunction()
 
 function(add_format_target)
   add_custom_target(
     format
+    # DONT TOUCH QUOTES AND BACKTICKS -- ninja goes crazy with $(...) syntax in SOME cases.
     COMMAND bash -c 'clang-format -i `git ls-files *.h *.c *.hpp *.cpp`'
     COMMAND bash -c 'cmake-format --in-place `git ls-files *.cmake *.CMakeLists.txt`'
-    COMMAND npm install --save-exact
-    COMMAND npx prettier --loglevel warn --write .
+    COMMAND bash -c 'prettier --log-level warn --write .'
     COMMENT "Format all source files"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endfunction()

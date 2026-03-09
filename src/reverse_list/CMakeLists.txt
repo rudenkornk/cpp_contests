@@ -12,4 +12,4 @@ target_sources(
 target_compile_features(reverse_list INTERFACE cxx_std_23)
 target_setup_for_install(reverse_list)
 
-add_subdirectory(unit_tests)
+add_subdirectory(tests)
