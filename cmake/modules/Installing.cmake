@@ -110,38 +110,6 @@ function(_set_test_install_find_packages)
       PARENT_SCOPE)
 endfunction()
 
-function(_set_test_install_vcpkg)
-  set(options)
-  set(oneValueArgs)
-  set(multiValueArgs VCPKG_DEPS)
-  cmake_parse_arguments(PARSE_ARGV 0 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
-
-  if(ARG_UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Too many arguments.")
-  endif()
-
-  list(SORT ARG_VCPKG_DEPS)
-  set(vcpkg_next "") # Workaround for weird json syntax
-  foreach(dependency ${ARG_VCPKG_DEPS})
-    string(APPEND vcpkg_deps ${vcpkg_comma})
-    set(vcpkg_next ",\n")
-    string(APPEND vcpkg_deps "\"")
-    string(APPEND vcpkg_deps ${dependency})
-    string(APPEND vcpkg_deps "\"")
-  endforeach()
-
-  file(READ ${PROJECT_SOURCE_DIR}/vcpkg.json vcpkg_json)
-  string(JSON baseline GET ${vcpkg_json} "builtin-baseline")
-
-  set(VCPKG_DEPS
-      ${vcpkg_deps}
-      PARENT_SCOPE)
-
-  set(VCPKG_BASELINE
-      ${baseline}
-      PARENT_SCOPE)
-endfunction()
-
 function(_set_test_install_binaries)
   set(options)
   set(oneValueArgs)
@@ -186,11 +154,11 @@ function(_set_test_install_binaries)
       PARENT_SCOPE)
 endfunction()
 
-# Create a simple project, which checks that all targets and headers were exported
 function(configure_test_install_project)
+  # Create a simple project, which checks that all targets and headers were exported.
   set(options)
   set(oneValueArgs)
-  set(multiValueArgs FIND_PACKAGES VCPKG_DEPS)
+  set(multiValueArgs FIND_PACKAGES)
   cmake_parse_arguments(PARSE_ARGV 0 ARG "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
   if(ARG_UNPARSED_ARGUMENTS)
@@ -198,13 +166,10 @@ function(configure_test_install_project)
   endif()
 
   _set_test_install_find_packages(FIND_PACKAGES ${ARG_FIND_PACKAGES})
-  _set_test_install_vcpkg(VCPKG_DEPS ${ARG_VCPKG_DEPS})
   _set_test_install_binaries()
 
   set(in_path ${PROJECT_SOURCE_DIR}/cmake/test_install)
-  configure_file(${in_path}/vcpkg.json.in ${PROJECT_BINARY_DIR}/test_install/vcpkg.json @ONLY)
   configure_file(${in_path}/CMakeLists.txt.in ${PROJECT_BINARY_DIR}/test_install/CMakeLists.txt @ONLY)
-  configure_file(${in_path}/CMakePresets.json.in ${PROJECT_BINARY_DIR}/test_install/CMakePresets.json @ONLY)
   configure_file(${in_path}/main.cpp.in ${PROJECT_BINARY_DIR}/test_install/main.cpp @ONLY)
 endfunction()
 

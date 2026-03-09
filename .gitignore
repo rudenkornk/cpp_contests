@@ -8,4 +8,4 @@ CMakeUserPresets.json
 /node_modules
 clang-tidy-fixes.yaml
 /.venv
-
+/result

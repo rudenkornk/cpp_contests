@@ -1,0 +1,11 @@
+add_executable(two_queue_cache_unit_tests)
+target_sources(two_queue_cache_unit_tests PRIVATE test.cpp)
+
+target_link_libraries(two_queue_cache_unit_tests PRIVATE Boost::headers)
+target_link_libraries(two_queue_cache_unit_tests PRIVATE two_queue_cache)
+target_add_headers_as_sources(two_queue_cache_unit_tests two_queue_cache)
+
+target_allow_instrumentation(two_queue_cache_unit_tests)
+target_allow_coding_standards(two_queue_cache_unit_tests)
+
+add_tests(TARGET two_queue_cache_unit_tests)

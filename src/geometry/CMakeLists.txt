@@ -16,4 +16,4 @@ target_compile_features(geometry INTERFACE cxx_std_23)
 target_setup_for_install(geometry)
 
 target_link_libraries(geometry INTERFACE utils)
-add_subdirectory(unit_tests)
+add_subdirectory(tests)

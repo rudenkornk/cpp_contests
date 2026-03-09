@@ -1,3 +1,3 @@
 # LRU cache
 
-Implement simple least-recently-used cache
+Implement simple least-recently-used cache.

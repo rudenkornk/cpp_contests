@@ -1,0 +1,11 @@
+add_executable(valid_parenthesis_unit_tests)
+target_sources(valid_parenthesis_unit_tests PRIVATE test.cpp)
+
+target_link_libraries(valid_parenthesis_unit_tests PRIVATE utils)
+target_link_libraries(valid_parenthesis_unit_tests PRIVATE Boost::headers)
+add_dependencies(valid_parenthesis_unit_tests valid_parenthesis_cli)
+
+target_allow_instrumentation(valid_parenthesis_unit_tests)
+target_allow_coding_standards(valid_parenthesis_unit_tests)
+
+add_tests(TARGET valid_parenthesis_unit_tests)

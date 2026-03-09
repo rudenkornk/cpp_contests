@@ -97,7 +97,7 @@ public:
   }
   friend constexpr std::partial_ordering
   operator<=>(TransposeIterator const &lhs, TransposeIterator const &rhs) {
-    if (lhs.begin() != rhs.begin())
+    if (lhs.begin_ != rhs.begin_)
       return std::partial_ordering::unordered;
     return lhs.i_ <=> rhs.i_;
   }
