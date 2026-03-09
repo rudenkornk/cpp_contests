@@ -6,7 +6,6 @@
       "displayName": "Base gcc config.",
       "generator": "Ninja",
       "hidden": true,
-      "toolchainFile": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "OFF",
         "CMAKE_C_COMPILER": "gcc",
@@ -17,9 +16,7 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CODE_COVERAGE": "OFF",
         "LINT": "OFF",
-        "LIT": "ON",
-        "LIT_PARALLEL": "AUTO",
-        "VALGRIND": "OFF"
+        "WARNINGS": "ON"
       }
     },
     {
@@ -54,7 +51,7 @@
       "inherits": ["gcc_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "VALGRIND": "ON"
+        "CMAKE_TEST_LAUNCHER": "valgrind"
       }
     },
     {

@@ -1,0 +1,68 @@
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
+// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+
+#define BOOST_TEST_MODULE Test  // NOLINT
+#define _CRT_SECURE_NO_WARNINGS // NOLINT
+
+#include <cassert>
+#include <filesystem>
+#include <fstream>
+#include <functional>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <boost/test/included/unit_test.hpp>
+
+#include "missing_numbers/solution.hpp"
+#include "utils/test_utils.hpp"
+#include "utils/utils.hpp"
+
+using namespace cpp_contests;
+
+BOOST_GLOBAL_FIXTURE(TestArgsFixture);
+
+BOOST_AUTO_TEST_CASE(library_function_tests) {
+  BOOST_TEST((std::pair(0u, 1u) == missing_numbers({})));
+  BOOST_TEST((std::pair(0u, 1u) == missing_numbers({2})));
+  BOOST_TEST((std::pair(0u, 1u) == missing_numbers({3, 2})));
+  BOOST_TEST((std::pair(0u, 1u) == missing_numbers({4, 3, 2})));
+  BOOST_TEST((std::pair(2u, 6u) == missing_numbers({7, 4, 1, 0, 3, 5})));
+  BOOST_TEST((std::pair(2u, 5u) == missing_numbers({7, 4, 1, 0, 3, 6})));
+  BOOST_TEST(
+      (std::pair(2u, 5u) == missing_numbers({7, 4, 1, 0, 3, 6, 9, 11, 10, 8})));
+}
+
+static std::pair<unsigned, unsigned>
+run_cli_test(std::string const &file_content) {
+  auto content_hash = std::hash<std::string>{}(file_content);
+  auto temp_path =
+      std::filesystem::temp_directory_path() /
+      ("missing_numbers_test_" + std::to_string(content_hash) + ".txt");
+
+  {
+    std::ofstream temp_file(temp_path);
+    temp_file << file_content;
+  }
+
+  auto [exit_code, stdout_str, stderr_str] =
+      run_shell(TestArgsFixture::cli_tools.at("missing_numbers_cli") + " " +
+                temp_path.string());
+
+  // Clean up temporary file
+  std::filesystem::remove(temp_path);
+
+  std::istringstream iss(stdout_str);
+  unsigned first = 0, second = 0;
+  iss >> first >> second;
+  return {first, second};
+}
+
+BOOST_AUTO_TEST_CASE(cli_integration_tests) {
+  BOOST_TEST((std::pair(0u, 1u) == run_cli_test("")));
+  BOOST_TEST((std::pair(2u, 5u) == run_cli_test("7 4 1 0 3 6")));
+}
+
+// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTEND(cppcoreguidelines-pro-type-vararg)

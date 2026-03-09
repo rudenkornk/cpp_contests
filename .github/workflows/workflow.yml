@@ -17,57 +17,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  main:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
+      - run: nix build
+
+  test:
     strategy:
       matrix:
         preset:
+          - gcc_debug
           - gcc_debug_san
           - gcc_debug_valgrind
+          - gcc_release
           - gcc_release_tsan
+          - llvm_debug
           - llvm_debug_san
           - llvm_debug_valgrind
+          - llvm_release
           - llvm_release_tsan
 
-    runs-on: ubuntu-22.04
-    container: ghcr.io/rudenkornk/cpp_ubuntu:22.0.17
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set safe repo
-        run: git config --global --add safe.directory "$(realpath .)"
-
-      - name: Set common environment
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          python3 -m pip install -r requirements.txt
-          {
-            echo "PARALLEL=$(nproc --all)"
-            echo "PATH=$PATH"
-            echo "VIRTUAL_ENV=$VIRTUAL_ENV"
-          } >> "$GITHUB_ENV"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
+      - uses: nicknovitski/nix-develop@9be7cfb4b10451d3390a75dc18ad0465bed4932a # v1.2.1
 
       - name: Load cached dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          path: /github/home/.cache
-          key: cache_ubuntu_22.04_${{ matrix.preset }}_{{ hashFiles('vcpkg.json') }}
-          restore-keys: cache_ubuntu_22.04_${{ matrix.preset }}
+          path: ~/.cache
+          key: cache_main_${{ matrix.preset }}_${{ hashFiles('flake.lock') }}
+          restore-keys: cache_main_${{ matrix.preset }}
 
       - name: Configure
         run: cmake -S . -B build --preset ${{ matrix.preset }}
       - name: Build
-        run: cmake --build build --parallel "$PARALLEL" --verbose
+        run: cmake --build build --parallel --verbose
       - name: Test
-        run: ctest --test-dir build --parallel "$PARALLEL" --verbose
+        run: ctest --test-dir build --parallel --verbose
       - name: Install
         run: cmake --install build --prefix build/install --verbose
       - name: Test install
         run: |
-          cmake -S build/test_install/ -B build/test_install/build  \
-            --preset llvm_release -Dcpp_contests_DIR="$(realpath build/install/lib/cmake/cpp_contests/)"
-          cmake --build build/test_install/build --parallel "$PARALLEL" --verbose
+          cmake -S build/test_install/ -B build/test_install/build \
+            -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests/)"
+          cmake --build build/test_install/build --parallel --verbose
       - name: Create package
         run: cd build && cpack -C CPackConfig.cmake
 

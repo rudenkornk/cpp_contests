@@ -3,7 +3,6 @@
 #include <cassert>
 #include <functional>
 #include <list>
-#include <string>
 #include <unordered_map>
 
 namespace cpp_contests {
