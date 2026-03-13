@@ -1,27 +1,29 @@
-// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
-
-#define BOOST_TEST_MODULE Test  // NOLINT
-#define _CRT_SECURE_NO_WARNINGS // NOLINT
+#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <string>
 
-#include <boost/process.hpp>
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/tools/interface.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 #include "lru_cache/solution.hpp"
 #include "utils/test_utils.hpp"
 #include "utils/utils.hpp"
 
-using namespace cpp_contests;
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
+using cpp_contests::lru_hits;
+using cpp_contests::TestArgsFixture;
 
 BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
-static int run_cli_test(std::string const &input) {
-  auto &&[exit_code, stdout, stderr] =
-      run_shell(TestArgsFixture::cli_tools.at("lru_cache_cli"), input);
+namespace {
+auto run_cli_test(std::string const &input) -> int {
+  auto &&[exit_code, stdout, stderr] = cpp_contests::run_shell(
+      TestArgsFixture::cli_tools.at("lru_cache_cli"), input);
   return std::stoi(stdout);
 }
+} // namespace
 
 BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(lru_hits({}, 0, 0) == 0);
@@ -54,5 +56,4 @@ BOOST_AUTO_TEST_CASE(cli_integration_tests) {
   BOOST_TEST(run_cli_test("4 14 1 2 3 1 2 4 5 1 7 3 2 6 1 2\n") == 4);
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-// NOLINTEND(cppcoreguidelines-pro-type-vararg)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

@@ -3,7 +3,7 @@
 
 // clang-format off
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
   #define DISABLE_WARNING_PUSH           __pragma(warning( push ))
   #define DISABLE_WARNING_POP            __pragma(warning( pop ))
   #define DISABLE_WARNING(warningNumber) __pragma(warning( disable : warningNumber ))

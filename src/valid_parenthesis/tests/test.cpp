@@ -1,25 +1,27 @@
-// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
-
-#define BOOST_TEST_MODULE Test  // NOLINT
-#define _CRT_SECURE_NO_WARNINGS // NOLINT
+#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <string>
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/tools/interface.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 #include "utils/test_utils.hpp"
 #include "utils/utils.hpp"
 
-using namespace cpp_contests;
+using cpp_contests::run_shell;
+using cpp_contests::TestArgsFixture;
 
 BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
-static bool run_cli_test(std::string const &file_content) {
+namespace {
+auto run_cli_test(std::string const &file_content) -> bool {
   auto content_hash = std::hash<std::string>{}(file_content);
   auto temp_path =
       std::filesystem::temp_directory_path() /
@@ -42,6 +44,7 @@ static bool run_cli_test(std::string const &file_content) {
   iss >> result;
   return result != 0;
 }
+} // namespace
 
 BOOST_AUTO_TEST_CASE(cli_integration_tests) {
   BOOST_TEST(run_cli_test("()") == true);
@@ -58,6 +61,3 @@ BOOST_AUTO_TEST_CASE(cli_integration_tests) {
   BOOST_TEST(run_cli_test("(())") == true);
   BOOST_TEST(run_cli_test("(()())") == true);
 }
-
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-// NOLINTEND(cppcoreguidelines-pro-type-vararg)

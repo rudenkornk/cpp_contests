@@ -1,18 +1,20 @@
 #include <cassert>
-#include <numeric>
+#include <cstddef>
 #include <set>
 #include <vector>
 
 #include "k_max/solution.hpp"
 
-std::vector<int> cpp_contests::k_max(std::vector<int> const &nums,
-                                     std::size_t k) {
+auto cpp_contests::k_max(std::vector<int> const &nums,
+                         // NOLINTNEXTLINE(readability-identifier-length)
+                         std::size_t k) -> std::vector<int> {
   // O(n) memory, O(n * log(k)) time
   std::vector<int> result{};
   result.reserve(nums.size() + 1 - k);
   std::multiset<int> window{};
-  for (std::size_t i = 0; i != k; ++i)
+  for (std::size_t i = 0; i != k; ++i) {
     window.insert(nums[i]);
+  }
 
   result.push_back(*window.rbegin());
   for (std::size_t i = 1; i != nums.size() + 1 - k; ++i) {

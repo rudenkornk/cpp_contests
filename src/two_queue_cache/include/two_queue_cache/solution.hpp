@@ -1,11 +1,14 @@
 #pragma once
 
 #include <cassert>
+#include <concepts>
+#include <cstddef>
 #include <functional>
 #include <list>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 namespace cpp_contests {
 
@@ -36,7 +39,7 @@ class TwoQueueCache final {
   HotList hot_;
 
 public:
-  // NOLINTNEXTLINE
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   TwoQueueCache(Load const &load, std::size_t max_size_in_bytes,
                 std::size_t override_value_size = sizeof(Value))
       : load_(load), max_size_(max_size_in_bytes),
@@ -53,25 +56,27 @@ public:
   // requires special handling, not supported in these methods by default
   TwoQueueCache(TwoQueueCache const &) = delete;
   TwoQueueCache(TwoQueueCache &&) = delete;
-  TwoQueueCache &operator=(TwoQueueCache const &) = delete;
-  TwoQueueCache &operator=(TwoQueueCache &&) = delete;
+  auto operator=(TwoQueueCache const &) -> TwoQueueCache & = delete;
+  auto operator=(TwoQueueCache &&) -> TwoQueueCache & = delete;
   ~TwoQueueCache() = default;
 
-  Value lookup_update(Key const &key) {
+  auto lookup_update(Key const &key) -> Value {
     if (hot_positions_.contains(key)) {
       touch_hot(key);
       return data_.at(key);
     }
 
     // key in cold_in_ bucket
-    if (data_.contains(key))
+    if (data_.contains(key)) {
       return data_.at(key);
+}
 
     Value value = load_and_allocate(key);
-    if (cold_out_set_.contains(key))
+    if (cold_out_set_.contains(key)) {
       push_hot(key);
-    else
+    } else {
       push_cold(key);
+}
 
     verify();
     return value;
@@ -82,7 +87,7 @@ private:
     auto &&pos = hot_positions_.at(key);
     hot_.splice(pos, hot_, std::next(pos), hot_.end());
   }
-  Value load_and_allocate(Key const &key) {
+  auto load_and_allocate(Key const &key) -> Value {
     assert(!data_.contains(key));
     Value value = std::invoke(load_, key);
     data_.emplace(key, value);
@@ -125,9 +130,9 @@ private:
   }
 };
 
-inline std::size_t two_queue_hits(std::vector<int> const &elements,
+inline auto two_queue_hits(std::vector<int> const &elements,
                                   std::size_t max_size_in_bytes,
-                                  std::size_t value_size) {
+                                  std::size_t value_size) -> std::size_t {
   std::size_t misses{0};
   auto load = [&misses](int) -> int {
     ++misses;
@@ -135,8 +140,9 @@ inline std::size_t two_queue_hits(std::vector<int> const &elements,
   };
   cpp_contests::TwoQueueCache<int, int, decltype(load)> cache{
       load, max_size_in_bytes, value_size};
-  for (auto &&e : elements)
-    cache.lookup_update(e);
+  for (auto &&elem : elements) {
+    cache.lookup_update(elem);
+}
   return elements.size() - misses;
 }
 
