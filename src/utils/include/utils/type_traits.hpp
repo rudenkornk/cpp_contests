@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <tuple>
 #include <type_traits>
@@ -17,7 +19,7 @@ constexpr static auto isInstanceOf = _isInstanceOf<Instance, Template>::value;
 
 template <typename Callable> struct CallableTraits final {
 private:
-  enum class CallableKind { Function, Method, Lambda };
+  enum class CallableKind : std::uint8_t { Function, Method, Lambda };
 
   template <typename Callable_> struct FunctionArgTypes;
   template <typename Callable_, typename... Args>
@@ -67,11 +69,14 @@ private:
         LambdaOrMethodArgTypes<Callable_>::isCallableConst;
   };
 
-  template <class Callable_> CallableKind constexpr static GetCallableKind() {
-    if (std::is_function_v<Callable_>)
+  template <class Callable_>
+  auto constexpr static GetCallableKind() -> CallableKind {
+    if (std::is_function_v<Callable_>) {
       return CallableKind::Function;
-    if (std::is_class_v<Callable_>)
+    }
+    if (std::is_class_v<Callable_>) {
       return CallableKind::Lambda;
+    }
     return CallableKind::Method;
   }
 
@@ -108,13 +113,14 @@ public:
   constexpr static bool isCallableConst = ArgTypes::isCallableConst;
 
   template <size_t n>
-  constexpr static decltype(auto)
+  constexpr static auto
   Forward(std::add_lvalue_reference_t<std::remove_reference_t<Type<n>>>
-              arg) noexcept {
-    if constexpr (isValue<n> || isRValueReference<n>)
+              arg) noexcept -> decltype(auto) {
+    if constexpr (isValue<n> || isRValueReference<n>) {
       return std::move(arg);
-    else
+    } else {
       return arg;
+    }
   }
 };
 } // namespace cpp_contests

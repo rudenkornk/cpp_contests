@@ -1,9 +1,10 @@
+#include <cstddef>
 #include <iostream>
 #include <vector>
 
 #include "perfect_cache/solution.hpp"
 
-int main() {
+auto main() -> int {
   std::size_t cache_length = 0;
   std::size_t n_elements = 0;
   std::vector<int> elements{};
@@ -15,9 +16,9 @@ int main() {
     std::cin >> n_elements;
     elements.reserve(n_elements);
     for (std::size_t i = 0; i < n_elements; ++i) {
-      int n = 0;
-      std::cin >> n;
-      elements.push_back(n);
+      int n_el = 0;
+      std::cin >> n_el;
+      elements.push_back(n_el);
     }
   } catch (std::ios_base::failure const &e) {
     std::cout << "Incorrect input! \n";

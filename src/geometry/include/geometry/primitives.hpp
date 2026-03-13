@@ -2,11 +2,14 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <optional>
+#include <utility>
 
 #include "geometry/matrix.hpp"
 
 namespace cpp_contests {
+// NOLINTBEGIN(readability-identifier-length)
 
 using Point = Vector<3, double>;
 
@@ -18,40 +21,50 @@ public:
   constexpr explicit Line(Point const &R0, Point const &R) noexcept
       : R0_(R0), R_(R / n(R)) {}
 
-  [[nodiscard]] constexpr double param(Point const &p) const noexcept {
+  [[nodiscard]] constexpr auto param(Point const &p) const noexcept -> double {
     auto diff = p - R0_;
-    auto mi = std::max_element(R_.begin(), R_.end(),
-                               [](auto left, auto right) {
-                                 return std::abs(left) < std::abs(right);
-                               }) -
-              R_.begin();
+    auto mi =
+        std::ranges::max_element(R_,
+                                 [](auto left, auto right) -> auto {
+                                   return std::abs(left) < std::abs(right);
+                                 }) -
+        R_.begin();
     auto l = diff[mi] / R_[mi];
 #ifndef NDEBUG
     for (std::size_t i = 0; i < 3; ++i) {
-      if (i == static_cast<std::size_t>(mi))
+      if (std::cmp_equal(i, mi)) {
         continue;
-      if (std::abs(R_[i]) < EPSMIN)
+      }
+      if (std::abs(R_[i]) < EPSMIN) {
         continue;
+      }
       auto ldebug = diff[i] / R_[i];
       assert(std::abs(l - ldebug) <= EPSMAX * std::abs(l));
     }
 #endif
     return l;
   }
-  [[nodiscard]] constexpr Point point(double param) const noexcept {
+  [[nodiscard]] constexpr auto point(double param) const noexcept -> Point {
     return R0_ + param * R_;
   }
 
-  [[nodiscard]] constexpr Point const &R0() const noexcept { return R0_; }
-  [[nodiscard]] constexpr Point const &R() const noexcept { return R_; }
+  [[nodiscard]] constexpr auto R0() const noexcept -> Point const & {
+    return R0_;
+  }
+  [[nodiscard]] constexpr auto R() const noexcept -> Point const & {
+    return R_;
+  }
 };
 
 struct Segment {
-  Point s;
-  Point e;
+  Point s; // NOLINT(misc-non-private-member-variables-in-classes)
+  Point e; // NOLINT(misc-non-private-member-variables-in-classes)
 
-  [[nodiscard]] constexpr Line line() const noexcept { return Line{s, e - s}; }
-};
+  [[nodiscard]] constexpr auto line() const noexcept -> Line {
+    return Line{s, e - s};
+  }
+} __attribute__((aligned(
+    64))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 class Plane final {
 private:
@@ -80,58 +93,62 @@ public:
       : normal_(Point{A, B, C} / norm_coeff_(A, B, C)),
         d_(-D / norm_coeff_(A, B, C)) {}
 
-  [[nodiscard]] constexpr Point const &normal() const noexcept {
+  [[nodiscard]] constexpr auto normal() const noexcept -> Point const & {
     return normal_;
   }
-  [[nodiscard]] constexpr double dist() const noexcept { return d_; }
+  [[nodiscard]] constexpr auto dist() const noexcept -> double { return d_; }
 };
 
-constexpr double dist(Point const &p1, Point const &p2) noexcept {
+constexpr auto dist(Point const &p1, Point const &p2) noexcept -> double {
   return n(p1 - p2);
 }
 
-constexpr bool complanar(Plane const &p1, Plane const &p2,
-                         double eps = EPSMIN) noexcept {
+constexpr auto complanar(Plane const &p1, Plane const &p2,
+                         double eps = EPSMIN) noexcept -> bool {
   auto diff = n(cross(p1.normal(), p2.normal()));
   // diff is implicitly divided by normal length squared to get relative
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
-constexpr bool complanar(Point const &p1, Point const &p2, Point const &p3,
-                         Point const &p4, double eps = EPSMIN) noexcept {
+constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3,
+                         Point const &p4, double eps = EPSMIN) noexcept
+    -> bool {
 
   auto v1 = p1 - p3;
   auto v2 = p2 - p3;
-  if (n(cross(v1, v2)) <= eps * n(v1) * n(v2))
+  if (n(cross(v1, v2)) <= eps * n(v1) * n(v2)) {
     return true;
+  }
 
   auto v3 = p1 - p4;
   auto v4 = p2 - p4;
-  if (n(cross(v3, v4)) <= eps * n(v3) * n(v4))
+  if (n(cross(v3, v4)) <= eps * n(v3) * n(v4)) {
     return true;
+  }
 
   auto plane1 = Plane{p1, p2, p3};
   auto plane2 = Plane{p1, p2, p4};
   return complanar(plane1, plane2, eps);
 }
-constexpr bool complanar(Line const &l1, Line const &l2,
-                         double eps = EPSMIN) noexcept {
+constexpr auto complanar(Line const &l1, Line const &l2,
+                         double eps = EPSMIN) noexcept -> bool {
   return complanar(l1.R0(), l1.R0() + l1.R(), l2.R0(), l2.R0() + l2.R(), eps);
 }
 
-constexpr bool parallel(Line const &l1, Line const &l2,
-                        double eps = EPSMIN) noexcept {
+constexpr auto parallel(Line const &l1, Line const &l2,
+                        double eps = EPSMIN) noexcept -> bool {
   auto diff = n(cross(l1.R(), l2.R()));
   // diff is implicitly divided by normal length squared to get relative
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
 
-constexpr std::optional<Point> complanar_intersection(Line const &p1,
-                                                      Line const &p2) noexcept {
+constexpr auto complanar_intersection(Line const &p1, Line const &p2) noexcept
+    -> std::optional<Point> {
   assert(complanar(p1, p2, EPSMAX));
-  if (parallel(p1, p2))
+  if (parallel(p1, p2)) {
     return std::nullopt;
+  }
 
   auto right = p2.R0() - p1.R0();
   auto left = Matrix<2, 3, double>{p1.R(), -p2.R()};
@@ -157,10 +174,11 @@ constexpr std::optional<Point> complanar_intersection(Line const &p1,
   return Point{};
 }
 
-constexpr std::optional<Line> intersection(Plane const &p1,
-                                           Plane const &p2) noexcept {
-  if (complanar(p1, p2))
+constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept
+    -> std::optional<Line> {
+  if (complanar(p1, p2)) {
     return std::nullopt;
+  }
 
   auto d1 = p1.dist();
   auto d2 = p2.dist();
@@ -172,49 +190,56 @@ constexpr std::optional<Line> intersection(Plane const &p1,
   return Line{R0, R};
 }
 
-constexpr std::optional<Point> intersection(Plane const &p1, Plane const &p2,
-                                            Plane const &p3) noexcept {
-  if (complanar(Point{}, p1.normal(), p2.normal(), p3.normal()))
+constexpr auto intersection(Plane const &p1, Plane const &p2,
+                            Plane const &p3) noexcept -> std::optional<Point> {
+  if (complanar(Point{}, p1.normal(), p2.normal(), p3.normal())) {
     return std::nullopt;
+  }
 
-  Matrix<3, 3, double> M{t(p1.normal()), t(p2.normal()), t(p3.normal())};
+  Matrix<3, 3, double> const M{t(p1.normal()), t(p2.normal()), t(p3.normal())};
   return inv(M) * Point{p1.dist(), p2.dist(), p3.dist()};
 }
 
-constexpr std::optional<Point> complanar_intersection(Segment const &s,
-                                                      Line const &l) noexcept {
+constexpr auto complanar_intersection(Segment const &s, Line const &l) noexcept
+    -> std::optional<Point> {
   auto seg = s.line();
   assert(complanar(seg, l, EPSMAX));
   auto intersection = complanar_intersection(seg, l);
-  if (!intersection)
+  if (!intersection) {
     // segment and line are parallel
     return std::nullopt;
+  }
 
   auto param = seg.param(intersection.value());
-  if (0.0 <= param && param <= n(s.e - s.s))
+  if (0.0 <= param && param <= n(s.e - s.s)) {
     return intersection;
+  }
   return std::nullopt;
 }
 
-constexpr std::optional<Point>
-complanar_intersection(Line const &l, Segment const &s) noexcept {
+constexpr auto complanar_intersection(Line const &l, Segment const &s) noexcept
+    -> std::optional<Point> {
   return complanar_intersection(s, l);
 }
 
-constexpr std::optional<Point>
+constexpr auto
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-complanar_intersection(Segment const &s1, Segment const &s2) noexcept {
+complanar_intersection(Segment const &s1, Segment const &s2) noexcept
+    -> std::optional<Point> {
   auto l1 = s1.line();
   auto l2 = s2.line();
   auto i1 = complanar_intersection(s1, l2);
-  if (!i1)
+  if (!i1) {
     return std::nullopt;
+  }
   auto i2 = complanar_intersection(s2, l1);
-  if (!i2)
+  if (!i2) {
     return std::nullopt;
+  }
 
   assert(n(i1.value() - i2.value()) <= EPSMAX * n(i1.value()));
   return i1;
 }
 
+// NOLINTEND(readability-identifier-length)
 } // namespace cpp_contests
