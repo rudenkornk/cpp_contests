@@ -1,27 +1,28 @@
-// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
-
-#define BOOST_TEST_MODULE Test  // NOLINT
-#define _CRT_SECURE_NO_WARNINGS // NOLINT
+#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstddef>
 #include <vector>
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
 
 #include "two_queue_cache/solution.hpp"
 
-using namespace cpp_contests;
+using cpp_contests::two_queue_hits;
 
+namespace {
 // Helper function to compute cache hits using the same parameters as CLI
-static std::size_t compute_hits(std::vector<int> const &elements,
-                                std::size_t cache_size) {
+auto compute_hits(std::vector<int> const &elements, std::size_t cache_size)
+    -> std::size_t {
   constexpr std::size_t virtual_value_size = std::size_t{1024} * 1024 * 1024;
   constexpr std::size_t key_size = sizeof(int);
   return two_queue_hits(elements,
                         cache_size * (virtual_value_size + (key_size * 3) / 2),
                         virtual_value_size);
 }
+} // namespace
+
+// NOLINTBEGIN(misc-include-cleaner)
 
 BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(compute_hits({}, 0) == std::size_t{0});
@@ -46,5 +47,4 @@ BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(compute_hits({1, 2, 1, 2, 1, 2}, 2) == std::size_t{0});
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-// NOLINTEND(cppcoreguidelines-pro-type-vararg)
+// NOLINTEND(misc-include-cleaner)

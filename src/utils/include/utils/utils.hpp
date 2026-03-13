@@ -5,8 +5,10 @@
 #include <atomic>
 #include <cassert>
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <numeric>
 #include <random>
@@ -15,18 +17,20 @@
 #include <string_view>
 #include <thread>
 #include <tuple>
+#include <utility>
 #include <vector>
 
-#include <boost/process.hpp>
+#include <boost/process.hpp> // NOLINT(misc-include-cleaner)
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "utils/type_traits.hpp"
 
 namespace cpp_contests {
 
-inline std::string size_to_string(size_t size) {
-  // NOLINTNEXTLINE
+inline auto size_to_string(size_t size) -> std::string {
+  // NOLINTNEXTLINE(altera-id-dependent-backward-branch)
   constexpr std::array<std::string_view, 8> units = {
       "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"};
   constexpr std::size_t base = 1024;
@@ -38,66 +42,74 @@ inline std::string size_to_string(size_t size) {
   double result = 0;
   bool is_exact = true;
   while (size != 0) {
-    std::size_t residual = size % base;
-    result = static_cast<double>(residual) + result / base;
+    std::size_t const residual = size % base;
+    result = static_cast<double>(residual) + (result / base);
     size /= base;
-    if (residual > 0 && size > 0)
+    if (residual > 0 && size > 0) {
       is_exact = false;
+    }
     ++tier;
   }
   --tier;
-  if (is_exact)
-    return fmt::format("{} {}", result, units[tier]); // TODO std::format
-  else
-    return fmt::format("{:.1f} {}", result, units[tier]); // TODO std::format
+  if (is_exact) {
+    return fmt::format(
+        "{} {}", result,
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+        units[tier]); // TODO(rudenkornk): std::format
+  }
+  return fmt::format(
+      "{:.1f} {}", result,
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+      units[tier]); // TODO(rudenkornk): std::format
 }
 
-template <std::size_t N> inline std::array<size_t, N> get_indices() {
+template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
   auto indices = std::array<size_t, N>();
   std::iota(indices.begin(), indices.end(), size_t{0});
   return indices;
 }
 
 template <typename Vector, typename VectorIndexers, typename IndexFunction>
-void permute(Vector &v, VectorIndexers &perm, IndexFunction const &Index) {
+void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
   using T = typename Vector::value_type;
   using Indexer = typename VectorIndexers::value_type;
   static_assert(std::is_nothrow_swappable_v<T>);
   static_assert(std::is_nothrow_swappable_v<Indexer>);
   static_assert(std::is_nothrow_invocable_v<IndexFunction, Indexer>);
-  using std::swap;
-  assert(v.size() == perm.size());
-  if (v.size() == 0)
+  using std::swap; // NOLINT(misc-include-header,misc-include-cleaner)
+  assert(vec.size() == perm.size());
+  if (vec.size() == 0) {
     return;
+  }
 #ifndef NDEBUG
   assert(std::unique(perm.begin(), perm.end(),
-                     [&](Indexer const &lhs, Indexer const &rhs) {
+                     [&](Indexer const &lhs, Indexer const &rhs) -> auto {
                        return Index(lhs) == Index(rhs);
                      }) == perm.end());
   assert(Index(*std::min_element(perm.begin(), perm.end(),
-                                 [&](Indexer const &lhs, Indexer const &rhs) {
-                                   return lhs < rhs;
-                                 })) == 0);
-  assert(Index(*std::max_element(perm.begin(), perm.end(),
-                                 [&](Indexer const &lhs, Indexer const &rhs) {
-                                   return lhs < rhs;
-                                 })) == perm.size() - 1);
+                                 [&](Indexer const &lhs, Indexer const &rhs)
+                                     -> auto { return lhs < rhs; })) == 0);
+  assert(Index(*std::max_element(
+             perm.begin(), perm.end(),
+             [&](Indexer const &lhs, Indexer const &rhs) -> auto {
+               return lhs < rhs;
+             })) == perm.size() - 1);
   if constexpr (std::is_same_v<T, Indexer>) {
-    assert(&v != &perm);
+    assert(&vec != &perm);
   }
 #endif // !NDEBUG
 
-  auto &&control = std::vector<size_t>(v.size());
+  auto &&control = std::vector<size_t>(vec.size());
   std::ranges::iota(control, size_t{0});
-  for (auto i = size_t{0}, e = v.size(); i != e; ++i) {
+  for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
     while (Index(perm[i]) != i) {
       swap(control[i], control[Index(perm[i])]);
       swap(perm[i], perm[Index(perm[i])]);
     }
   }
-  for (auto i = size_t{0}, e = v.size(); i != e; ++i) {
+  for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
     while (control[i] != i) {
-      swap(v[i], v[control[i]]);
+      swap(vec[i], vec[control[i]]);
       swap(perm[i], perm[control[i]]);
       swap(control[i], control[control[i]]);
     }
@@ -105,37 +117,39 @@ void permute(Vector &v, VectorIndexers &perm, IndexFunction const &Index) {
 }
 
 template <typename Vector, typename VectorIndexers>
-void permute(Vector &v, VectorIndexers &perm) {
-  permute(v, perm, std::identity{});
+void permute(Vector &vec, VectorIndexers &perm) {
+  permute(vec, perm, std::identity{});
 }
 
 template <typename Vector, typename Comparator>
-std::vector<size_t> get_sort_permutation(Vector const &v,
-                                         Comparator const &cmp) {
-  auto permutation = get_indices(v.size());
-  std::sort(
-      permutation.begin(), permutation.end(),
-      [&](size_t index0, size_t index1) { return cmp(v[index0], v[index1]); });
+auto get_sort_permutation(Vector const &vec, Comparator const &cmp)
+    -> std::vector<size_t> {
+  auto permutation = get_indices(vec.size());
+  std::sort(permutation.begin(), permutation.end(),
+            [&](size_t index0, size_t index1) -> auto {
+              return cmp(vec[index0], vec[index1]);
+            });
   return permutation;
 }
 
 template <typename Vector>
-std::vector<size_t> get_sort_permutation(Vector const &v) {
-  return get_sort_permutation(v, std::less<>{});
+auto get_sort_permutation(Vector const &vec) -> std::vector<size_t> {
+  return get_sort_permutation(vec, std::less<>{});
 }
 
 template <typename Generator = std::mt19937, unsigned seed = 0>
-Generator &get_random_generator() {
+auto get_random_generator() -> Generator & {
   auto static thread_local generator = Generator{seed};
   return generator;
 }
 
 template <size_t NRuns = 1, typename FG, typename... Args>
-std::chrono::nanoseconds benchmark(FG const &Func, Args &&...args) {
+auto benchmark(FG const &Func, Args &&...args) -> std::chrono::nanoseconds {
   static_assert(CallableTraits<FG>::nArguments == sizeof...(args));
   auto start = std::chrono::steady_clock::now();
-  for (auto i = size_t{0}; i != NRuns; ++i)
+  for (auto i = size_t{0}; i != NRuns; ++i) {
     Func(std::forward<Args>(args)...);
+  }
   auto end = std::chrono::steady_clock::now();
   return (end - start) / NRuns;
 }
@@ -159,8 +173,8 @@ public:
 
   SaveRestore(SaveRestore const &) = delete;
   SaveRestore(SaveRestore &&other) noexcept { swap(other); }
-  SaveRestore &operator=(SaveRestore const &) = delete;
-  SaveRestore &operator=(SaveRestore &&other) & noexcept {
+  auto operator=(SaveRestore const &) -> SaveRestore & = delete;
+  auto operator=(SaveRestore &&other) & noexcept -> SaveRestore & {
     swap(other);
     return *this;
   }
@@ -187,20 +201,24 @@ class ExceptionSaver final {
   std::vector<std::exception_ptr> exceptions;
 
 public:
-  ExceptionSaver(size_t maxExceptions = 1) { exceptions.resize(maxExceptions); }
+  explicit ExceptionSaver(size_t maxExceptions = 1) {
+    exceptions.resize(maxExceptions);
+  }
   ExceptionSaver(ExceptionSaver const &) = delete;
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
-  ExceptionSaver &operator=(ExceptionSaver const &) = delete;
-  ExceptionSaver &operator=(ExceptionSaver &&other) & noexcept {
+  auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
+  auto operator=(ExceptionSaver &&other) & noexcept -> ExceptionSaver & {
     swap(other);
     return *this;
   }
   ~ExceptionSaver() noexcept(false) { rethrow(); }
 
-  [[nodiscard]] size_t ncaptured() const noexcept {
+  [[nodiscard]] auto ncaptured() const noexcept -> size_t {
     return nCapturedExceptions;
   }
-  [[nodiscard]] size_t nsaved() const noexcept { return nSavedExceptions; }
+  [[nodiscard]] auto nsaved() const noexcept -> size_t {
+    return nSavedExceptions;
+  }
 
   void swap(ExceptionSaver &other) noexcept {
     using std::swap;
@@ -223,23 +241,26 @@ public:
 
   void rethrow() {
 #ifndef NDEBUG
-    for (auto i = size_t{0}, e = exceptions.size(); i != e; ++i)
+    for (auto i = size_t{0}, end = exceptions.size(); i != end; ++i) {
       assert(static_cast<bool>(exceptions[i]) == (i < nSavedExceptions));
+    }
 #endif // !NDEBUG
-    if (!nSavedExceptions)
+    if (nSavedExceptions == 0U) {
       return;
+    }
     using std::swap;
-    auto e = std::exception_ptr{};
-    swap(e, exceptions[--nSavedExceptions]);
-    std::rethrow_exception(e);
+    auto exc = std::exception_ptr{};
+    swap(exc, exceptions[--nSavedExceptions]);
+    std::rethrow_exception(exc);
   }
   void drop() noexcept {
     std::fill_n(exceptions.begin(), nSavedExceptions.load(),
                 std::exception_ptr{});
     nSavedExceptions = 0;
 #ifndef NDEBUG
-    for (auto &&ptr : exceptions)
+    for (auto &&ptr : exceptions) {
       assert(!ptr);
+    }
 #endif // !NDEBUG
   }
   void set_max_exceptions(size_t max_exceptions) {
@@ -249,38 +270,42 @@ public:
 private:
   template <class Callable, size_t... Indices>
   auto wrap_(Callable const &callable,
-             std::integer_sequence<size_t, Indices...>) {
+             std::integer_sequence<size_t, Indices...> /*unused*/) {
     using ReturnType = typename CallableTraits<Callable>::ReturnType;
     return [&](typename CallableTraits<Callable>::template ArgType<
-               Indices>... args) noexcept {
+               Indices>... args) noexcept -> auto {
       try {
         return callable(
             std::forward<
                 typename CallableTraits<Callable>::template ArgType<Indices>>(
                 args)...);
       } catch (...) {
-        size_t index = nCapturedExceptions++;
+        size_t const index = nCapturedExceptions++;
         if (index < exceptions.size()) {
           ++nSavedExceptions;
           exceptions[index] = std::current_exception();
         }
-        if constexpr (!std::is_void_v<ReturnType>)
+        if constexpr (!std::is_void_v<ReturnType>) {
           return ReturnType{};
+        }
       }
     };
   }
 };
 
-void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept {
+inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept {
   left.swap(right);
 }
 
-static inline std::tuple<int, std::string, std::string>
+static inline auto
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 run_shell(std::string const &cmd, std::string const &stdin_data = "",
           std::map<std::string, std::string> const &extra_env = {},
           std::vector<std::filesystem::path> const &extra_paths = {},
           std::filesystem::path const &cwd = std::filesystem::current_path(),
-          bool check = true) {
+          bool check = true) -> std::tuple<int, std::string, std::string> {
+
+  // NOLINTBEGIN(misc-include-cleaner)
   namespace bp = boost::process;
 
   bp::ipstream stdout_stream;
@@ -324,7 +349,7 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   std::string stdout_result;
   std::string stderr_result;
 
-  auto read_stream = [](bp::ipstream &stream, std::string &result) {
+  auto read_stream = [](bp::ipstream &stream, std::string &result) -> void {
     std::string line;
     while (std::getline(stream, line)) {
       result += line + "\n";
@@ -345,7 +370,7 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   stderr_thread.join();
 
   process.wait();
-  int exit_code = process.exit_code();
+  int const exit_code = process.exit_code();
 
   if (check && exit_code != 0) {
     throw std::runtime_error("Command failed with exit code " +
@@ -354,6 +379,8 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
 
   return std::make_tuple(exit_code, std::move(stdout_result),
                          std::move(stderr_result));
+
+  // NOLINTEND(misc-include-cleaner)
 }
 
 } // namespace cpp_contests

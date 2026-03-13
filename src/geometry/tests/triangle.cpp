@@ -1,14 +1,16 @@
-// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
-#define BOOST_TEST_MODULE Matrix // NOLINT
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT
+#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/unit_test_suite.hpp>
 
-#include <boost/test/included/unit_test.hpp>
-
+#include "geometry/primitives.hpp"
 #include "geometry/triangle.hpp"
 
-using namespace cpp_contests;
+using cpp_contests::Point;
+using cpp_contests::Triangle;
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 
 BOOST_AUTO_TEST_CASE(triangle_test) {
   constexpr Triangle t1(Point{0.0, 0.0, 0.0}, Point{1.0, 0.0, 0.0},
@@ -36,5 +38,4 @@ BOOST_AUTO_TEST_CASE(triangle_test) {
   // static_assert(intersect(t1, t1));
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-// NOLINTEND(cppcoreguidelines-pro-type-vararg)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

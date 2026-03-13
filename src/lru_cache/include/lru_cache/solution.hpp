@@ -1,9 +1,12 @@
 #pragma once
 
 #include <cassert>
+#include <concepts>
+#include <cstddef>
 #include <functional>
 #include <list>
 #include <unordered_map>
+#include <vector>
 
 namespace cpp_contests {
 
@@ -17,7 +20,7 @@ class LRUCache final {
   std::unordered_map<Key, Position> key_positions_;
 
 public:
-  // NOLINTNEXTLINE
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   LRUCache(Load const &load, std::size_t max_size_in_bytes,
            std::size_t override_value_size = sizeof(Value))
       : load_(load),
@@ -27,11 +30,11 @@ public:
   // requires special handling, not supported in these methods by default
   LRUCache(LRUCache const &) = delete;
   LRUCache(LRUCache &&) = delete;
-  LRUCache &operator=(LRUCache const &) = delete;
-  LRUCache &operator=(LRUCache &&) = delete;
+  auto operator=(LRUCache const &) -> LRUCache & = delete;
+  auto operator=(LRUCache &&) -> LRUCache & = delete;
   ~LRUCache() = default;
 
-  Value lookup_update(Key const &key) {
+  auto lookup_update(Key const &key) -> Value {
     if (key_positions_.contains(key)) {
       keys_.splice(key_positions_.at(key), keys_,
                    std::next(key_positions_.at(key)), keys_.end());
@@ -52,9 +55,9 @@ public:
   }
 };
 
-inline std::size_t lru_hits(std::vector<int> const &elements,
-                            std::size_t max_size_in_bytes,
-                            std::size_t value_size_in_bytes) {
+inline auto lru_hits(std::vector<int> const &elements,
+                     std::size_t max_size_in_bytes,
+                     std::size_t value_size_in_bytes) -> std::size_t {
   std::size_t misses{0};
   auto load = [&misses](int) -> int {
     ++misses;
@@ -62,8 +65,9 @@ inline std::size_t lru_hits(std::vector<int> const &elements,
   };
   cpp_contests::LRUCache<int, int, decltype(load)> cache{
       load, max_size_in_bytes, value_size_in_bytes};
-  for (auto &&e : elements)
-    cache.lookup_update(e);
+  for (auto &&elem : elements) {
+    cache.lookup_update(elem);
+  }
   return elements.size() - misses;
 }
 

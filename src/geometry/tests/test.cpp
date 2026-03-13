@@ -1,17 +1,27 @@
-// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg)
-// NOLINTBEGIN(cppcoreguidelines-avoid-non-const-global-variables)
+#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
-#define BOOST_TEST_MODULE Matrix // NOLINT
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT
-
-#include <boost/test/included/unit_test.hpp>
+#include <array>
+#include <cstddef>
 #include <numbers>
+
+#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/tools/interface.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 #include "geometry/matrix.hpp"
 #include "geometry/primitives.hpp"
 
-using namespace cpp_contests;
+using cpp_contests::eye;
+using cpp_contests::Line;
+using cpp_contests::Matrix;
+using cpp_contests::MInds;
+using cpp_contests::Plane;
+using cpp_contests::Point;
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 BOOST_AUTO_TEST_CASE(matrix_ctors_test) {
   constexpr std::size_t X = 3;
   constexpr std::size_t Y = 2;
@@ -38,9 +48,10 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test) {
   BOOST_TEST(n(m_from_splatted - m_from_arr) < small);
   BOOST_TEST(n(m_from_mat_range - m_from_arr) < small);
   BOOST_TEST(n(m_from_range - m_from_arr) < small);
+  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
   for (std::size_t i = 0; i < X; ++i) {
     for (std::size_t j = 0; j < Y; ++j) {
-      auto n = i + j * X;
+      auto n = i + (j * X);
       auto ijres = m_from_arr[i, j];
       auto ijres_splat = m_from_splatted[i, j];
       BOOST_TEST(ijres == a[j][i]);
@@ -52,11 +63,13 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test) {
       BOOST_TEST(m_default_ctor[n] == 0);
     }
   }
+  // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
   BOOST_TEST(n(transpose(m_from_trange) - m_from_arr) < small);
   BOOST_TEST(n(m_from_trange - m_from_tarr) < small);
   auto smallest = m_smallest[0, 0];
   BOOST_TEST(e == smallest);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 BOOST_AUTO_TEST_CASE(matrix_ctors_test_2) {
   constexpr double small = 0.00001;
@@ -71,7 +84,7 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test_2) {
   BOOST_TEST(n(MCheck - M) < small);
   BOOST_TEST(n(MCheck - M2) < small);
 
-  constexpr Matrix<3, 3, int> M3(std::move(M));
+  constexpr Matrix<3, 3, int> M3(M);
   BOOST_TEST(n(MCheck - M3) < small);
 
   constexpr Matrix<3, 2, int> m4{0, 1, 2, 3, 4, 5};
@@ -89,12 +102,12 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test_3) {
   constexpr Matrix<1, 3, int> m2{3, 4, 5};
   constexpr Matrix<1, 3, int> m3{6, 7, 8};
 
-  Matrix<3, 3, int> M(m1, m2, m3);
+  Matrix<3, 3, int> const M(m1, m2, m3);
   BOOST_TEST(n(MCheck - M) < small);
 
   constexpr Matrix<2, 3, int> m4{0, 3, 1, 4, 2, 5};
   constexpr Matrix<1, 3, int> m5{6, 7, 8};
-  Matrix<3, 3, int> M4(std::move(m4), m5);
+  Matrix<3, 3, int> const M4(m4, m5);
   BOOST_TEST(n(MCheck - M4) < small);
 }
 
@@ -104,10 +117,10 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test_4) {
   constexpr Matrix<3, 0, int> MZeroV{};
   constexpr Matrix<3, 3, int> M{0, 3, 6, 1, 4, 7, 2, 5, 8};
 
-  Matrix<3, 3, int> MV1(M, MZeroH);
-  Matrix<3, 3, int> MV2(MZeroH, M);
-  Matrix<3, 3, int> MH1(M, MZeroV);
-  Matrix<3, 3, int> MH2(MZeroV, M);
+  Matrix<3, 3, int> const MV1(M, MZeroH);
+  Matrix<3, 3, int> const MV2(MZeroH, M);
+  Matrix<3, 3, int> const MH1(M, MZeroV);
+  Matrix<3, 3, int> const MH2(MZeroV, M);
 
   BOOST_TEST(n(M - MV1) < small);
   BOOST_TEST(n(M - MV2) < small);
@@ -118,7 +131,7 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test_4) {
 BOOST_AUTO_TEST_CASE(matrix_ops_test) {
   constexpr std::size_t X = 3;
   constexpr std::size_t Y = 2;
-  Matrix<X, Y, int> m{{1, 2, 3}, {4, 5, 6}}; // NOLINT
+  Matrix<X, Y, int> m{{1, 2, 3}, {4, 5, 6}};
   BOOST_TEST(+m == m);
   BOOST_TEST(-m == (Matrix<X, Y, int>{-1, -2, -3, -4, -5, -6}));
   m += 1;
@@ -133,12 +146,12 @@ BOOST_AUTO_TEST_CASE(matrix_mult_test) {
   // clang-format off
   constexpr Matrix<3, 2, int> m1{
     {1, 2, 3},
-    {4, 5, 6}}; // NOLINT
+    {4, 5, 6}};
   constexpr Matrix<4, 3, int> m2{
     {1, 2, 0, 1},
     {4, 5, 1, 1},
     {0, 6, 2, 0},
-  }; // NOLINT
+  }; 
   constexpr Matrix<4, 2, int> mcheck{
     {9, 30, 8, 3},
     {24, 69, 17, 9},
@@ -154,10 +167,10 @@ BOOST_AUTO_TEST_CASE(matrix_transform_test) {
     {1, 2, 0, 1},
     {4, 5, 1, 1},
     {0, 6, 2, 0},
-  }; // NOLINT
+  };
   constexpr Matrix<3, 2, int> mref{
     {1, 1, 1},
-    {5, 5, 2}}; // NOLINT
+    {5, 5, 2}};
   // clang-format on
   constexpr auto m3 = t(m1[MInds<2>{3, 1}, MInds<3>{1, 1, 0}]);
   BOOST_TEST(m3 == mref);
@@ -166,7 +179,6 @@ BOOST_AUTO_TEST_CASE(matrix_transform_test) {
 BOOST_AUTO_TEST_CASE(matrix_det) {
   constexpr Matrix<1, 1, int> m1{9};
   constexpr auto res1 = det(m1);
-  // NOLINTNEXTLINE
   static_assert(res1 == 9);
 
   // clang-format off
@@ -186,7 +198,6 @@ BOOST_AUTO_TEST_CASE(matrix_det) {
   };
   // clang-format on
   constexpr auto res3 = det(m3);
-  // NOLINTNEXTLINE
   static_assert(res3 == 228);
 
   // clang-format off
@@ -198,7 +209,6 @@ BOOST_AUTO_TEST_CASE(matrix_det) {
   };
   // clang-format on
   constexpr auto res4 = det(m4);
-  // NOLINTNEXTLINE
   static_assert(res4 == 2);
 
   // clang-format off
@@ -212,7 +222,6 @@ BOOST_AUTO_TEST_CASE(matrix_det) {
   };
   // clang-format on
   constexpr auto res6 = det(m6);
-  // NOLINTNEXTLINE
   static_assert(res6 == 7905);
 }
 
@@ -221,7 +230,6 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
 
   constexpr Matrix<1, 1, double> m1{9};
   constexpr auto res1 = inv(m1);
-  // NOLINTNEXTLINE
   static_assert(n(m1 * res1 - eye<1, 1, double>()) < eps);
 
   // clang-format off
@@ -241,7 +249,6 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res3 = inv(m3);
-  // NOLINTNEXTLINE
   static_assert(n(m3 * res3 - eye<3, 3, double>()) < eps);
 
   // clang-format off
@@ -253,7 +260,6 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res4 = inv(m4);
-  // NOLINTNEXTLINE
   static_assert(n(m4 * res4 - eye<4, 4, double>()) < eps);
 
   // clang-format off
@@ -267,7 +273,6 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res6 = inv(m6);
-  // NOLINTNEXTLINE
   static_assert(n(m6 * res6 - eye<6, 6, double>()) < eps);
 }
 
@@ -277,13 +282,15 @@ BOOST_AUTO_TEST_CASE(plane_test) {
   constexpr Plane p2(0, 1, 0, -1);
   constexpr Plane p3(0, 0, 1, -1);
   constexpr auto r2 = std::numbers::sqrt2;
-  Line ref_inter_12{Point{r2, r2, 0}, Point{0, 0, 1}};
-  Line ref_inter_23{Point{0, r2, r2}, Point{1, 0, 0}};
-  Line ref_inter_31{Point{r2, 0, r2}, Point{0, 1, 0}};
+  Line const ref_inter_12{Point{r2, r2, 0}, Point{0, 0, 1}};
+  Line const ref_inter_23{Point{0, r2, r2}, Point{1, 0, 0}};
+  Line const ref_inter_31{Point{r2, 0, r2}, Point{0, 1, 0}};
 
-  constexpr Line inter12 = intersection(p1, p2).value(); // NOLINT
-  constexpr Line inter23 = intersection(p2, p3).value(); // NOLINT
-  constexpr Line inter31 = intersection(p3, p1).value(); // NOLINT
+  // NOLINTBEGIN(bugprone-unchecked-optional-access)
+  constexpr Line inter12 = intersection(p1, p2).value();
+  constexpr Line inter23 = intersection(p2, p3).value();
+  constexpr Line inter31 = intersection(p3, p1).value();
+  // NOLINTEND(bugprone-unchecked-optional-access)
 
   auto diff12 = n(inter12.R() - ref_inter_12.R());
   auto diff23 = n(inter23.R() - ref_inter_23.R());
@@ -294,5 +301,4 @@ BOOST_AUTO_TEST_CASE(plane_test) {
   BOOST_TEST(diff31 < eps);
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-non-const-global-variables)
-// NOLINTEND(cppcoreguidelines-pro-type-vararg)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
