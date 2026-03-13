@@ -43,8 +43,6 @@ cmake --install build --prefix build/install
 
 ## Format
 
-Formatting and linting is sensitive to the tools versions, so it is recommended (but not required) to run these commands inside container.
-
 ```bash
 cmake --build build --target format
 ```
