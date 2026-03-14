@@ -5,6 +5,7 @@
       "name": "gcc_base",
       "displayName": "Base gcc config.",
       "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
       "hidden": true,
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "OFF",

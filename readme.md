@@ -35,7 +35,7 @@ The project has several presets preconfigured, see them with `cmake --list-prese
 All presets require at least some optional dependencies, so for bare minimal build omit their usage.
 
 ```bash
-cmake -S . -B build --preset gcc_release
+cmake -B build --preset gcc_release
 cmake --build build --parallel
 ctest --test-dir build
 cmake --install build --prefix build/install

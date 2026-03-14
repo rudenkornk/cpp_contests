@@ -5,6 +5,7 @@
       "name": "llvm_base",
       "displayName": "Base LLVM config.",
       "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
       "hidden": true,
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "OFF",
