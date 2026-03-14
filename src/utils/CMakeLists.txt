@@ -13,7 +13,6 @@ target_sources(
             include/utils/utils.hpp
             include/utils/warnings.hpp)
 target_compile_features(utils INTERFACE cxx_std_23)
-target_link_libraries(utils INTERFACE fmt::fmt)
 target_setup_for_install(utils)
 
 add_subdirectory(tests)
