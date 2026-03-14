@@ -31,8 +31,7 @@ namespace cpp_contests {
 
 inline auto size_to_string(size_t size) -> std::string {
   // NOLINTNEXTLINE(altera-id-dependent-backward-branch)
-  constexpr std::array<std::string_view, 8> units = {
-      "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"};
+  constexpr std::array<std::string_view, 8> units = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"};
   constexpr std::size_t base = 1024;
   if (size == 0) {
     return "0 B";
@@ -52,15 +51,13 @@ inline auto size_to_string(size_t size) -> std::string {
   }
   --tier;
   if (is_exact) {
-    return fmt::format(
-        "{} {}", result,
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-        units[tier]); // TODO(rudenkornk): std::format
+    return fmt::format("{} {}", result,
+                       // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+                       units[tier]); // TODO(rudenkornk): std::format
   }
-  return fmt::format(
-      "{:.1f} {}", result,
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-      units[tier]); // TODO(rudenkornk): std::format
+  return fmt::format("{:.1f} {}", result,
+                     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+                     units[tier]); // TODO(rudenkornk): std::format
 }
 
 template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
@@ -82,18 +79,14 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
     return;
   }
 #ifndef NDEBUG
-  assert(std::unique(perm.begin(), perm.end(),
-                     [&](Indexer const &lhs, Indexer const &rhs) -> auto {
-                       return Index(lhs) == Index(rhs);
-                     }) == perm.end());
+  assert(std::unique(perm.begin(), perm.end(), [&](Indexer const &lhs, Indexer const &rhs) -> auto {
+           return Index(lhs) == Index(rhs);
+         }) == perm.end());
   assert(Index(*std::min_element(perm.begin(), perm.end(),
-                                 [&](Indexer const &lhs, Indexer const &rhs)
-                                     -> auto { return lhs < rhs; })) == 0);
-  assert(Index(*std::max_element(
-             perm.begin(), perm.end(),
-             [&](Indexer const &lhs, Indexer const &rhs) -> auto {
-               return lhs < rhs;
-             })) == perm.size() - 1);
+                                 [&](Indexer const &lhs, Indexer const &rhs) -> auto { return lhs < rhs; })) == 0);
+  assert(Index(*std::max_element(perm.begin(), perm.end(), [&](Indexer const &lhs, Indexer const &rhs) -> auto {
+           return lhs < rhs;
+         })) == perm.size() - 1);
   if constexpr (std::is_same_v<T, Indexer>) {
     assert(&vec != &perm);
   }
@@ -116,29 +109,23 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
   }
 }
 
-template <typename Vector, typename VectorIndexers>
-void permute(Vector &vec, VectorIndexers &perm) {
+template <typename Vector, typename VectorIndexers> void permute(Vector &vec, VectorIndexers &perm) {
   permute(vec, perm, std::identity{});
 }
 
 template <typename Vector, typename Comparator>
-auto get_sort_permutation(Vector const &vec, Comparator const &cmp)
-    -> std::vector<size_t> {
+auto get_sort_permutation(Vector const &vec, Comparator const &cmp) -> std::vector<size_t> {
   auto permutation = get_indices(vec.size());
   std::sort(permutation.begin(), permutation.end(),
-            [&](size_t index0, size_t index1) -> auto {
-              return cmp(vec[index0], vec[index1]);
-            });
+            [&](size_t index0, size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
   return permutation;
 }
 
-template <typename Vector>
-auto get_sort_permutation(Vector const &vec) -> std::vector<size_t> {
+template <typename Vector> auto get_sort_permutation(Vector const &vec) -> std::vector<size_t> {
   return get_sort_permutation(vec, std::less<>{});
 }
 
-template <typename Generator = std::mt19937, unsigned seed = 0>
-auto get_random_generator() -> Generator & {
+template <typename Generator = std::mt19937, unsigned seed = 0> auto get_random_generator() -> Generator & {
   auto static thread_local generator = Generator{seed};
   return generator;
 }
@@ -161,14 +148,11 @@ template <typename T> class SaveRestore final {
   T *restoreTo = nullptr;
 
 public:
-  explicit SaveRestore(T &value) noexcept(
-      std::is_nothrow_copy_constructible_v<T>)
+  explicit SaveRestore(T &value) noexcept(std::is_nothrow_copy_constructible_v<T>)
       : originalValue{std::as_const(value)}, restoreTo{&value} {}
-  explicit SaveRestore(T &&value) noexcept(
-      std::is_nothrow_move_constructible_v<T>)
+  explicit SaveRestore(T &&value) noexcept(std::is_nothrow_move_constructible_v<T>)
       : originalValue{std::move(value)}, restoreTo{&value} {}
-  explicit SaveRestore(T &&value, T &restoreTo) noexcept(
-      std::is_nothrow_move_constructible_v<T>)
+  explicit SaveRestore(T &&value, T &restoreTo) noexcept(std::is_nothrow_move_constructible_v<T>)
       : originalValue{std::move(value)}, restoreTo{&restoreTo} {}
 
   SaveRestore(SaveRestore const &) = delete;
@@ -189,10 +173,7 @@ public:
   ~SaveRestore() { *restoreTo = std::move(originalValue.value()); }
 };
 
-template <typename T>
-void swap(SaveRestore<T> &left, SaveRestore<T> &right) noexcept {
-  left.swap(right);
-}
+template <typename T> void swap(SaveRestore<T> &left, SaveRestore<T> &right) noexcept { left.swap(right); }
 
 // Save exceptions in multithreading environment
 class ExceptionSaver final {
@@ -201,9 +182,7 @@ class ExceptionSaver final {
   std::vector<std::exception_ptr> exceptions;
 
 public:
-  explicit ExceptionSaver(size_t maxExceptions = 1) {
-    exceptions.resize(maxExceptions);
-  }
+  explicit ExceptionSaver(size_t maxExceptions = 1) { exceptions.resize(maxExceptions); }
   ExceptionSaver(ExceptionSaver const &) = delete;
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
   auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
@@ -213,17 +192,12 @@ public:
   }
   ~ExceptionSaver() noexcept(false) { rethrow(); }
 
-  [[nodiscard]] auto ncaptured() const noexcept -> size_t {
-    return nCapturedExceptions;
-  }
-  [[nodiscard]] auto nsaved() const noexcept -> size_t {
-    return nSavedExceptions;
-  }
+  [[nodiscard]] auto ncaptured() const noexcept -> size_t { return nCapturedExceptions; }
+  [[nodiscard]] auto nsaved() const noexcept -> size_t { return nSavedExceptions; }
 
   void swap(ExceptionSaver &other) noexcept {
     using std::swap;
-    nCapturedExceptions =
-        other.nCapturedExceptions.exchange(nCapturedExceptions);
+    nCapturedExceptions = other.nCapturedExceptions.exchange(nCapturedExceptions);
     nSavedExceptions = other.nSavedExceptions.exchange(nSavedExceptions);
     swap(exceptions, other.exceptions);
   }
@@ -232,11 +206,8 @@ public:
   template <typename Callable> auto wrap(Callable &&callable) {
     using ReturnType = typename CallableTraits<Callable>::template Type<0>;
     static_assert(std::is_void_v<ReturnType> ||
-                  (std::is_nothrow_default_constructible_v<ReturnType> &&
-                   !std::is_reference_v<ReturnType>));
-    return _wrap(
-        std::forward<Callable>(callable),
-        std::make_index_sequence<CallableTraits<Callable>::nArguments>{});
+                  (std::is_nothrow_default_constructible_v<ReturnType> && !std::is_reference_v<ReturnType>));
+    return _wrap(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::nArguments>{});
   }
 
   void rethrow() {
@@ -254,8 +225,7 @@ public:
     std::rethrow_exception(exc);
   }
   void drop() noexcept {
-    std::fill_n(exceptions.begin(), nSavedExceptions.load(),
-                std::exception_ptr{});
+    std::fill_n(exceptions.begin(), nSavedExceptions.load(), std::exception_ptr{});
     nSavedExceptions = 0;
 #ifndef NDEBUG
     for (auto &&ptr : exceptions) {
@@ -263,22 +233,15 @@ public:
     }
 #endif // !NDEBUG
   }
-  void set_max_exceptions(size_t max_exceptions) {
-    exceptions.resize(max_exceptions);
-  }
+  void set_max_exceptions(size_t max_exceptions) { exceptions.resize(max_exceptions); }
 
 private:
   template <class Callable, size_t... Indices>
-  auto wrap_(Callable const &callable,
-             std::integer_sequence<size_t, Indices...> /*unused*/) {
+  auto wrap_(Callable const &callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
     using ReturnType = typename CallableTraits<Callable>::ReturnType;
-    return [&](typename CallableTraits<Callable>::template ArgType<
-               Indices>... args) noexcept -> auto {
+    return [&](typename CallableTraits<Callable>::template ArgType<Indices>... args) noexcept -> auto {
       try {
-        return callable(
-            std::forward<
-                typename CallableTraits<Callable>::template ArgType<Indices>>(
-                args)...);
+        return callable(std::forward<typename CallableTraits<Callable>::template ArgType<Indices>>(args)...);
       } catch (...) {
         size_t const index = nCapturedExceptions++;
         if (index < exceptions.size()) {
@@ -293,17 +256,15 @@ private:
   }
 };
 
-inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept {
-  left.swap(right);
-}
+inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept { left.swap(right); }
 
 static inline auto
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 run_shell(std::string const &cmd, std::string const &stdin_data = "",
           std::map<std::string, std::string> const &extra_env = {},
           std::vector<std::filesystem::path> const &extra_paths = {},
-          std::filesystem::path const &cwd = std::filesystem::current_path(),
-          bool check = true) -> std::tuple<int, std::string, std::string> {
+          std::filesystem::path const &cwd = std::filesystem::current_path(), bool check = true)
+    -> std::tuple<int, std::string, std::string> {
 
   // NOLINTBEGIN(misc-include-cleaner)
   namespace bp = boost::process;
@@ -335,15 +296,13 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   bp::opstream stdin_stream;
 
   if (!stdin_data.empty()) {
-    process =
-        bp::child(cmd, env, bp::std_in<stdin_stream, bp::std_out> stdout_stream,
-                  bp::std_err > stderr_stream, bp::start_dir = cwd.string());
+    process = bp::child(cmd, env, bp::std_in<stdin_stream, bp::std_out> stdout_stream, bp::std_err > stderr_stream,
+                        bp::start_dir = cwd.string());
     stdin_stream << stdin_data;
     stdin_stream.flush();
   } else {
     process =
-        bp::child(cmd, env, bp::std_out > stdout_stream,
-                  bp::std_err > stderr_stream, bp::start_dir = cwd.string());
+        bp::child(cmd, env, bp::std_out > stdout_stream, bp::std_err > stderr_stream, bp::start_dir = cwd.string());
   }
 
   std::string stdout_result;
@@ -356,10 +315,8 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
     }
   };
 
-  std::thread stdout_thread(read_stream, std::ref(stdout_stream),
-                            std::ref(stdout_result));
-  std::thread stderr_thread(read_stream, std::ref(stderr_stream),
-                            std::ref(stderr_result));
+  std::thread stdout_thread(read_stream, std::ref(stdout_stream), std::ref(stdout_result));
+  std::thread stderr_thread(read_stream, std::ref(stderr_stream), std::ref(stderr_result));
 
   // Close stdin after starting read threads to signal EOF
   if (!stdin_data.empty()) {
@@ -373,12 +330,10 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   int const exit_code = process.exit_code();
 
   if (check && exit_code != 0) {
-    throw std::runtime_error("Command failed with exit code " +
-                             std::to_string(exit_code));
+    throw std::runtime_error("Command failed with exit code " + std::to_string(exit_code));
   }
 
-  return std::make_tuple(exit_code, std::move(stdout_result),
-                         std::move(stderr_result));
+  return std::make_tuple(exit_code, std::move(stdout_result), std::move(stderr_result));
 
   // NOLINTEND(misc-include-cleaner)
 }

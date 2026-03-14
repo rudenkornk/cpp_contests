@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstddef>
 #include <cstdlib>
@@ -20,10 +20,8 @@ BOOST_AUTO_TEST_CASE(size_to_string_test) {
   BOOST_TEST(size_to_string(std::size_t{1024} * 1024) == "1 MiB");
   BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024) == "1 GiB");
   BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024 * 1024) == "1 TiB");
-  BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024 * 1024 * 1024) ==
-             "1 PiB");
-  BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024 * 1024 * 1024 *
-                            1024) == "1 EiB");
+  BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024 * 1024 * 1024) == "1 PiB");
+  BOOST_TEST(size_to_string(std::size_t{1024} * 1024 * 1024 * 1024 * 1024 * 1024) == "1 EiB");
   BOOST_TEST(size_to_string(std::size_t{17}) == "17 B");
   BOOST_TEST(size_to_string(std::size_t{1025}) == "1.0 KiB");
   BOOST_TEST(size_to_string(std::size_t{1129}) == "1.1 KiB");

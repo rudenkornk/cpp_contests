@@ -7,9 +7,7 @@
 
 namespace cpp_contests {
 
-PERFECT_CACHE_EXPORT auto perfect_cache(std::vector<int> const &keys,
-                                        std::size_t max_size_in_bytes,
-                                        std::size_t value_size_in_bytes)
-    -> std::size_t;
+PERFECT_CACHE_EXPORT auto perfect_cache(std::vector<int> const &keys, std::size_t max_size_in_bytes,
+                                        std::size_t value_size_in_bytes) -> std::size_t;
 
 } // namespace cpp_contests

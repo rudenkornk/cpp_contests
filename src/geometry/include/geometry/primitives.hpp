@@ -18,16 +18,12 @@ private:
   Point R0_, R_;
 
 public:
-  constexpr explicit Line(Point const &R0, Point const &R) noexcept
-      : R0_(R0), R_(R / n(R)) {}
+  constexpr explicit Line(Point const &R0, Point const &R) noexcept : R0_(R0), R_(R / n(R)) {}
 
   [[nodiscard]] constexpr auto param(Point const &p) const noexcept -> double {
     auto diff = p - R0_;
     auto mi =
-        std::ranges::max_element(R_,
-                                 [](auto left, auto right) -> auto {
-                                   return std::abs(left) < std::abs(right);
-                                 }) -
+        std::ranges::max_element(R_, [](auto left, auto right) -> auto { return std::abs(left) < std::abs(right); }) -
         R_.begin();
     auto l = diff[mi] / R_[mi];
 #ifndef NDEBUG
@@ -44,27 +40,18 @@ public:
 #endif
     return l;
   }
-  [[nodiscard]] constexpr auto point(double param) const noexcept -> Point {
-    return R0_ + param * R_;
-  }
+  [[nodiscard]] constexpr auto point(double param) const noexcept -> Point { return R0_ + param * R_; }
 
-  [[nodiscard]] constexpr auto R0() const noexcept -> Point const & {
-    return R0_;
-  }
-  [[nodiscard]] constexpr auto R() const noexcept -> Point const & {
-    return R_;
-  }
+  [[nodiscard]] constexpr auto R0() const noexcept -> Point const & { return R0_; }
+  [[nodiscard]] constexpr auto R() const noexcept -> Point const & { return R_; }
 };
 
 struct Segment {
   Point s; // NOLINT(misc-non-private-member-variables-in-classes)
   Point e; // NOLINT(misc-non-private-member-variables-in-classes)
 
-  [[nodiscard]] constexpr auto line() const noexcept -> Line {
-    return Line{s, e - s};
-  }
-} __attribute__((aligned(
-    64))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+  [[nodiscard]] constexpr auto line() const noexcept -> Line { return Line{s, e - s}; }
+} __attribute__((aligned(64))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 class Plane final {
 private:
@@ -77,42 +64,32 @@ private:
   }
 
 public:
-  constexpr explicit Plane(Point const &normal) noexcept
-      : normal_(normal / n(normal)), d_(n(normal)) {
+  constexpr explicit Plane(Point const &normal) noexcept : normal_(normal / n(normal)), d_(n(normal)) {
     assert(n(normal) > EPSMIN);
   }
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  constexpr explicit Plane(Point const &normal, double d) noexcept
-      : normal_(normal / n(normal)), d_(d / n(normal)) {
+  constexpr explicit Plane(Point const &normal, double d) noexcept : normal_(normal / n(normal)), d_(d / n(normal)) {
     assert(n(normal) > EPSMIN);
   }
-  constexpr explicit Plane(Point const &p1, Point const &p2,
-                           Point const &p3) noexcept
+  constexpr explicit Plane(Point const &p1, Point const &p2, Point const &p3) noexcept
       : Plane(cross(p1 - p3, p2 - p3), dot(p3, cross(p1 - p3, p2 - p3))) {}
   constexpr explicit Plane(double A, double B, double C, double D) noexcept
-      : normal_(Point{A, B, C} / norm_coeff_(A, B, C)),
-        d_(-D / norm_coeff_(A, B, C)) {}
+      : normal_(Point{A, B, C} / norm_coeff_(A, B, C)), d_(-D / norm_coeff_(A, B, C)) {}
 
-  [[nodiscard]] constexpr auto normal() const noexcept -> Point const & {
-    return normal_;
-  }
+  [[nodiscard]] constexpr auto normal() const noexcept -> Point const & { return normal_; }
   [[nodiscard]] constexpr auto dist() const noexcept -> double { return d_; }
 };
 
-constexpr auto dist(Point const &p1, Point const &p2) noexcept -> double {
-  return n(p1 - p2);
-}
+constexpr auto dist(Point const &p1, Point const &p2) noexcept -> double { return n(p1 - p2); }
 
-constexpr auto complanar(Plane const &p1, Plane const &p2,
-                         double eps = EPSMIN) noexcept -> bool {
+constexpr auto complanar(Plane const &p1, Plane const &p2, double eps = EPSMIN) noexcept -> bool {
   auto diff = n(cross(p1.normal(), p2.normal()));
   // diff is implicitly divided by normal length squared to get relative
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
-constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3,
-                         Point const &p4, double eps = EPSMIN) noexcept
-    -> bool {
+constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3, Point const &p4,
+                         double eps = EPSMIN) noexcept -> bool {
 
   auto v1 = p1 - p3;
   auto v2 = p2 - p3;
@@ -130,21 +107,18 @@ constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3,
   auto plane2 = Plane{p1, p2, p4};
   return complanar(plane1, plane2, eps);
 }
-constexpr auto complanar(Line const &l1, Line const &l2,
-                         double eps = EPSMIN) noexcept -> bool {
+constexpr auto complanar(Line const &l1, Line const &l2, double eps = EPSMIN) noexcept -> bool {
   return complanar(l1.R0(), l1.R0() + l1.R(), l2.R0(), l2.R0() + l2.R(), eps);
 }
 
-constexpr auto parallel(Line const &l1, Line const &l2,
-                        double eps = EPSMIN) noexcept -> bool {
+constexpr auto parallel(Line const &l1, Line const &l2, double eps = EPSMIN) noexcept -> bool {
   auto diff = n(cross(l1.R(), l2.R()));
   // diff is implicitly divided by normal length squared to get relative
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
 
-constexpr auto complanar_intersection(Line const &p1, Line const &p2) noexcept
-    -> std::optional<Point> {
+constexpr auto complanar_intersection(Line const &p1, Line const &p2) noexcept -> std::optional<Point> {
   assert(complanar(p1, p2, EPSMAX));
   if (parallel(p1, p2)) {
     return std::nullopt;
@@ -174,8 +148,7 @@ constexpr auto complanar_intersection(Line const &p1, Line const &p2) noexcept
   return Point{};
 }
 
-constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept
-    -> std::optional<Line> {
+constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept -> std::optional<Line> {
   if (complanar(p1, p2)) {
     return std::nullopt;
   }
@@ -190,8 +163,7 @@ constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept
   return Line{R0, R};
 }
 
-constexpr auto intersection(Plane const &p1, Plane const &p2,
-                            Plane const &p3) noexcept -> std::optional<Point> {
+constexpr auto intersection(Plane const &p1, Plane const &p2, Plane const &p3) noexcept -> std::optional<Point> {
   if (complanar(Point{}, p1.normal(), p2.normal(), p3.normal())) {
     return std::nullopt;
   }
@@ -200,8 +172,7 @@ constexpr auto intersection(Plane const &p1, Plane const &p2,
   return inv(M) * Point{p1.dist(), p2.dist(), p3.dist()};
 }
 
-constexpr auto complanar_intersection(Segment const &s, Line const &l) noexcept
-    -> std::optional<Point> {
+constexpr auto complanar_intersection(Segment const &s, Line const &l) noexcept -> std::optional<Point> {
   auto seg = s.line();
   assert(complanar(seg, l, EPSMAX));
   auto intersection = complanar_intersection(seg, l);
@@ -217,15 +188,13 @@ constexpr auto complanar_intersection(Segment const &s, Line const &l) noexcept
   return std::nullopt;
 }
 
-constexpr auto complanar_intersection(Line const &l, Segment const &s) noexcept
-    -> std::optional<Point> {
+constexpr auto complanar_intersection(Line const &l, Segment const &s) noexcept -> std::optional<Point> {
   return complanar_intersection(s, l);
 }
 
 constexpr auto
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-complanar_intersection(Segment const &s1, Segment const &s2) noexcept
-    -> std::optional<Point> {
+complanar_intersection(Segment const &s1, Segment const &s2) noexcept -> std::optional<Point> {
   auto l1 = s1.line();
   auto l2 = s2.line();
   auto i1 = complanar_intersection(s1, l2);

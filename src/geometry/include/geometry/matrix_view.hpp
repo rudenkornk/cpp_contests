@@ -25,8 +25,7 @@ namespace cpp_contests {
 
 template <std::size_t N> using MatrixIndices = std::array<std::size_t, N>;
 
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
-class MatrixIterator final {
+template <std::random_access_iterator Iterator, size_t X, size_t Y> class MatrixIterator final {
 public:
   using iterator_type = Iterator;
   using iterator_concept = std::random_access_iterator_tag;
@@ -80,21 +79,15 @@ public:
     #endif
   }
   // clang-format on
-  constexpr explicit MatrixIterator() noexcept(
-      std::is_nothrow_constructible_v<Iterator>) = default;
+  constexpr explicit MatrixIterator() noexcept(std::is_nothrow_constructible_v<Iterator>) = default;
 
-  constexpr auto base() const
-      noexcept(std::is_nothrow_copy_constructible_v<Iterator>)
-          -> iterator_type {
-    return it_;
-  }
+  constexpr auto base() const noexcept(std::is_nothrow_copy_constructible_v<Iterator>) -> iterator_type { return it_; }
   constexpr auto operator*() const -> reference {
     assert(i_ >= 0 && i_ < X * Y);
     return *it_;
   }
   constexpr auto operator->() const -> pointer
-    requires(std::is_pointer_v<Iterator> ||
-             requires(Iterator const i) { i.operator->(); })
+    requires(std::is_pointer_v<Iterator> || requires(Iterator const i) { i.operator->(); })
   {
     assert(i_ >= 0 && i_ < X * Y);
     return it_.operator->();
@@ -109,9 +102,7 @@ public:
     i_ += n;
     return *this;
   }
-  constexpr auto operator-=(difference_type n) -> MatrixIterator & {
-    return operator+=(-n);
-  }
+  constexpr auto operator-=(difference_type n) -> MatrixIterator & { return operator+=(-n); }
   constexpr auto operator++() -> MatrixIterator & { return operator+=(1); }
   constexpr auto operator--() -> MatrixIterator & { return operator-=(1); }
   constexpr auto operator++(int) -> MatrixIterator {
@@ -125,64 +116,42 @@ public:
     return tmp;
   }
 
-  constexpr auto operator-(typename MatrixIterator::difference_type n) const
-      -> MatrixIterator {
+  constexpr auto operator-(typename MatrixIterator::difference_type n) const -> MatrixIterator {
     auto tmp = it_;
     tmp -= n;
     return tmp;
   }
-  friend constexpr auto operator-(MatrixIterator const &lhs,
-                                  MatrixIterator const &rhs)
-      -> difference_type {
+  friend constexpr auto operator-(MatrixIterator const &lhs, MatrixIterator const &rhs) -> difference_type {
     return lhs.i_ - rhs.i_;
   }
-  friend constexpr auto operator==(MatrixIterator const &lhs,
-                                   MatrixIterator const &rhs) -> bool {
-    return lhs.begin_ == rhs.begin_ && lhs.it_ == rhs.it_ &&
-           lhs.transposed_ == rhs.transposed_ && lhs.rows_ == rhs.rows_ &&
-           lhs.cols_ == rhs.cols_;
+  friend constexpr auto operator==(MatrixIterator const &lhs, MatrixIterator const &rhs) -> bool {
+    return lhs.begin_ == rhs.begin_ && lhs.it_ == rhs.it_ && lhs.transposed_ == rhs.transposed_ &&
+           lhs.rows_ == rhs.rows_ && lhs.cols_ == rhs.cols_;
   }
-  friend constexpr auto operator<=>(MatrixIterator const &lhs,
-                                    MatrixIterator const &rhs)
-      -> std::partial_ordering {
-    auto ordered = lhs.begin_ == rhs.begin_ &&
-                   lhs.transposed_ == rhs.transposed_ &&
-                   lhs.rows_ == rhs.rows_ && lhs.cols_ == rhs.cols_;
+  friend constexpr auto operator<=>(MatrixIterator const &lhs, MatrixIterator const &rhs) -> std::partial_ordering {
+    auto ordered = lhs.begin_ == rhs.begin_ && lhs.transposed_ == rhs.transposed_ && lhs.rows_ == rhs.rows_ &&
+                   lhs.cols_ == rhs.cols_;
     if (!ordered) {
       return std::partial_ordering::unordered;
     }
     return lhs.i_ <=> rhs.i_;
   }
 
-  [[nodiscard]] constexpr auto rows() const noexcept
-      -> MatrixIndices<Y> const & {
-    return rows_;
-  }
-  [[nodiscard]] constexpr auto cols() const noexcept
-      -> MatrixIndices<X> const & {
-    return cols_;
-  }
+  [[nodiscard]] constexpr auto rows() const noexcept -> MatrixIndices<Y> const & { return rows_; }
+  [[nodiscard]] constexpr auto cols() const noexcept -> MatrixIndices<X> const & { return cols_; }
   constexpr auto begin() const noexcept -> Iterator { return begin_; }
-  [[nodiscard]] constexpr auto real_x() const noexcept -> std::size_t {
-    return real_x_;
-  }
-  [[nodiscard]] constexpr auto real_y() const noexcept -> std::size_t {
-    return real_y_;
-  }
-  [[nodiscard]] constexpr auto transposed() const noexcept -> bool {
-    return transposed_;
-  }
+  [[nodiscard]] constexpr auto real_x() const noexcept -> std::size_t { return real_x_; }
+  [[nodiscard]] constexpr auto real_y() const noexcept -> std::size_t { return real_y_; }
+  [[nodiscard]] constexpr auto transposed() const noexcept -> bool { return transposed_; }
 
 private:
   constexpr auto transform(difference_type i) const noexcept -> Iterator {
     return transform(begin_, i, transposed_, real_x_, real_y_, cols_, rows_);
   }
 
-  static constexpr auto
-  transform(Iterator begin, difference_type i, bool transposed,
-            std::size_t real_x, std::size_t real_y,
-            MatrixIndices<X> const &cols, MatrixIndices<Y> const &rows) noexcept
-      -> Iterator {
+  static constexpr auto transform(Iterator begin, difference_type i, bool transposed, std::size_t real_x,
+                                  std::size_t real_y, MatrixIndices<X> const &cols,
+                                  MatrixIndices<Y> const &rows) noexcept -> Iterator {
     assert(i >= 0 && i <= X * Y);
 
     if (i == X * Y) {
@@ -201,19 +170,15 @@ private:
   }
 };
 template <std::random_access_iterator Iterator, size_t X, size_t Y>
-constexpr auto
-operator+(MatrixIterator<Iterator, X, Y> const &it,
-          typename MatrixIterator<Iterator, X, Y>::difference_type n)
-    -> MatrixIterator<Iterator, X, Y> {
+constexpr auto operator+(MatrixIterator<Iterator, X, Y> const &it,
+                         typename MatrixIterator<Iterator, X, Y>::difference_type n) -> MatrixIterator<Iterator, X, Y> {
   auto tmp = it;
   tmp += n;
   return tmp;
 }
 template <std::random_access_iterator Iterator, size_t X, size_t Y>
-constexpr auto
-operator+(typename MatrixIterator<Iterator, X, Y>::difference_type n,
-          MatrixIterator<Iterator, X, Y> const &it)
-    -> MatrixIterator<Iterator, X, Y> {
+constexpr auto operator+(typename MatrixIterator<Iterator, X, Y>::difference_type n,
+                         MatrixIterator<Iterator, X, Y> const &it) -> MatrixIterator<Iterator, X, Y> {
   return it + n;
 }
 
@@ -244,16 +209,10 @@ private:
 
 public:
   constexpr Matrix() noexcept { data_.fill(value_type{}); }
-  constexpr explicit Matrix(
-      std::array<std::array<value_type, X>, Y> const &m) noexcept
-      : data_(splat(m)) {}
-  constexpr explicit Matrix(std::array<value_type, X * Y> m) noexcept
-      : data_(std::move(m)) {}
-  constexpr Matrix(std::initializer_list<value_type> m) noexcept {
-    std::move(m.begin(), m.end(), data_.begin());
-  }
-  constexpr Matrix(
-      std::initializer_list<std::initializer_list<value_type>> m) noexcept {
+  constexpr explicit Matrix(std::array<std::array<value_type, X>, Y> const &m) noexcept : data_(splat(m)) {}
+  constexpr explicit Matrix(std::array<value_type, X * Y> m) noexcept : data_(std::move(m)) {}
+  constexpr Matrix(std::initializer_list<value_type> m) noexcept { std::move(m.begin(), m.end(), data_.begin()); }
+  constexpr Matrix(std::initializer_list<std::initializer_list<value_type>> m) noexcept {
     assert(m.size() == Y);
     std::size_t y = 0;
     for (auto &&l : m) {
@@ -262,14 +221,12 @@ public:
       ++y;
     }
   }
-  template <std::input_iterator Iterator>
-  constexpr explicit Matrix(Iterator first, Iterator last) noexcept {
+  template <std::input_iterator Iterator> constexpr explicit Matrix(Iterator first, Iterator last) noexcept {
     std::copy(first, last, data_.begin());
   }
 
 private:
-  static constexpr auto
-  splat(std::array<std::array<value_type, X>, Y> const &m) noexcept
+  static constexpr auto splat(std::array<std::array<value_type, X>, Y> const &m) noexcept
       -> std::array<value_type, X * Y> {
     std::array<value_type, X * Y> m_;
     for (std::size_t i = 0; i < X * Y; ++i) {
@@ -293,21 +250,15 @@ private:
   iterator begin_;
 
 public:
-  constexpr explicit MatrixView(Matrix<X, Y, value_type> &m) noexcept
-      : begin_(m.begin()) {}
+  constexpr explicit MatrixView(Matrix<X, Y, value_type> &m) noexcept : begin_(m.begin()) {}
 
   template <std::size_t XR, std::size_t YR>
-  constexpr auto operator()(MatrixIndices<XR> cols,
-                            MatrixIndices<XR> rows) const noexcept
-      -> MatrixView<XR, YR, T> {
-    return MatrixView<XR, YR, T>(begin_, std::move(cols), std::move(rows),
-                                 false);
+  constexpr auto operator()(MatrixIndices<XR> cols, MatrixIndices<XR> rows) const noexcept -> MatrixView<XR, YR, T> {
+    return MatrixView<XR, YR, T>(begin_, std::move(cols), std::move(rows), false);
   }
 
-  constexpr MatrixView(MatrixView const &other) noexcept
-      : begin_(other.begin_) {}
-  constexpr MatrixView(MatrixView &&other) noexcept
-      : begin_(std::move(other.begin_)) {}
+  constexpr MatrixView(MatrixView const &other) noexcept : begin_(other.begin_) {}
+  constexpr MatrixView(MatrixView &&other) noexcept : begin_(std::move(other.begin_)) {}
 
   constexpr auto operator=(MatrixView const &other) noexcept -> MatrixView & {
     if (this == &other) {
@@ -324,79 +275,56 @@ public:
     return *this;
   }
 
-  constexpr auto operator()(std::size_t x, std::size_t y) noexcept
-      -> value_type & {
-    return begin_[x + (y * X)];
-  }
-  constexpr auto operator()(std::size_t x, std::size_t y) const noexcept
-      -> value_type {
-    return begin_[x + (y * X)];
-  }
+  constexpr auto operator()(std::size_t x, std::size_t y) noexcept -> value_type & { return begin_[x + (y * X)]; }
+  constexpr auto operator()(std::size_t x, std::size_t y) const noexcept -> value_type { return begin_[x + (y * X)]; }
 
-  constexpr auto transpose() const noexcept -> MatrixView<Y, X, T> {
-    return MatrixView<Y, X, T>(begin_, true);
-  }
+  constexpr auto transpose() const noexcept -> MatrixView<Y, X, T> { return MatrixView<Y, X, T>(begin_, true); }
 
   constexpr auto begin() const noexcept -> iterator { return begin_; }
   constexpr auto end() const noexcept -> iterator { return begin_ + X * Y; }
 
   template <std::invocable<value_type> F>
-  auto elementwise(F f) noexcept(noexcept(f(std::declval<value_type>())))
-      -> MatrixView & {
+  auto elementwise(F f) noexcept(noexcept(f(std::declval<value_type>()))) -> MatrixView & {
     std::transform(begin(), end(), begin(), f);
     return *this;
   }
-  template <std::invocable<value_type, value_type> F,
-            std::convertible_to<value_type> MT>
+  template <std::invocable<value_type, value_type> F, std::convertible_to<value_type> MT>
   auto elementwise(MatrixView<X, Y, MT> const &m,
-                   F f) noexcept(noexcept(f(std::declval<value_type>(),
-                                            std::declval<value_type>())))
-      -> MatrixView & {
+                   F f) noexcept(noexcept(f(std::declval<value_type>(), std::declval<value_type>()))) -> MatrixView & {
     std::transform(begin(), end(), m.begin(), begin(), f);
     return *this;
   }
   template <std::convertible_to<value_type> MT>
   auto operator+=(MatrixView<X, Y, MT> const &m) noexcept -> MatrixView & {
-    return elementwise(
-        m, [](value_type a, value_type b) noexcept -> auto { return a + b; });
+    return elementwise(m, [](value_type a, value_type b) noexcept -> auto { return a + b; });
   }
   template <std::convertible_to<value_type> MT>
   auto operator-=(MatrixView<X, Y, MT> const &m) noexcept -> MatrixView & {
-    return elementwise(
-        m, [](value_type a, value_type b) noexcept -> auto { return a - b; });
+    return elementwise(m, [](value_type a, value_type b) noexcept -> auto { return a - b; });
   }
   auto operator+=(value_type x) noexcept -> MatrixView & {
     return elementwise([x](value_type a) noexcept -> auto { return a + x; });
   }
-  auto operator-=(value_type x) noexcept -> MatrixView & {
-    return operator+=(-x);
-  }
+  auto operator-=(value_type x) noexcept -> MatrixView & { return operator+=(-x); }
   auto operator*=(value_type x) noexcept -> MatrixView & {
     return elementwise([x](value_type a) noexcept -> auto { return a * x; });
   }
-  auto operator/=(value_type x) -> MatrixView & {
-    return operator*=(value_type{1} / x);
-  }
+  auto operator/=(value_type x) -> MatrixView & { return operator*=(value_type{1} / x); }
 
   ~MatrixView() = default;
 
 private:
   template <std::size_t XR, std::size_t YR>
-  constexpr MatrixView(MatrixIterator<MI, XR, YR> const &mi,
-                       MatrixIndices<X> &&cols,
-                       MatrixIndices<Y> &&rows) noexcept
-      : begin_(mi.begin(), 0, transpose, mi.real_x(), mi.real_y(),
-               reindex(mi.cols(), std::move(cols)),
+  constexpr MatrixView(MatrixIterator<MI, XR, YR> const &mi, MatrixIndices<X> &&cols, MatrixIndices<Y> &&rows) noexcept
+      : begin_(mi.begin(), 0, transpose, mi.real_x(), mi.real_y(), reindex(mi.cols(), std::move(cols)),
                reindex(mi.rows(), std::move(rows))) {}
 
-  constexpr MatrixView(MatrixIterator<MI, Y, X> const &mi,
-                       bool /*unused*/) noexcept
-      : begin_(mi.begin(), 0, !mi.transposed(), mi.real_y(), mi.real_x(),
-               MatrixIndices<Y>(mi.cols()), MatrixIndices<X>(mi.rows())) {}
+  constexpr MatrixView(MatrixIterator<MI, Y, X> const &mi, bool /*unused*/) noexcept
+      : begin_(mi.begin(), 0, !mi.transposed(), mi.real_y(), mi.real_x(), MatrixIndices<Y>(mi.cols()),
+               MatrixIndices<X>(mi.rows())) {}
 
   template <std::size_t N, std::size_t M>
-  static constexpr auto reindex(MatrixIndices<M> const &original,
-                                MatrixIndices<N> const &permutation) noexcept
+  static constexpr auto reindex(MatrixIndices<M> const &original, MatrixIndices<N> const &permutation) noexcept
       -> MatrixIndices<N> {
     MatrixIndices<N> indices;
     for (std::size_t i = 0; i < N; ++i) {

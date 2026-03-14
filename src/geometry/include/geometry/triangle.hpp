@@ -19,8 +19,7 @@ private:
   std::array<Point, 3> points_;
 
 public:
-  constexpr Triangle(Point p1, Point p2, Point p3) noexcept
-      : plane_(p1, p2, p3), points_({p1, p2, p3}) {
+  constexpr Triangle(Point p1, Point p2, Point p3) noexcept : plane_(p1, p2, p3), points_({p1, p2, p3}) {
 #ifndef NDEBUG
     auto d1 = dist(p1, p2);
     auto d2 = dist(p2, p3);
@@ -29,19 +28,15 @@ public:
 #endif
   }
 
-  [[nodiscard]] constexpr auto operator[](std::size_t i) const noexcept
-      -> Point const & {
+  [[nodiscard]] constexpr auto operator[](std::size_t i) const noexcept -> Point const & {
     assert(i < 3);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
     return points_[i];
   }
-  [[nodiscard]] constexpr auto plane() const noexcept -> Plane const & {
-    return plane_;
-  }
+  [[nodiscard]] constexpr auto plane() const noexcept -> Plane const & { return plane_; }
 };
 
-constexpr auto complanar_intersects(Triangle const &t1,
-                                    Triangle const &t2) noexcept -> bool {
+constexpr auto complanar_intersects(Triangle const &t1, Triangle const &t2) noexcept -> bool {
   if (std::abs(t1.plane().dist() - t2.plane().dist()) > EPSMIN) {
     return false;
   }
@@ -57,8 +52,7 @@ constexpr auto complanar_intersects(Triangle const &t1,
   return false;
 }
 
-constexpr auto complanar_intersection(Triangle const &t, Line const &l)
-    -> std::optional<Segment> {
+constexpr auto complanar_intersection(Triangle const &t, Line const &l) -> std::optional<Segment> {
   Vector<3, Point> result{};
   std::size_t j = 0;
   for (std::size_t i = 0; i < 3; ++i) {
@@ -93,13 +87,11 @@ constexpr auto complanar_intersection(Triangle const &t, Line const &l)
   return Segment{.s = result[inds[0]], .e = result[inds[1]]};
 }
 
-constexpr auto complanar_intersection(Line const &l, Triangle const &t)
-    -> std::optional<Segment> {
+constexpr auto complanar_intersection(Line const &l, Triangle const &t) -> std::optional<Segment> {
   return complanar_intersection(t, l);
 }
 
-constexpr auto intersection(Triangle const &t1, Triangle const &t2) noexcept
-    -> std::optional<Segment> {
+constexpr auto intersection(Triangle const &t1, Triangle const &t2) noexcept -> std::optional<Segment> {
   auto intersection_opt = intersection(t1.plane(), t2.plane());
   if (!intersection_opt) {
     // Triangles are complanar
@@ -138,8 +130,7 @@ constexpr auto intersection(Triangle const &t1, Triangle const &t2) noexcept
   return std::nullopt;
 }
 
-constexpr auto intersects(Triangle const &t1, Triangle const &t2) noexcept
-    -> bool {
+constexpr auto intersects(Triangle const &t1, Triangle const &t2) noexcept -> bool {
   if (complanar(t1.plane(), t2.plane())) {
     return complanar_intersects(t1, t2);
   }
