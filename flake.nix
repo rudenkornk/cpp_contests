@@ -28,7 +28,6 @@
 
       buildInputs = with pkgs; [
         boost
-        fmt
       ];
 
       devTools = with pkgs; [

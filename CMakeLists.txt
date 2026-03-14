@@ -14,7 +14,6 @@ option(LINT "Enable lint tests." OFF)
 option(WARNINGS "Enable strict warnings." ON)
 
 find_package(Boost REQUIRED COMPONENTS program_options unit_test_framework)
-find_package(fmt CONFIG REQUIRED)
 
 include(CodingStandards)
 include(Installing)
@@ -48,7 +47,7 @@ if(CODE_COVERAGE)
 endif()
 
 generic_install()
-configure_test_install_project(FIND_PACKAGES Boost fmt)
+configure_test_install_project(FIND_PACKAGES Boost)
 configure_cpack_options(EMAIL "rudenkornk@gmail.com")
 
 include(CPack)

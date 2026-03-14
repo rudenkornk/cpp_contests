@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <exception>
 #include <filesystem>
+#include <format>
 #include <functional>
 #include <map>
 #include <numeric>
@@ -21,9 +22,6 @@
 #include <vector>
 
 #include <boost/process.hpp> // NOLINT(misc-include-cleaner)
-
-#include <fmt/core.h>
-#include <fmt/format.h>
 
 #include "utils/type_traits.hpp"
 
@@ -51,13 +49,13 @@ inline auto size_to_string(size_t size) -> std::string {
   }
   --tier;
   if (is_exact) {
-    return fmt::format("{} {}", result,
+    return std::format("{} {}", result,
                        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-                       units[tier]); // TODO(rudenkornk): std::format
+                       units[tier]);
   }
-  return fmt::format("{:.1f} {}", result,
+  return std::format("{:.1f} {}", result,
                      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-                     units[tier]); // TODO(rudenkornk): std::format
+                     units[tier]);
 }
 
 template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {

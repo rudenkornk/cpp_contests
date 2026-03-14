@@ -9,7 +9,7 @@ The project uses relatively standard set of `C++` tools, which include:
 1. Recent compiler (assumed `gcc` or `clang`).
 1. `cmake` as a build system.
 1. Any `cmake` backend (`ninja` assumed).
-1. `Boost` and `fmt` libraries.
+1. `Boost` library.
 
 As well as optional dependencies:
 

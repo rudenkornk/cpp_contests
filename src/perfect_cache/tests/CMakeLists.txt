@@ -1,7 +1,7 @@
 add_executable(perfect_cache_unit_tests)
 target_sources(perfect_cache_unit_tests PRIVATE test.cpp)
 
-target_link_libraries(perfect_cache_unit_tests PRIVATE Boost::program_options Boost::headers fmt::fmt utils)
+target_link_libraries(perfect_cache_unit_tests PRIVATE Boost::program_options Boost::headers utils)
 target_link_libraries(perfect_cache_unit_tests PRIVATE lru_cache perfect_cache two_queue_cache)
 target_add_headers_as_sources(perfect_cache_unit_tests perfect_cache)
 

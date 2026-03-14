@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <format>
 #include <iostream>
 #include <iterator>
 #include <random>
@@ -12,8 +13,6 @@
 #include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include <fmt/base.h>
-#include <fmt/core.h>
 
 #include "lru_cache/solution.hpp"
 #include "perfect_cache/solution.hpp"
@@ -72,14 +71,11 @@ BOOST_AUTO_TEST_CASE(uniform_distribution_cache_test) {
             << ", page size=" << size_to_string(virtual_web_page_size_in_benchmark)
             << ", keys amplitude=" << (max - min + 1) << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(lru) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
   std::cout << "2Q cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(two_queue) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
   std::cout << "Perfect cache hit rate: ";
-  fmt::print("{:.2f}%\n\n",
-             cents * static_cast<double>(perfect) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
@@ -101,14 +97,11 @@ BOOST_AUTO_TEST_CASE(binomial_distribution_cache_test) {
             << ", page size=" << size_to_string(virtual_web_page_size_in_benchmark) << ", keys amplitude=" << (max + 1)
             << ", pool size=" << n_elements << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(lru) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
   std::cout << "2Q cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(two_queue) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
   std::cout << "Perfect cache hit rate: ";
-  fmt::print("{:.2f}%\n\n",
-             cents * static_cast<double>(perfect) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
@@ -130,14 +123,11 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
             << ", page size=" << size_to_string(virtual_web_page_size_in_benchmark) << ", pool size=" << n_elements
             << "\n";
   std::cout << "LRU cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(lru) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
   std::cout << "2Q cache hit rate: ";
-  fmt::print("{:.2f}%\n",
-             cents * static_cast<double>(two_queue) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
   std::cout << "Perfect cache hit rate: ";
-  fmt::print("{:.2f}%\n\n",
-             cents * static_cast<double>(perfect) / n_elements); // TODO(rudenkornk): std::format
+  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
