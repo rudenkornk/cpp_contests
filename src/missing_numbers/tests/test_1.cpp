@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cassert>
 #include <filesystem>
@@ -33,17 +33,14 @@ BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({4, 3, 2})));
   BOOST_TEST((std::pair(2U, 6U) == missing_numbers({7, 4, 1, 0, 3, 5})));
   BOOST_TEST((std::pair(2U, 5U) == missing_numbers({7, 4, 1, 0, 3, 6})));
-  BOOST_TEST(
-      (std::pair(2U, 5U) == missing_numbers({7, 4, 1, 0, 3, 6, 9, 11, 10, 8})));
+  BOOST_TEST((std::pair(2U, 5U) == missing_numbers({7, 4, 1, 0, 3, 6, 9, 11, 10, 8})));
 }
 
 namespace {
-auto run_cli_test(std::string const &file_content)
-    -> std::pair<unsigned, unsigned> {
+auto run_cli_test(std::string const &file_content) -> std::pair<unsigned, unsigned> {
   auto content_hash = std::hash<std::string>{}(file_content);
   auto temp_path =
-      std::filesystem::temp_directory_path() /
-      ("missing_numbers_test_" + std::to_string(content_hash) + ".txt");
+      std::filesystem::temp_directory_path() / ("missing_numbers_test_" + std::to_string(content_hash) + ".txt");
 
   {
     std::ofstream temp_file(temp_path);
@@ -51,8 +48,7 @@ auto run_cli_test(std::string const &file_content)
   }
 
   auto [exit_code, stdout_str, stderr_str] =
-      run_shell(TestArgsFixture::cli_tools.at("missing_numbers_cli") + " " +
-                temp_path.string());
+      run_shell(TestArgsFixture::cli_tools.at("missing_numbers_cli") + " " + temp_path.string());
 
   // Clean up temporary file
   std::filesystem::remove(temp_path);

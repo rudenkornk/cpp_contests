@@ -10,8 +10,7 @@
 
 namespace cpp_contests {
 
-template <typename Key, typename Value, std::invocable<Key> Load>
-class LRUCache final {
+template <typename Key, typename Value, std::invocable<Key> Load> class LRUCache final {
   using Position = typename std::list<Key>::const_iterator;
   Load load_;
   std::size_t max_length_;
@@ -21,10 +20,8 @@ class LRUCache final {
 
 public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  LRUCache(Load const &load, std::size_t max_size_in_bytes,
-           std::size_t override_value_size = sizeof(Value))
-      : load_(load),
-        max_length_(max_size_in_bytes / (override_value_size + sizeof(Key))) {}
+  LRUCache(Load const &load, std::size_t max_size_in_bytes, std::size_t override_value_size = sizeof(Value))
+      : load_(load), max_length_(max_size_in_bytes / (override_value_size + sizeof(Key))) {}
 
   // Forbid all copy and moves, since storing references inside class fields
   // requires special handling, not supported in these methods by default
@@ -36,8 +33,7 @@ public:
 
   auto lookup_update(Key const &key) -> Value {
     if (key_positions_.contains(key)) {
-      keys_.splice(key_positions_.at(key), keys_,
-                   std::next(key_positions_.at(key)), keys_.end());
+      keys_.splice(key_positions_.at(key), keys_, std::next(key_positions_.at(key)), keys_.end());
       return data_.at(key);
     }
 
@@ -55,16 +51,14 @@ public:
   }
 };
 
-inline auto lru_hits(std::vector<int> const &elements,
-                     std::size_t max_size_in_bytes,
-                     std::size_t value_size_in_bytes) -> std::size_t {
+inline auto lru_hits(std::vector<int> const &elements, std::size_t max_size_in_bytes, std::size_t value_size_in_bytes)
+    -> std::size_t {
   std::size_t misses{0};
   auto load = [&misses](int) -> int {
     ++misses;
     return 0;
   };
-  cpp_contests::LRUCache<int, int, decltype(load)> cache{
-      load, max_size_in_bytes, value_size_in_bytes};
+  cpp_contests::LRUCache<int, int, decltype(load)> cache{load, max_size_in_bytes, value_size_in_bytes};
   for (auto &&elem : elements) {
     cache.lookup_update(elem);
   }

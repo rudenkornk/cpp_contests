@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstdlib>
 #include <filesystem>
@@ -24,8 +24,7 @@ namespace {
 auto run_cli_test(std::string const &file_content) -> bool {
   auto content_hash = std::hash<std::string>{}(file_content);
   auto temp_path =
-      std::filesystem::temp_directory_path() /
-      ("valid_parenthesis_test_" + std::to_string(content_hash) + ".txt");
+      std::filesystem::temp_directory_path() / ("valid_parenthesis_test_" + std::to_string(content_hash) + ".txt");
 
   {
     std::ofstream temp_file(temp_path);
@@ -33,8 +32,7 @@ auto run_cli_test(std::string const &file_content) -> bool {
   }
 
   auto [exit_code, stdout_str, stderr_str] =
-      run_shell(TestArgsFixture::cli_tools.at("valid_parenthesis_cli") + " " +
-                temp_path.string());
+      run_shell(TestArgsFixture::cli_tools.at("valid_parenthesis_cli") + " " + temp_path.string());
 
   // Clean up temporary file
   std::filesystem::remove(temp_path);

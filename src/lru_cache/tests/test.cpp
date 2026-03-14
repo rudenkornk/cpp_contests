@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <string>
 
@@ -19,8 +19,7 @@ BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
 namespace {
 auto run_cli_test(std::string const &input) -> int {
-  auto &&[exit_code, stdout, stderr] = cpp_contests::run_shell(
-      TestArgsFixture::cli_tools.at("lru_cache_cli"), input);
+  auto &&[exit_code, stdout, stderr] = cpp_contests::run_shell(TestArgsFixture::cli_tools.at("lru_cache_cli"), input);
   return std::stoi(stdout);
 }
 } // namespace
@@ -37,8 +36,7 @@ BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(lru_hits({1, 2, 1}, 2 * sizeof(int), 0) == 1);
   BOOST_TEST(lru_hits({1, 2, 3, 1, 2}, 2 * sizeof(int), 0) == 0);
   BOOST_TEST(lru_hits({1, 2, 3, 2, 3}, 2 * sizeof(int), 0) == 2);
-  BOOST_TEST(lru_hits({1, 2, 3, 1, 2, 4, 5, 1, 7, 3, 2, 6, 1, 2},
-                      4 * sizeof(int), 0) == 4);
+  BOOST_TEST(lru_hits({1, 2, 3, 1, 2, 4, 5, 1, 7, 3, 2, 6, 1, 2}, 4 * sizeof(int), 0) == 4);
 }
 
 BOOST_AUTO_TEST_CASE(cli_integration_tests) {

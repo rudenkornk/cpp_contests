@@ -25,8 +25,7 @@ auto main() -> int {
     std::cout << e.what() << "\n";
   }
 
-  auto lru =
-      cpp_contests::perfect_cache(elements, cache_length * sizeof(int), 0);
+  auto lru = cpp_contests::perfect_cache(elements, cache_length * sizeof(int), 0);
   std::cout << lru << "\n";
   return 0;
 }

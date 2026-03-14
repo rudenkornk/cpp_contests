@@ -14,21 +14,17 @@ using Key = int;
 struct KeyNextpos {
   Key key;
   std::size_t nextpos;
-} __attribute__((aligned(
-    16))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+} __attribute__((aligned(16))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 struct KeyNextposCompare {
-  constexpr auto operator()(KeyNextpos const &lhs,
-                            KeyNextpos const &rhs) const noexcept -> bool {
+  constexpr auto operator()(KeyNextpos const &lhs, KeyNextpos const &rhs) const noexcept -> bool {
     return std::tie(lhs.nextpos, lhs.key) > std::tie(rhs.nextpos, rhs.key);
   }
 };
 
 auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
-    std::vector<Key> const &keys, std::size_t max_size_in_bytes,
-    std::size_t value_size_in_bytes) -> std::size_t {
-  std::size_t const max_length =
-      max_size_in_bytes / (value_size_in_bytes + sizeof(Key));
+    std::vector<Key> const &keys, std::size_t max_size_in_bytes, std::size_t value_size_in_bytes) -> std::size_t {
+  std::size_t const max_length = max_size_in_bytes / (value_size_in_bytes + sizeof(Key));
   if (max_length == 0) {
     return 0;
   }

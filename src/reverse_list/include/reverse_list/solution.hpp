@@ -10,13 +10,11 @@ namespace cpp_contests {
 template <typename T> struct list_node final {
   T data_;          // NOLINT(misc-non-private-member-variables-in-classes)
   list_node *next_; // NOLINT(misc-non-private-member-variables-in-classes)
-  list_node(T data,
-            list_node *next) noexcept(std::is_nothrow_move_constructible_v<T>)
+  list_node(T data, list_node *next) noexcept(std::is_nothrow_move_constructible_v<T>)
       : data_(std::move(data)), next_(next) {}
 };
 
-template <typename T>
-auto reverse_list(list_node<T> *head) noexcept -> list_node<T> * {
+template <typename T> auto reverse_list(list_node<T> *head) noexcept -> list_node<T> * {
   list_node<T> *new_head = nullptr;
   while (head) {
     list_node<T> *next = head->next_;

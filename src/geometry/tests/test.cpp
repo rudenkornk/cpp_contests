@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <array>
 #include <cstddef>
@@ -34,13 +34,10 @@ BOOST_AUTO_TEST_CASE(matrix_ctors_test) {
   constexpr Matrix m_from_arr(a);
   constexpr Matrix<X, Y, int> m_from_slist({1, 2, 3, 4, 5, 6});
   constexpr Matrix<X, Y, int> m_from_llist({{1, 2, 3}, {4, 5, 6}});
-  constexpr Matrix<X, Y, int> m_from_range(a_splatted.begin(),
-                                           a_splatted.end());
+  constexpr Matrix<X, Y, int> m_from_range(a_splatted.begin(), a_splatted.end());
   constexpr Matrix m_from_tarr(at);
-  constexpr Matrix<X, Y, int> m_from_mat_range(m_from_arr.begin(),
-                                               m_from_arr.end());
-  constexpr Matrix<Y, X, int> m_from_trange(m_from_arr.tbegin(),
-                                            m_from_arr.tend());
+  constexpr Matrix<X, Y, int> m_from_mat_range(m_from_arr.begin(), m_from_arr.end());
+  constexpr Matrix<Y, X, int> m_from_trange(m_from_arr.tbegin(), m_from_arr.tend());
   constexpr Matrix<1, 1, int> m_smallest{};
   constexpr int e = m_smallest;
   constexpr double small = 0.00001;

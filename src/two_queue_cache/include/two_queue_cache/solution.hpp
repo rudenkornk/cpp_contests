@@ -12,8 +12,7 @@
 
 namespace cpp_contests {
 
-template <typename Key, typename Value, std::invocable<Key> Load>
-class TwoQueueCache final {
+template <typename Key, typename Value, std::invocable<Key> Load> class TwoQueueCache final {
   using ColdList = std::queue<Key>;
   using HotList = std::list<Key>;
   using HotPosition = typename HotList::const_iterator;
@@ -40,16 +39,11 @@ class TwoQueueCache final {
 
 public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  TwoQueueCache(Load const &load, std::size_t max_size_in_bytes,
-                std::size_t override_value_size = sizeof(Value))
-      : load_(load), max_size_(max_size_in_bytes),
-        value_size_(override_value_size),
-        max_length_(static_cast<std::size_t>(
-            max_size_ / (value_size_ + key_size_ * (1 + cold_out_ratio_)))),
-        cold_in_max_length_(
-            static_cast<std::size_t>(max_length_ * cold_in_ratio_)),
-        cold_out_max_length_(
-            static_cast<std::size_t>(max_length_ * cold_out_ratio_)),
+  TwoQueueCache(Load const &load, std::size_t max_size_in_bytes, std::size_t override_value_size = sizeof(Value))
+      : load_(load), max_size_(max_size_in_bytes), value_size_(override_value_size),
+        max_length_(static_cast<std::size_t>(max_size_ / (value_size_ + key_size_ * (1 + cold_out_ratio_)))),
+        cold_in_max_length_(static_cast<std::size_t>(max_length_ * cold_in_ratio_)),
+        cold_out_max_length_(static_cast<std::size_t>(max_length_ * cold_out_ratio_)),
         hot_max_length_(max_length_ - cold_in_max_length_) {}
 
   // Forbid all copies and moves, since storing references inside class fields
@@ -130,16 +124,14 @@ private:
   }
 };
 
-inline auto two_queue_hits(std::vector<int> const &elements,
-                           std::size_t max_size_in_bytes,
-                           std::size_t value_size) -> std::size_t {
+inline auto two_queue_hits(std::vector<int> const &elements, std::size_t max_size_in_bytes, std::size_t value_size)
+    -> std::size_t {
   std::size_t misses{0};
   auto load = [&misses](int) -> int {
     ++misses;
     return 0;
   };
-  cpp_contests::TwoQueueCache<int, int, decltype(load)> cache{
-      load, max_size_in_bytes, value_size};
+  cpp_contests::TwoQueueCache<int, int, decltype(load)> cache{load, max_size_in_bytes, value_size};
   for (auto &&elem : elements) {
     cache.lookup_update(elem);
   }
