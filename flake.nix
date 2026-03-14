@@ -20,7 +20,7 @@
 
       nativeBuildInputs = with pkgs; [
         clang
-        gcc
+        gcc15
 
         cmake
         ninja
