@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <fmt/base.h>
 #include <iostream>
 #include <iterator>
 #include <random>
@@ -13,6 +12,7 @@
 #include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <fmt/base.h>
 #include <fmt/core.h>
 
 #include "lru_cache/solution.hpp"
