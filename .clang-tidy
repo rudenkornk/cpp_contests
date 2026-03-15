@@ -14,4 +14,22 @@ Checks: >
 
   -llvmlibc-*,
 
-  -portability-avoid-pragma-once
+  -portability-avoid-pragma-once,
+
+  -misc-include-cleaner,
+  -readability-redundant-declaration
+
+# Notes regarding disabled warnings:
+# fuchsia-*, linuxkernel-*, llvm-*, llvmlibc-* are mostly designed for their own codebases, restricting normal C++ features.
+# We disable them, since this is a generic C++ code.
+#
+# portability-avoid-pragma-once is a legitimate warning, but a correct alternative with macro wrappers is too noisy.
+#
+# misc-include-cleaner produces pervasive false positives in C++20 module-based codebases:
+#   clang-tidy analyses each translation unit in isolation without resolving cross-module symbol visibility,
+#   so every symbol imported via an `import` declaration is reported as lacking a directly included header.
+#   Until clang-tidy gains proper understanding of the C++20 module system, suppressing the check globally is the only practical option.
+#
+# readability-redundant-declaration produces false positives when C++20 modules are used:
+# operator new/delete get declared in both the system <new> header and via module interface exports,
+# causing spurious "redundant declaration" warnings in system headers that cannot be suppressed with NOLINT.

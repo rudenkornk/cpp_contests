@@ -8,7 +8,7 @@
 #include <ranges>
 #include <vector>
 
-#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

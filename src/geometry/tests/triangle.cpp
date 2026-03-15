@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
 #define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
-#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 #include "geometry/primitives.hpp"

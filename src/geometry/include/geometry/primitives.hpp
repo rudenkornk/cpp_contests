@@ -58,6 +58,7 @@ private:
   Point normal_;
   double d_;
 
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   static constexpr auto norm_coeff_(double A, double B, double C) noexcept {
     auto &&normal = Point{A, B, C};
     return n(normal);
@@ -88,6 +89,7 @@ constexpr auto complanar(Plane const &p1, Plane const &p2, double eps = EPSMIN) 
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3, Point const &p4,
                          double eps = EPSMIN) noexcept -> bool {
 
@@ -142,7 +144,7 @@ constexpr auto complanar_intersection(Line const &p1, Line const &p2) noexcept -
     }
     auto rightcut = right[first, rows];
     auto answ = inv(leftcut) * rightcut;
-    return answ[0] * p1.R() + p1.R0();
+    return (answ[0] * p1.R()) + p1.R0();
   }
   assert(false);
   return Point{};
@@ -158,7 +160,7 @@ constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept -> std::o
   auto nn = dot(p1.normal(), p2.normal());
   auto c1 = (d1 - d2 * nn) / (1 - nn * nn);
   auto c2 = (d2 - d1 * nn) / (1 - nn * nn);
-  auto R0 = c1 * p1.normal() + c2 * p2.normal();
+  auto R0 = (c1 * p1.normal()) + (c2 * p2.normal());
   auto R = cross(p1.normal(), p2.normal());
   return Line{R0, R};
 }

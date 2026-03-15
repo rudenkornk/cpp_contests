@@ -25,7 +25,8 @@
       "displayName": "Debug LLVM config.",
       "inherits": ["llvm_base"],
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-fstack-protector-strong -fwrapv"
       }
     },
     {
