@@ -12,8 +12,8 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
+#include "utils/shell.hpp"
 #include "utils/test_utils.hpp"
-#include "utils/utils.hpp"
 
 using cpp_contests::run_shell;
 using cpp_contests::TestArgsFixture;

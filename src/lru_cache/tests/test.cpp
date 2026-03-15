@@ -8,8 +8,8 @@
 #include <boost/test/unit_test_suite.hpp>
 
 #include "lru_cache/solution.hpp"
+#include "utils/shell.hpp"
 #include "utils/test_utils.hpp"
-#include "utils/utils.hpp"
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 using cpp_contests::lru_hits;

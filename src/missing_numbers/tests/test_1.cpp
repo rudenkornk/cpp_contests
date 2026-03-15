@@ -15,8 +15,8 @@
 #include <boost/test/unit_test_suite.hpp>
 
 #include "missing_numbers/solution.hpp"
+#include "utils/shell.hpp"
 #include "utils/test_utils.hpp"
-#include "utils/utils.hpp"
 
 using cpp_contests::missing_numbers;
 using cpp_contests::run_shell;

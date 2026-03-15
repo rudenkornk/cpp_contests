@@ -58,8 +58,8 @@ Custom test harness utilities are provided in the `utils` module.
 
 **Key Libraries:**
 Boost is the primary external dependency, specifically `program_options` and `unit_test_framework`.
-Boost.Process is used for shell command execution in utility code.
 The standard library is heavily utilized with modern C++23 features.
+Shell command execution in utility code is implemented using POSIX `fork`/`exec` APIs (no Boost.Process dependency for now).
 
 **Platforms:**
 Linux is the primary supported platform.

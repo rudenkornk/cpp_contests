@@ -7,21 +7,16 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
-#include <filesystem>
 #include <format>
 #include <functional>
-#include <map>
 #include <numeric>
 #include <random>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <tuple>
 #include <utility>
 #include <vector>
-
-#include <boost/process.hpp> // NOLINT(misc-include-cleaner)
 
 #include "utils/type_traits.hpp"
 
@@ -255,85 +250,5 @@ private:
 };
 
 inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept { left.swap(right); }
-
-static inline auto
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-run_shell(std::string const &cmd, std::string const &stdin_data = "",
-          std::map<std::string, std::string> const &extra_env = {},
-          std::vector<std::filesystem::path> const &extra_paths = {},
-          std::filesystem::path const &cwd = std::filesystem::current_path(), bool check = true)
-    -> std::tuple<int, std::string, std::string> {
-
-  // NOLINTBEGIN(misc-include-cleaner)
-  namespace bp = boost::process;
-
-  bp::ipstream stdout_stream;
-  bp::ipstream stderr_stream;
-
-  auto env = boost::this_process::environment();
-
-  for (auto const &[key, value] : extra_env) {
-    env[key] = value;
-  }
-
-  if (!extra_paths.empty()) {
-    std::string path_value;
-    for (auto const &path : extra_paths) {
-      if (!path_value.empty()) {
-        path_value += ":";
-      }
-      path_value += path.string();
-    }
-    if (!env["PATH"].empty()) {
-      path_value += ":" + env["PATH"].to_string();
-    }
-    env["PATH"] = path_value;
-  }
-
-  bp::child process;
-  bp::opstream stdin_stream;
-
-  if (!stdin_data.empty()) {
-    process = bp::child(cmd, env, bp::std_in<stdin_stream, bp::std_out> stdout_stream, bp::std_err > stderr_stream,
-                        bp::start_dir = cwd.string());
-    stdin_stream << stdin_data;
-    stdin_stream.flush();
-  } else {
-    process =
-        bp::child(cmd, env, bp::std_out > stdout_stream, bp::std_err > stderr_stream, bp::start_dir = cwd.string());
-  }
-
-  std::string stdout_result;
-  std::string stderr_result;
-
-  auto read_stream = [](bp::ipstream &stream, std::string &result) -> void {
-    std::string line;
-    while (std::getline(stream, line)) {
-      result += line + "\n";
-    }
-  };
-
-  std::thread stdout_thread(read_stream, std::ref(stdout_stream), std::ref(stdout_result));
-  std::thread stderr_thread(read_stream, std::ref(stderr_stream), std::ref(stderr_result));
-
-  // Close stdin after starting read threads to signal EOF
-  if (!stdin_data.empty()) {
-    stdin_stream.pipe().close();
-  }
-
-  stdout_thread.join();
-  stderr_thread.join();
-
-  process.wait();
-  int const exit_code = process.exit_code();
-
-  if (check && exit_code != 0) {
-    throw std::runtime_error("Command failed with exit code " + std::to_string(exit_code));
-  }
-
-  return std::make_tuple(exit_code, std::move(stdout_result), std::move(stderr_result));
-
-  // NOLINTEND(misc-include-cleaner)
-}
 
 } // namespace cpp_contests
