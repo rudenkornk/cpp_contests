@@ -14,10 +14,10 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-#include "lru_cache/solution.hpp"
-#include "perfect_cache/solution.hpp"
-#include "two_queue_cache/solution.hpp"
-#include "utils/utils.hpp"
+import utils.utils;
+import lru_cache.solution;
+import perfect_cache.solution;
+import two_queue_cache.solution;
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 using cpp_contests::perfect_cache;

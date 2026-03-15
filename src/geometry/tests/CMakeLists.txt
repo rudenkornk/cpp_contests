@@ -4,7 +4,6 @@ target_link_libraries(geometry_unit_tests PRIVATE geometry)
 target_link_libraries(geometry_unit_tests PRIVATE Boost::headers)
 
 target_sources(geometry_unit_tests PRIVATE test.cpp)
-target_add_headers_as_sources(geometry_unit_tests geometry)
 
 target_allow_instrumentation(geometry_unit_tests)
 target_allow_coding_standards(geometry_unit_tests)
@@ -17,7 +16,6 @@ target_link_libraries(geom_triangle_unit_tests PRIVATE geometry)
 target_link_libraries(geom_triangle_unit_tests PRIVATE Boost::headers)
 
 target_sources(geom_triangle_unit_tests PRIVATE triangle.cpp)
-target_add_headers_as_sources(geom_triangle_unit_tests geometry)
 
 target_allow_instrumentation(geom_triangle_unit_tests)
 target_allow_coding_standards(geom_triangle_unit_tests)

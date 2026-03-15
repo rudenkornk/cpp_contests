@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <array>
@@ -17,9 +17,10 @@
 #include <vector>
 
 
-#include "utils/type_traits.hpp"
+export module utils.utils;
+import utils.type_traits;
 
-namespace cpp_contests {
+export namespace cpp_contests {
 
 inline auto size_to_string(size_t size) -> std::string {
   // NOLINTNEXTLINE(altera-id-dependent-backward-branch)

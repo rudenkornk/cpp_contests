@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "lru_cache/solution.hpp"
+import lru_cache.solution;
 
 auto main() -> int {
   std::size_t cache_length = 0;

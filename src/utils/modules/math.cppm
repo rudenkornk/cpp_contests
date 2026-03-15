@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <cmath>
 #include <limits>
 #include <type_traits>
 
-namespace cpp_contests {
+export module utils.math;
+
+export namespace cpp_contests {
 
 namespace details_ {
 // See https://gist.github.com/alexshtf/eb5128b3e3e143187794

@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <cassert>
@@ -6,9 +6,11 @@
 #include <optional>
 #include <utility>
 
-#include "geometry/matrix.hpp"
+export module geometry.primitives;
 
-namespace cpp_contests {
+import geometry.matrix;
+
+export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
 using Point = Vector<3, double>;

@@ -1,19 +1,20 @@
-add_library(geometry INTERFACE)
+add_library(geometry)
+
 target_sources(
   geometry
-  INTERFACE FILE_SET
-            geometry_headers
-            TYPE
-            HEADERS
-            BASE_DIRS
-            include
-            FILES
-            include/geometry/matrix.hpp
-            include/geometry/primitives.hpp
-            include/geometry/triangle.hpp
+  PUBLIC FILE_SET
+         CXX_MODULES
+         FILES
+           modules/matrix.cppm
+           modules/matrix_view.cppm
+           modules/primitives.cppm
+           modules/triangle.cppm
 )
-target_compile_features(geometry INTERFACE cxx_std_23)
-target_setup_for_install(geometry)
 
-target_link_libraries(geometry INTERFACE utils)
+target_compile_features(geometry PUBLIC cxx_std_23)
+target_setup_for_install(geometry)
+target_allow_instrumentation(geometry)
+target_allow_coding_standards(geometry)
+
+target_link_libraries(geometry PRIVATE utils)
 add_subdirectory(tests)

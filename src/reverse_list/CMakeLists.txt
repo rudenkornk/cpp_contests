@@ -1,15 +1,16 @@
-add_library(reverse_list INTERFACE)
+add_library(reverse_list)
+
 target_sources(
   reverse_list
-  INTERFACE FILE_SET
-            reverse_list_headers
-            TYPE
-            HEADERS
-            BASE_DIRS
-            include
-            FILES
-            include/reverse_list/solution.hpp)
-target_compile_features(reverse_list INTERFACE cxx_std_23)
+  PUBLIC FILE_SET
+         CXX_MODULES
+         FILES
+           modules/solution.cppm
+)
+
+target_compile_features(reverse_list PUBLIC cxx_std_23)
 target_setup_for_install(reverse_list)
+target_allow_instrumentation(reverse_list)
+target_allow_coding_standards(reverse_list)
 
 add_subdirectory(tests)

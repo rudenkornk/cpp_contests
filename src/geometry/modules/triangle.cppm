@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <array>
@@ -7,10 +7,12 @@
 #include <cstdlib>
 #include <optional>
 
-#include "geometry/matrix.hpp"
-#include "geometry/primitives.hpp"
+export module geometry.triangle;
 
-namespace cpp_contests {
+import geometry.matrix;
+import geometry.primitives;
+
+export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
 class Triangle final {

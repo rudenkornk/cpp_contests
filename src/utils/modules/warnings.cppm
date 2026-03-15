@@ -1,3 +1,5 @@
+module;
+
 // Source & credit:
 // https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/
 
@@ -23,6 +25,8 @@
 #endif
 // NOLINTEND(cppcoreguidelines-macro-usage)
 // clang-format on
+
+export module utils.warnings;
 
 /* example use:
 DISABLE_WARNING_PUSH

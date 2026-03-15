@@ -63,9 +63,32 @@ function(generic_install)
     COMPATIBILITY SameMajorVersion)
 
   foreach(target ${install_targets})
-    get_target_property(header_sets ${target} INTERFACE_HEADER_SETS)
-    foreach(header_set ${header_sets})
-      list(APPEND INSTALL_HEADER_SET_OPTION FILE_SET ${header_set} COMPONENT ${CMAKE_PROJECT_NAME}_dev)
+    foreach(file_set_type HEADERS CXX_MODULES)
+      if(file_set_type STREQUAL "HEADERS")
+        set(property_name INTERFACE_HEADER_SETS)
+        set(destination_dir ${CMAKE_INSTALL_INCLUDEDIR})
+      elseif(file_set_type STREQUAL "CXX_MODULES")
+        set(property_name INTERFACE_CXX_MODULE_SETS)
+        set(destination_dir ${CMAKE_INSTALL_INCLUDEDIR})
+      else()
+        set(property_name INTERFACE_${file_set_type}_SETS)
+        set(destination_dir ${CMAKE_INSTALL_INCLUDEDIR})
+      endif()
+      get_target_property(file_sets ${target} ${property_name})
+      if(NOT file_sets OR file_sets STREQUAL "file_sets-NOTFOUND")
+        continue()
+      endif()
+      foreach(file_set ${file_sets})
+        list(
+          APPEND
+          INSTALL_FILE_SET_OPTION
+          FILE_SET
+          ${file_set}
+          COMPONENT
+          ${CMAKE_PROJECT_NAME}_dev
+          DESTINATION
+          ${destination_dir})
+      endforeach()
     endforeach()
   endforeach()
 
@@ -74,7 +97,7 @@ function(generic_install)
     EXPORT ${CMAKE_PROJECT_NAME}_targets
     RUNTIME COMPONENT ${CMAKE_PROJECT_NAME}_runtime
     LIBRARY COMPONENT ${CMAKE_PROJECT_NAME}_runtime NAMELINK_COMPONENT ${CMAKE_PROJECT_NAME}_dev
-    ARCHIVE COMPONENT ${CMAKE_PROJECT_NAME}_dev ${INSTALL_HEADER_SET_OPTION}
+    ARCHIVE COMPONENT ${CMAKE_PROJECT_NAME}_dev ${INSTALL_FILE_SET_OPTION}
     INCLUDES
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   install(

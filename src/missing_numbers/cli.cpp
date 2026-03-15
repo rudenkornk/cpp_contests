@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "missing_numbers/solution.hpp"
+import missing_numbers.solution;
 
 auto main(int argc, char **argv) -> int {
   auto const args = std::span(argv, static_cast<std::size_t>(argc));

@@ -1,20 +1,22 @@
-add_library(utils INTERFACE)
+add_library(utils)
+
 target_sources(
   utils
-  INTERFACE FILE_SET
-            utils_headers
-            TYPE
-            HEADERS
-            BASE_DIRS
-            include
-            FILES
-            include/utils/math.hpp
-            include/utils/shell.hpp
-            include/utils/type_traits.hpp
-            include/utils/utils.hpp
-            include/utils/warnings.hpp)
-target_compile_features(utils INTERFACE cxx_std_23)
+  PUBLIC FILE_SET
+         CXX_MODULES
+         FILES
+           modules/math.cppm
+           modules/shell.cppm
+           modules/type_traits.cppm
+           modules/utils.cppm
+           modules/warnings.cppm
+           modules/test_utils.cppm
+)
 
+target_compile_features(utils PUBLIC cxx_std_23)
+target_link_libraries(utils PUBLIC Boost::headers)
 target_setup_for_install(utils)
+target_allow_instrumentation(utils)
+target_allow_coding_standards(utils)
 
 add_subdirectory(tests)

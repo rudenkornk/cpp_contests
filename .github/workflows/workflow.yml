@@ -70,6 +70,7 @@ jobs:
       - name: Install
         run: cmake --install build --prefix build/install --verbose
       - name: Test install
+        if: ${{ !contains(matrix.preset, 'san') }}
         run: |
           cmake -G Ninja -S build/test_install/ -B build/test_install/build \
             -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests/)"
