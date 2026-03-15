@@ -1,4 +1,4 @@
-#include "perfect_cache/solution.hpp"
+module;
 
 #include <cassert>
 #include <cstddef>
@@ -7,7 +7,11 @@
 #include <unordered_map>
 #include <vector>
 
-namespace cpp_contests {
+#include "perfect_cache/perfect_cache_export.h"
+
+export module perfect_cache.solution;
+
+export namespace cpp_contests {
 
 using Key = int;
 
@@ -22,7 +26,7 @@ struct KeyNextposCompare {
   }
 };
 
-auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
+PERFECT_CACHE_EXPORT auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
     std::vector<Key> const &keys, std::size_t max_size_in_bytes, std::size_t value_size_in_bytes) -> std::size_t {
   std::size_t const max_length = max_size_in_bytes / (value_size_in_bytes + sizeof(Key));
   if (max_length == 0) {

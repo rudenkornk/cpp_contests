@@ -3,7 +3,6 @@ target_sources(reverse_list_unit_tests PRIVATE test_1.cpp)
 
 target_link_libraries(reverse_list_unit_tests PRIVATE Boost::headers)
 target_link_libraries(reverse_list_unit_tests PRIVATE reverse_list)
-target_add_headers_as_sources(reverse_list_unit_tests reverse_list)
 
 target_allow_instrumentation(reverse_list_unit_tests)
 target_allow_coding_standards(reverse_list_unit_tests)

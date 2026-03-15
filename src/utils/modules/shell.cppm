@@ -1,3 +1,5 @@
+module;
+
 #include <array>
 #include <cctype>
 #include <cerrno>
@@ -19,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+export module utils.shell;
+
 // This is the implementation of run_shell util, written only with stdlib and POSIX.
 // Initially, run_shell was written in a much simpler way with a use of <boost/process.hpp>.
 // However, boost.process appears to be not ready for C++20 modules, which makes gcc fail to compile it.
@@ -33,6 +37,8 @@
 namespace cpp_contests {
 
 namespace detail {
+// TODO: remove this NOLINT once all utils are under single interface module declaration.
+// NOLINTBEGIN(misc-use-internal-linkage)
 
 // RAII wrapper around a pair of file descriptors created by pipe2().
 // Ensures both ends are closed on destruction unless explicitly released.
@@ -238,9 +244,10 @@ inline auto build_env_map(std::map<std::string, std::string> const &extra_env,
   return env_map;
 }
 
+// NOLINTEND(misc-use-internal-linkage)
 } // namespace detail
 
-inline auto
+export auto
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 run_shell(std::string const &cmd, std::string const &stdin_data = "",
           std::map<std::string, std::string> const &extra_env = {},

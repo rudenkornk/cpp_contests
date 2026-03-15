@@ -9,9 +9,9 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-#include "utils/math.hpp"
-#include "utils/shell.hpp"
-#include "utils/utils.hpp"
+import utils.math;
+import utils.shell;
+import utils.utils;
 
 using cpp_contests::size_to_string;
 
@@ -83,7 +83,6 @@ BOOST_AUTO_TEST_CASE(run_shell_exit_code) {
 }
 
 BOOST_AUTO_TEST_CASE(run_shell_check_throws) {
-  // NOLINTNEXTLINE(misc-include-cleaner)
   BOOST_CHECK_THROW(cpp_contests::run_shell("false"), std::runtime_error);
 }
 

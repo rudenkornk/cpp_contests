@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <array>
@@ -12,9 +12,10 @@
 #include <numeric>
 #include <type_traits>
 
-#include "utils/math.hpp"
+export module geometry.matrix;
+import utils.math;
 
-namespace cpp_contests {
+export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
 constexpr double EPSMIN = 1e-100;

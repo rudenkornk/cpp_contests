@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cstddef>
 #include <cstdint>
@@ -7,14 +7,16 @@
 #include <type_traits>
 #include <utility>
 
-namespace cpp_contests {
+export module utils.type_traits;
+
+export namespace cpp_contests {
 
 template <typename T, template <typename...> typename Template> struct _isInstanceOf : std::false_type {};
 template <template <typename...> typename Template, typename... Args>
 struct _isInstanceOf<Template<Args...>, Template> : std::true_type {};
 
 template <template <typename...> typename Template, typename Instance>
-constexpr static auto isInstanceOf = _isInstanceOf<Instance, Template>::value;
+constexpr inline auto isInstanceOf = _isInstanceOf<Instance, Template>::value;
 
 template <typename Callable> struct CallableTraits final {
 private:

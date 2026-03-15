@@ -1,13 +1,18 @@
-#include <cassert>
+module;
+
 #include <cstddef>
 #include <set>
 #include <vector>
 
-#include "k_max/solution.hpp"
+#include "k_max/k_max_export.h"
 
-auto cpp_contests::k_max(std::vector<int> const &nums,
-                         // NOLINTNEXTLINE(readability-identifier-length)
-                         std::size_t k) -> std::vector<int> {
+export module k_max.solution;
+
+export namespace cpp_contests {
+
+K_MAX_EXPORT auto k_max(std::vector<int> const &nums,
+                        // NOLINTNEXTLINE(readability-identifier-length)
+                        std::size_t k) -> std::vector<int> {
   // O(n) memory, O(n * log(k)) time
   std::vector<int> result{};
   result.reserve(nums.size() + 1 - k);
@@ -24,3 +29,5 @@ auto cpp_contests::k_max(std::vector<int> const &nums,
   }
   return result;
 }
+
+} // namespace cpp_contests

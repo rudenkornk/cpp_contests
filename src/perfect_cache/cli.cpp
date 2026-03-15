@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "perfect_cache/solution.hpp"
+import perfect_cache.solution;
 
 auto main() -> int {
   std::size_t cache_length = 0;

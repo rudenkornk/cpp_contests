@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cassert>
 #include <concepts>
@@ -8,7 +8,9 @@
 #include <unordered_map>
 #include <vector>
 
-namespace cpp_contests {
+export module lru_cache.solution;
+
+export namespace cpp_contests {
 
 template <typename Key, typename Value, std::invocable<Key> Load> class LRUCache final {
   using Position = typename std::list<Key>::const_iterator;

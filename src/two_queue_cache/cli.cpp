@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "two_queue_cache/solution.hpp"
+import two_queue_cache.solution;
 
 auto main() -> int {
   std::size_t cache_size = 0;

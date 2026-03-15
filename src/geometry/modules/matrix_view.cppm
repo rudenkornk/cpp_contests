@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 // An alternative draft implementation of a matrix.
 // The core idea is to use Matrix View to perform operations on the matrix.
@@ -16,11 +16,13 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
+#include <numeric>
 #include <type_traits>
 
-#include "utils/utils.hpp"
+export module geometry.matrix_view;
+import utils.utils;
 
-namespace cpp_contests {
+export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
 template <std::size_t N> using MatrixIndices = std::array<std::size_t, N>;

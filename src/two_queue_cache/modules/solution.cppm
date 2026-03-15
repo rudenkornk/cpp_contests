@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cassert>
 #include <concepts>
@@ -10,7 +10,9 @@
 #include <unordered_set>
 #include <vector>
 
-namespace cpp_contests {
+export module two_queue_cache.solution;
+
+export namespace cpp_contests {
 
 template <typename Key, typename Value, std::invocable<Key> Load> class TwoQueueCache final {
   using ColdList = std::queue<Key>;

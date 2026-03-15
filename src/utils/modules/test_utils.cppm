@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cstddef>
 #include <map>
@@ -8,7 +8,9 @@
 #include <boost/test/framework.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace cpp_contests {
+export module utils.test_utils;
+
+export namespace cpp_contests {
 
 struct TestArgsFixture {
   // NOLINTNEXTLINE(fuchsia-statically-constructed-objects)

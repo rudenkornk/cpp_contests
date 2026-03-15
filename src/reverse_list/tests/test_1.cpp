@@ -11,8 +11,9 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
+import reverse_list.solution;
+
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
-#include "reverse_list/solution.hpp"
 
 using cpp_contests::list_node;
 using cpp_contests::reverse_list;

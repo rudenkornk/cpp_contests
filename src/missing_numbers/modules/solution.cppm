@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cassert>
 #include <climits>
@@ -8,7 +8,9 @@
 #include <boost/algorithm/cxx17/reduce.hpp>
 #include <boost/range/numeric.hpp>
 
-namespace cpp_contests {
+export module missing_numbers.solution;
+
+export namespace cpp_contests {
 
 auto inline missing_numbers(std::vector<unsigned> const &nums) -> std::pair<unsigned, unsigned> {
   assert(nums.size() + 2 < (1U << sizeof(unsigned) * CHAR_BIT / 2));

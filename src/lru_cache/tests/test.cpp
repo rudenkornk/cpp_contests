@@ -2,14 +2,15 @@
 #define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <string>
+#include <vector>
 
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-#include "lru_cache/solution.hpp"
-#include "utils/shell.hpp"
-#include "utils/test_utils.hpp"
+import utils.shell;
+import utils.test_utils;
+import lru_cache.solution;
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 using cpp_contests::lru_hits;

@@ -4,8 +4,8 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-#include "geometry/primitives.hpp"
-#include "geometry/triangle.hpp"
+import geometry.primitives;
+import geometry.triangle;
 
 using cpp_contests::Point;
 using cpp_contests::Triangle;

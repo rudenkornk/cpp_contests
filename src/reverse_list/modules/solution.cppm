@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <cassert>
 #include <climits>
 #include <type_traits>
 #include <utility>
 
-namespace cpp_contests {
+export module reverse_list.solution;
+
+export namespace cpp_contests {
 
 template <typename T> struct list_node final {
   T data_;          // NOLINT(misc-non-private-member-variables-in-classes)
