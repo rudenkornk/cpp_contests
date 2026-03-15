@@ -11,12 +11,11 @@
 #include <functional>
 #include <numeric>
 #include <random>
-#include <stdexcept>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 #include <vector>
+
 
 #include "utils/type_traits.hpp"
 
@@ -66,7 +65,7 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
   static_assert(std::is_nothrow_swappable_v<T>);
   static_assert(std::is_nothrow_swappable_v<Indexer>);
   static_assert(std::is_nothrow_invocable_v<IndexFunction, Indexer>);
-  using std::swap; // NOLINT(misc-include-header,misc-include-cleaner)
+  using std::swap;
   assert(vec.size() == perm.size());
   if (vec.size() == 0) {
     return;
@@ -175,8 +174,10 @@ class ExceptionSaver final {
   std::vector<std::exception_ptr> exceptions;
 
 public:
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
   explicit ExceptionSaver(size_t maxExceptions = 1) { exceptions.resize(maxExceptions); }
   ExceptionSaver(ExceptionSaver const &) = delete;
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
   auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
   auto operator=(ExceptionSaver &&other) & noexcept -> ExceptionSaver & {
@@ -218,6 +219,7 @@ public:
     std::rethrow_exception(exc);
   }
   void drop() noexcept {
+    // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
     std::fill_n(exceptions.begin(), nSavedExceptions.load(), std::exception_ptr{});
     nSavedExceptions = 0;
 #ifndef NDEBUG
@@ -252,3 +254,4 @@ private:
 inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept { left.swap(right); }
 
 } // namespace cpp_contests
+

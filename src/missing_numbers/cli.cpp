@@ -1,4 +1,3 @@
-// NOLINTNEXTLINE(misc-include-cleaner)
 #include <cstddef>
 #include <fstream>
 #include <iostream>

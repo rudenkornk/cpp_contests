@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <vector>
 
-#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/included/unit_test.hpp>
 
 #include "two_queue_cache/solution.hpp"
 
@@ -18,8 +18,6 @@ auto compute_hits(std::vector<int> const &elements, std::size_t cache_size) -> s
   return two_queue_hits(elements, cache_size * (virtual_value_size + (key_size * 3) / 2), virtual_value_size);
 }
 } // namespace
-
-// NOLINTBEGIN(misc-include-cleaner)
 
 BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(compute_hits({}, 0) == std::size_t{0});
@@ -40,5 +38,3 @@ BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(compute_hits({1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4}, 4) == std::size_t{0});
   BOOST_TEST(compute_hits({1, 2, 1, 2, 1, 2}, 2) == std::size_t{0});
 }
-
-// NOLINTEND(misc-include-cleaner)

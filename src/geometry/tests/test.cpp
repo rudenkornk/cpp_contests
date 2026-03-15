@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <numbers>
 
-#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 

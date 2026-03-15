@@ -4,9 +4,8 @@
 #include <cstddef>
 #include <cstdlib>
 #include <stdexcept>
-#include <string>
 
-#include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
@@ -48,6 +47,7 @@ constexpr auto sqrt_check() -> bool {
   bool result = true;
   for (std::size_t i = 0; i < N_iter; ++i) {
     double const curr = pow2(mult, i) * start;
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     double const res = cpp_contests::sqrt(curr * curr);
     double const diff = res - curr;
     result &= std::abs(diff) < eps;

@@ -6,7 +6,7 @@
 #include <string>
 
 #include <boost/test/framework.hpp>
-#include <boost/test/unit_test.hpp> // NOLINT(misc-include-cleaner)
+#include <boost/test/unit_test.hpp>
 
 namespace cpp_contests {
 
