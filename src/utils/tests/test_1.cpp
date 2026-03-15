@@ -3,12 +3,15 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <stdexcept>
+#include <string>
 
 #include <boost/test/included/unit_test.hpp> // NOLINT(misc-include-cleaner)
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 #include "utils/math.hpp"
+#include "utils/shell.hpp"
 #include "utils/utils.hpp"
 
 using cpp_contests::size_to_string;
@@ -55,3 +58,54 @@ constexpr auto sqrt_check() -> bool {
 } // namespace
 
 BOOST_AUTO_TEST_CASE(sqrt_test) { static_assert(sqrt_check()); }
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
+BOOST_AUTO_TEST_CASE(run_shell_basic) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("echo hello");
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out == "hello\n");
+  BOOST_TEST(err.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_stdin) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("cat", "world\n");
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out == "world\n");
+  BOOST_TEST(err.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_exit_code) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("false", "", {}, {}, {}, false);
+  BOOST_TEST(exit_code == 1);
+  (void)out;
+  (void)err;
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_check_throws) {
+  // NOLINTNEXTLINE(misc-include-cleaner)
+  BOOST_CHECK_THROW(cpp_contests::run_shell("false"), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_extra_env) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'echo $MY_VAR'", "", {{"MY_VAR", "hello_env"}});
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out == "hello_env\n");
+  BOOST_TEST(err.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_stderr) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'echo errline >&2'", "", {}, {}, {}, false);
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out.empty());
+  BOOST_TEST(err == "errline\n");
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_quoted_args) {
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("echo \"hello world\"");
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out == "hello world\n");
+  BOOST_TEST(err.empty());
+}
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
