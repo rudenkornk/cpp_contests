@@ -235,7 +235,7 @@ ctest --test-dir build --parallel --verbose
 ```
 
 Tests include unit tests for each problem solution.
-Test executables are named `<problem>_unit_tests`.
+Test executables are named `<problem>_tests`.
 
 **Static Analysis:**
 clang-tidy is activated when building with the `LINT=ON` option.
