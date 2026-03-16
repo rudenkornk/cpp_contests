@@ -4,7 +4,7 @@ module;
 #include <limits>
 #include <type_traits>
 
-export module utils.math;
+export module utils:math;
 
 export namespace cpp_contests {
 

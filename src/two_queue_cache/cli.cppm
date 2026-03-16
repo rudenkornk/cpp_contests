@@ -5,7 +5,7 @@ module;
 #include <vector>
 
 export module two_queue_cache.cli;
-import two_queue_cache.solution;
+import two_queue_cache;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"

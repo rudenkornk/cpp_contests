@@ -8,7 +8,7 @@ module;
 #include <stack>
 #include <string>
 
-export module valid_parenthesis.cli;
+export module valid_parenthesis;
 
 export namespace cpp_contests {
 

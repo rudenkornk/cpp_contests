@@ -7,7 +7,7 @@ module;
 #include <unordered_map>
 #include <vector>
 
-export module perfect_cache.solution;
+export module perfect_cache;
 
 export namespace cpp_contests {
 

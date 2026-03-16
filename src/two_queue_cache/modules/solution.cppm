@@ -10,7 +10,7 @@ module;
 #include <unordered_set>
 #include <vector>
 
-export module two_queue_cache.solution;
+export module two_queue_cache;
 
 export namespace cpp_contests {
 

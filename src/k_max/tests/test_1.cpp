@@ -7,7 +7,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-import k_max.solution;
+import k_max;
 
 using cpp_contests::k_max;
 

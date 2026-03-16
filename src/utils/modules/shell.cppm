@@ -20,7 +20,7 @@ module;
 #include <utility>
 #include <vector>
 
-export module utils.shell;
+export module utils:shell;
 
 // This is the implementation of run_shell util, written only with stdlib and POSIX.
 // Initially, run_shell was written in a much simpler way with a use of <boost/process.hpp>.

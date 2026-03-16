@@ -9,8 +9,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-import geometry.matrix;
-import geometry.primitives;
+import geometry;
 
 using cpp_contests::eye;
 using cpp_contests::Line;

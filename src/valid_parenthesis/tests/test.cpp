@@ -12,9 +12,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-import utils.generic;
-import utils.shell;
-import utils.test_utils;
+import utils;
 
 using cpp_contests::run_shell;
 using cpp_contests::TestArgsFixture;

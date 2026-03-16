@@ -14,9 +14,8 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-import utils.shell;
-import utils.test_utils;
-import missing_numbers.solution;
+import utils;
+import missing_numbers;
 
 using cpp_contests::missing_numbers;
 using cpp_contests::run_shell;
