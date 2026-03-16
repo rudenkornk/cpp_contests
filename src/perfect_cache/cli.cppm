@@ -1,10 +1,15 @@
+module;
+
 #include <cstddef>
 #include <iostream>
 #include <vector>
 
+export module perfect_cache.cli;
 import perfect_cache.solution;
 
-auto main() -> int {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main() -> int {
   std::size_t cache_length = 0;
   std::size_t n_elements = 0;
   std::vector<int> elements{};
@@ -29,3 +34,4 @@ auto main() -> int {
   std::cout << lru << "\n";
   return 0;
 }
+#pragma GCC diagnostic pop
