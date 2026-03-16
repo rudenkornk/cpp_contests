@@ -167,9 +167,11 @@ Cache-aware data structure design (implicit in cache problem solutions).
 ## 6. Key Files & Entrypoints
 
 **Main Entrypoint:**
-Each problem has its own CLI entrypoint in `src/<problem>/cli.cpp`.
+Each problem typically has its own CLI entrypoint implemented as a C++ module in `src/<problem>/cli.cppm`.
 These executables read from stdin and write solutions to stdout.
-Example: `src/lru_cache/cli.cpp`, `src/geometry/cli.cpp`.
+Some targets instead define `main` in a different module file (for example, `src/valid_parenthesis/solution.cppm`),
+so always consult the corresponding `CMakeLists.txt` or target configuration to locate the actual entrypoint.
+Example: `src/lru_cache/cli.cppm`, `src/geometry/cli.cppm`, `src/valid_parenthesis/solution.cppm`.
 
 **Build Configuration:**
 `CMakeLists.txt` - Root CMake configuration defining project options and subdirectories.

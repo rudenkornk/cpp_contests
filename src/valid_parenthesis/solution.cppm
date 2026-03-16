@@ -1,3 +1,5 @@
+module;
+
 #include <cassert>
 #include <cstddef>
 #include <fstream>
@@ -5,6 +7,10 @@
 #include <span>
 #include <stack>
 #include <string>
+
+export module valid_parenthesis.cli;
+
+export namespace cpp_contests {
 
 class Solution {
 public:
@@ -52,8 +58,11 @@ public:
     return p_stack.empty();
   }
 };
+} // namespace cpp_contests
 
-auto main(int argc, char **argv) -> int {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main(int argc, char **argv) -> int {
   auto const args = std::span(argv, static_cast<std::size_t>(argc));
   if (args.size() < 2) {
     std::cerr << "Provide exactly one file input\n";
@@ -68,6 +77,7 @@ auto main(int argc, char **argv) -> int {
   }
   std::string parens{};
   input >> parens;
-  std::cout << Solution::isValid(parens);
+  std::cout << cpp_contests::Solution::isValid(parens);
   return 0;
 }
+#pragma GCC diagnostic pop

@@ -1,3 +1,5 @@
+module;
+
 #include <cstddef>
 #include <fstream>
 #include <iostream>
@@ -5,9 +7,12 @@
 #include <string>
 #include <vector>
 
+export module missing_numbers.cli;
 import missing_numbers.solution;
 
-auto main(int argc, char **argv) -> int {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main(int argc, char **argv) -> int {
   auto const args = std::span(argv, static_cast<std::size_t>(argc));
 
   if (args.size() < 2) {
@@ -30,3 +35,4 @@ auto main(int argc, char **argv) -> int {
   std::cout << res.first << " " << res.second;
   return 0;
 }
+#pragma GCC diagnostic pop
