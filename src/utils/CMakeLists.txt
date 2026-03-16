@@ -7,10 +7,10 @@ target_sources(
          FILES
            modules/math.cppm
            modules/shell.cppm
-           modules/type_traits.cppm
-           modules/utils.cppm
-           modules/warnings.cppm
            modules/test_utils.cppm
+           modules/type_traits.cppm
+           modules/generic.cppm
+           modules/warnings.cppm
 )
 
 target_compile_features(utils PUBLIC cxx_std_23)

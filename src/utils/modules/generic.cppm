@@ -17,7 +17,7 @@ module;
 #include <vector>
 
 
-export module utils.utils;
+export module utils.generic;
 import utils.type_traits;
 
 export namespace cpp_contests {

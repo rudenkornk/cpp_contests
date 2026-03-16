@@ -14,7 +14,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
-import utils.utils;
+import utils.generic;
 import lru_cache.solution;
 import perfect_cache.solution;
 import two_queue_cache.solution;

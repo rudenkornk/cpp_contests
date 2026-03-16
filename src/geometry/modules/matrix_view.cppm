@@ -20,7 +20,7 @@ module;
 #include <type_traits>
 
 export module geometry.matrix_view;
-import utils.utils;
+import utils.generic;
 
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
