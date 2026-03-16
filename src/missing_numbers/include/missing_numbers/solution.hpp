@@ -1,11 +1,12 @@
 #pragma once
 
-#include <boost/algorithm/cxx17/reduce.hpp>
-#include <boost/range/numeric.hpp>
 #include <cassert>
 #include <climits>
 #include <utility>
 #include <vector>
+
+#include <boost/algorithm/cxx17/reduce.hpp>
+#include <boost/range/numeric.hpp>
 
 namespace cpp_contests {
 
