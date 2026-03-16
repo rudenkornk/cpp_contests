@@ -65,7 +65,7 @@ jobs:
         run: cmake --install build --prefix build/install --verbose
       - name: Test install
         run: |
-          cmake -S build/test_install/ -B build/test_install/build \
+          cmake -G Ninja -S build/test_install/ -B build/test_install/build \
             -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests/)"
           cmake --build build/test_install/build --parallel --verbose
       - name: Create package
