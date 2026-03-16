@@ -52,7 +52,7 @@ cmake --build build --target format
 Besides general tests you can also check installation integrity.
 
 ```bash
-cmake -S build/test_install -B build/test_install/build \
+cmake -G Ninja -S build/test_install -B build/test_install/build \
     --preset gcc_release -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests)"
 cmake --build build/test_install/build
 cd build && cpack -C CPackConfig.cmake
