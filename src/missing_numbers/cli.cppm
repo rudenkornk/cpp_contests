@@ -8,7 +8,7 @@ module;
 #include <vector>
 
 export module missing_numbers.cli;
-import missing_numbers.solution;
+import missing_numbers;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"

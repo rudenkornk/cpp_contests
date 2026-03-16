@@ -26,7 +26,7 @@ module;
 // NOLINTEND(cppcoreguidelines-macro-usage)
 // clang-format on
 
-export module utils.warnings;
+export module utils:warnings;
 
 /* example use:
 DISABLE_WARNING_PUSH

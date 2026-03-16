@@ -4,7 +4,7 @@ module;
 #include <set>
 #include <vector>
 
-export module k_max.solution;
+export module k_max;
 
 export namespace cpp_contests {
 

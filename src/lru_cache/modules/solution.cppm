@@ -8,7 +8,7 @@ module;
 #include <unordered_map>
 #include <vector>
 
-export module lru_cache.solution;
+export module lru_cache:solution;
 
 export namespace cpp_contests {
 

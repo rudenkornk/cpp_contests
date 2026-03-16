@@ -7,10 +7,10 @@ module;
 #include <cstdlib>
 #include <optional>
 
-export module geometry.triangle;
+export module geometry:triangle;
 
-import geometry.matrix;
-import geometry.primitives;
+import :matrix;
+import :primitives;
 
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)

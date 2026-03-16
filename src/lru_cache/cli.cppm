@@ -5,7 +5,7 @@ module;
 #include <vector>
 
 export module lru_cache.cli;
-import lru_cache.solution;
+import lru_cache;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"

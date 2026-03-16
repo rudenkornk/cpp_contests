@@ -5,7 +5,7 @@ module;
 #include <type_traits>
 #include <utility>
 
-export module reverse_list.solution;
+export module reverse_list;
 
 export namespace cpp_contests {
 

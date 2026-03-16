@@ -12,8 +12,8 @@ module;
 #include <numeric>
 #include <type_traits>
 
-export module geometry.matrix;
-import utils.math;
+export module geometry:matrix;
+import utils;
 
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)

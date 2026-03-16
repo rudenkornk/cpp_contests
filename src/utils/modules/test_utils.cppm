@@ -8,7 +8,7 @@ module;
 #include <boost/test/framework.hpp>
 #include <boost/test/unit_test.hpp>
 
-export module utils.test_utils;
+export module utils:test_utils;
 
 export namespace cpp_contests {
 

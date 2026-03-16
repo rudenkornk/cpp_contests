@@ -7,7 +7,7 @@ module;
 #include <type_traits>
 #include <utility>
 
-export module utils.type_traits;
+export module utils:type_traits;
 
 export namespace cpp_contests {
 

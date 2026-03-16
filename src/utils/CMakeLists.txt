@@ -5,11 +5,12 @@ target_sources(
   PUBLIC FILE_SET
          CXX_MODULES
          FILES
+           modules/generic.cppm
            modules/math.cppm
            modules/shell.cppm
            modules/test_utils.cppm
            modules/type_traits.cppm
-           modules/generic.cppm
+           modules/utils.cppm
            modules/warnings.cppm
 )
 

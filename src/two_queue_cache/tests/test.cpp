@@ -6,7 +6,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-import two_queue_cache.solution;
+import two_queue_cache;
 
 using cpp_contests::two_queue_hits;
 

@@ -5,7 +5,7 @@ module;
 #include <vector>
 
 export module perfect_cache.cli;
-import perfect_cache.solution;
+import perfect_cache;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"

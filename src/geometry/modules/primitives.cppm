@@ -6,9 +6,9 @@ module;
 #include <optional>
 #include <utility>
 
-export module geometry.primitives;
+export module geometry:primitives;
 
-import geometry.matrix;
+import :matrix;
 
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
