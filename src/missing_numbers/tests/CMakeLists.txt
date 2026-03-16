@@ -1,11 +1,11 @@
-add_executable(missing_numbers_unit_tests)
-target_sources(missing_numbers_unit_tests PRIVATE test_1.cpp)
+add_executable(missing_numbers_tests)
+target_sources(missing_numbers_tests PRIVATE test_1.cpp)
 
-target_link_libraries(missing_numbers_unit_tests PRIVATE Boost::headers utils)
-target_link_libraries(missing_numbers_unit_tests PRIVATE missing_numbers)
-add_dependencies(missing_numbers_unit_tests missing_numbers_cli)
+target_link_libraries(missing_numbers_tests PRIVATE Boost::headers utils)
+target_link_libraries(missing_numbers_tests PRIVATE missing_numbers)
+add_dependencies(missing_numbers_tests missing_numbers_cli)
 
-target_allow_instrumentation(missing_numbers_unit_tests)
-target_allow_coding_standards(missing_numbers_unit_tests)
+target_allow_instrumentation(missing_numbers_tests)
+target_allow_coding_standards(missing_numbers_tests)
 
-add_tests(TARGET missing_numbers_unit_tests)
+add_tests(TARGET missing_numbers_tests)
