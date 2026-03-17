@@ -35,10 +35,16 @@ jobs:
       matrix:
         preset:
           - gcc_debug
-          - gcc_debug_san
+          # Disable gcc_debug_san preset due to an ICE:
+          #   internal compiler error: in tree_node, at cp/module.cc:9996
+          # - gcc_debug_san
           - gcc_debug_valgrind
           - gcc_release
-          - gcc_release_tsan
+          # gcc thread sanitizer does not play well with modules either, failing with compiler error:
+          #   shared_ptr_atomic.h:421:9: error:
+          #   ‘template<class _Tp> std::_Sp_atomic<>::_Atomic_count::~_Atomic_count()’
+          #   exposes TU-local entity ‘__tsan_mutex_not_static’
+          # - gcc_release_tsan
           - llvm_debug
           - llvm_debug_san
           - llvm_debug_valgrind
