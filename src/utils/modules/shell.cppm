@@ -15,7 +15,6 @@ module;
 #include <string_view>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <thread>
 #include <tuple>
 #include <unistd.h>
 #include <utility>
@@ -326,30 +325,52 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   stdout_pipe.close_end(1);
   stderr_pipe.close_end(1);
 
-  // Write stdin in a thread to avoid deadlock with stdout/stderr filling up.
-  auto stdin_thread = std::thread([&stdin_data, &stdin_pipe]() -> void {
-    detail::write_all(stdin_pipe.write_end(), stdin_data);
-    stdin_pipe.close_end(1);
-  });
+  // This initially was written using std::thread, spawning read and writes into separate threads
+  // to avoid potential locks.
+  // However, current version of GCC (gcc 15) have bugs, which do not play well with combination
+  // of C++20 modules and std::thread.
+  // gcc in that context failed with internal compiler error.
+  // Specifically, reproduction could be reached with these commands:
+  // ```cpp
+  // // utils.cppm
+  // export module utils;
+  // export import :shell;
+  // ```
+  //
+  // ```cpp
+  // // shell.cppm
+  // module;
+  // #include <thread>
+  // export module utils:shell;
+  // export void run_shell() {
+  //   auto stdout_thread = std::thread([] -> void {});
+  // }
+  // ```
+  // ```bash
+  // g++ -std=c++23 -fmodules-ts -x c++ -c shell.cppm -o shell.o
+  // g++ -std=c++23 -fmodules-ts -x c++ -c utils.cppm -o utils.o
+  // ```
+  // The error:
+  // ```
+  // utils.cppm:1:8: internal compiler error: Segmentation fault
+  //     1 | export module utils;
+  //       |        ^~~~~~
+  // ```
+  // The error seems to be related to this resolved issue:
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103701
+  // Indeed, compilation of reduced example with trunk gcc succeeds.
 
   // Read stdout & stderr in threads.
-  auto stdout_result = std::string{};
-  auto stdout_thread = std::thread([&stdout_result, &stdout_pipe]() -> void {
-    stdout_result = detail::read_all(stdout_pipe.read_end());
-    stdout_pipe.close_end(0);
-  });
+  detail::write_all(stdin_pipe.write_end(), stdin_data);
+  stdin_pipe.close_end(1);
 
-  auto stderr_result = std::string{};
-  auto stderr_thread = std::thread([&stderr_result, &stderr_pipe]() -> void {
-    stderr_result = detail::read_all(stderr_pipe.read_end());
-    stderr_pipe.close_end(0);
-  });
+  auto stdout_result = detail::read_all(stdout_pipe.read_end());
+  stdout_pipe.close_end(0);
 
-  stdin_thread.join();
-  stdout_thread.join();
-  stderr_thread.join();
+  auto stderr_result = detail::read_all(stderr_pipe.read_end());
+  stderr_pipe.close_end(0);
 
-  // Wait for child. Retry on EINTR; surface other failures.
+  // Wait for child.
   int wstatus = 0;
   for (pid_t wait_result = ::waitpid(pid, &wstatus, 0); wait_result < 0; wait_result = ::waitpid(pid, &wstatus, 0)) {
     if (errno != EINTR) {
