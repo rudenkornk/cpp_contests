@@ -5,7 +5,6 @@ target_sources(
   PUBLIC FILE_SET
          CXX_MODULES
          FILES
-           modules/missing_numbers.cppm
            modules/solution.cppm
 )
 

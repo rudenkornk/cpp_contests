@@ -5,7 +5,6 @@ target_sources(
   PUBLIC FILE_SET
          CXX_MODULES
          FILES
-           modules/lru_cache.cppm
            modules/solution.cppm
 )
 

@@ -8,7 +8,7 @@ module;
 #include <boost/algorithm/cxx17/reduce.hpp>
 #include <boost/range/numeric.hpp>
 
-export module missing_numbers:solution;
+export module missing_numbers;
 
 export namespace cpp_contests {
 
