@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <vector>
 

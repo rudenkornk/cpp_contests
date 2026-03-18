@@ -15,6 +15,7 @@ import :primitives;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
+
 class Triangle final {
 private:
   Plane plane_;

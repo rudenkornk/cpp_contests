@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cassert>
 #include <filesystem>
@@ -20,8 +20,6 @@ import missing_numbers;
 using cpp_contests::missing_numbers;
 using cpp_contests::run_shell;
 using cpp_contests::TestArgsFixture;
-
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 
 BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
@@ -64,5 +62,3 @@ BOOST_AUTO_TEST_CASE(cli_integration_tests) {
   BOOST_TEST((std::pair(0U, 1U) == run_cli_test("")));
   BOOST_TEST((std::pair(2U, 5U) == run_cli_test("7 4 1 0 3 6")));
 }
-
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

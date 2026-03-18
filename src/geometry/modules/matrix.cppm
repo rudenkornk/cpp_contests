@@ -582,5 +582,4 @@ auto operator<<(std::ostream &os, Matrix<X, Y, T> const &m) -> std::ostream & {
 }
 
 // NOLINTEND(readability-identifier-length)
-
 } // namespace cpp_contests

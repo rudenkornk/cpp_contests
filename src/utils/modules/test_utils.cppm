@@ -13,7 +13,6 @@ export module utils:test_utils;
 export namespace cpp_contests {
 
 struct TestArgsFixture {
-  // NOLINTNEXTLINE(fuchsia-statically-constructed-objects)
   static inline std::map<std::string, std::string> cli_tools;
 
   TestArgsFixture() {
