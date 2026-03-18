@@ -23,7 +23,6 @@ import :type_traits;
 export namespace cpp_contests {
 
 inline auto size_to_string(size_t size) -> std::string {
-  // NOLINTNEXTLINE(altera-id-dependent-backward-branch)
   constexpr std::array<std::string_view, 8> units = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"};
   constexpr std::size_t base = 1024;
   if (size == 0) {
@@ -48,9 +47,8 @@ inline auto size_to_string(size_t size) -> std::string {
                        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
                        units[tier]);
   }
-  return std::format("{:.1f} {}", result,
-                     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-                     units[tier]);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
+  return std::format("{:.1f} {}", result, units[tier]);
 }
 
 template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
@@ -175,10 +173,8 @@ class ExceptionSaver final {
   std::vector<std::exception_ptr> exceptions;
 
 public:
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
   explicit ExceptionSaver(size_t maxExceptions = 1) { exceptions.resize(maxExceptions); }
   ExceptionSaver(ExceptionSaver const &) = delete;
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
   auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
   auto operator=(ExceptionSaver &&other) & noexcept -> ExceptionSaver & {
@@ -220,7 +216,6 @@ public:
     std::rethrow_exception(exc);
   }
   void drop() noexcept {
-    // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
     std::fill_n(exceptions.begin(), nSavedExceptions.load(), std::exception_ptr{});
     nSavedExceptions = 0;
 #ifndef NDEBUG

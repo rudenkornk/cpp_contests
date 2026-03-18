@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <algorithm>
 #include <cassert>
@@ -19,9 +19,10 @@ import lru_cache;
 import perfect_cache;
 import two_queue_cache;
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 using cpp_contests::perfect_cache;
 using cpp_contests::size_to_string;
+
+// NOLINTBEGIN(readability-identifier-length)
 
 namespace {
 // Assume that sizeof(Value) >> sizeof(Key), then
@@ -131,4 +132,4 @@ BOOST_AUTO_TEST_CASE(poisson_distribution_cache_test) {
   BOOST_TEST(lru <= perfect);
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
+// NOLINTEND(readability-identifier-length)

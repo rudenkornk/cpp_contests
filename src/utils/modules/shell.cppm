@@ -247,7 +247,6 @@ inline auto build_env_map(std::map<std::string, std::string> const &extra_env,
 } // namespace detail
 
 export auto
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 run_shell(std::string const &cmd, std::string const &stdin_data = "",
           std::map<std::string, std::string> const &extra_env = {},
           std::vector<std::filesystem::path> const &extra_paths = {},
@@ -309,7 +308,7 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
       ::_exit(detail::EXIT_CODE_DUP2_FAILED);
     }
 
-    if (!cwd.empty() && ::chdir(cwd.c_str()) != 0) { // NOLINT(cert-env33-c)
+    if (!cwd.empty() && ::chdir(cwd.c_str()) != 0) {
       ::_exit(detail::EXIT_CODE_CHDIR_FAILED);
     }
 

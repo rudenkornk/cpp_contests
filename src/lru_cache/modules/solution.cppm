@@ -21,7 +21,6 @@ template <typename Key, typename Value, std::invocable<Key> Load> class LRUCache
   std::unordered_map<Key, Position> key_positions_;
 
 public:
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   LRUCache(Load const &load, std::size_t max_size_in_bytes, std::size_t override_value_size = sizeof(Value))
       : load_(load), max_length_(max_size_in_bytes / (override_value_size + sizeof(Key))) {}
 

@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstddef>
 #include <cstdlib>
@@ -45,7 +45,6 @@ constexpr auto sqrt_check() -> bool {
   bool result = true;
   for (std::size_t i = 0; i < N_iter; ++i) {
     double const curr = pow2(mult, i) * start;
-    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     double const res = cpp_contests::sqrt(curr * curr);
     double const diff = res - curr;
     result &= std::abs(diff) < eps;
@@ -56,8 +55,6 @@ constexpr auto sqrt_check() -> bool {
 } // namespace
 
 BOOST_AUTO_TEST_CASE(sqrt_test) { static_assert(sqrt_check()); }
-
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 BOOST_AUTO_TEST_CASE(run_shell_basic) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("echo hello");
@@ -104,5 +101,3 @@ BOOST_AUTO_TEST_CASE(run_shell_quoted_args) {
   BOOST_TEST(out == "hello world\n");
   BOOST_TEST(err.empty());
 }
-
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)

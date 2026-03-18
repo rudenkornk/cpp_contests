@@ -13,6 +13,7 @@ import :matrix;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
+
 using Point = Vector<3, double>;
 
 class Line final {
@@ -60,7 +61,6 @@ private:
   Point normal_;
   double d_;
 
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   static constexpr auto norm_coeff_(double A, double B, double C) noexcept {
     auto &&normal = Point{A, B, C};
     return n(normal);
@@ -70,7 +70,6 @@ public:
   constexpr explicit Plane(Point const &normal) noexcept : normal_(normal / n(normal)), d_(n(normal)) {
     assert(n(normal) > EPSMIN);
   }
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   constexpr explicit Plane(Point const &normal, double d) noexcept : normal_(normal / n(normal)), d_(d / n(normal)) {
     assert(n(normal) > EPSMIN);
   }
@@ -91,7 +90,6 @@ constexpr auto complanar(Plane const &p1, Plane const &p2, double eps = EPSMIN) 
   // difference Since normal is a unit vector, division is omitted
   return diff < eps;
 }
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr auto complanar(Point const &p1, Point const &p2, Point const &p3, Point const &p4,
                          double eps = EPSMIN) noexcept -> bool {
 
@@ -197,7 +195,6 @@ constexpr auto complanar_intersection(Line const &l, Segment const &s) noexcept 
 }
 
 constexpr auto
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 complanar_intersection(Segment const &s1, Segment const &s2) noexcept -> std::optional<Point> {
   auto l1 = s1.line();
   auto l2 = s2.line();

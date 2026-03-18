@@ -9,8 +9,8 @@ export module k_max;
 export namespace cpp_contests {
 
 auto k_max(std::vector<int> const &nums,
-                        // NOLINTNEXTLINE(readability-identifier-length)
-                        std::size_t k) -> std::vector<int> {
+                         // NOLINTNEXTLINE(readability-identifier-length)
+                         std::size_t k) -> std::vector<int> {
   // O(n) memory, O(n * log(k)) time
   std::vector<int> result{};
   result.reserve(nums.size() + 1 - k);

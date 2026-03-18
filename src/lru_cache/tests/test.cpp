@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <string>
 #include <vector>
@@ -11,7 +11,6 @@
 import utils;
 import lru_cache;
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 using cpp_contests::lru_hits;
 using cpp_contests::TestArgsFixture;
 
@@ -53,5 +52,3 @@ BOOST_AUTO_TEST_CASE(cli_integration_tests) {
   BOOST_TEST(run_cli_test("2 5 1 2 3 2 3\n") == 2);
   BOOST_TEST(run_cli_test("4 14 1 2 3 1 2 4 5 1 7 3 2 6 1 2\n") == 4);
 }
-
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

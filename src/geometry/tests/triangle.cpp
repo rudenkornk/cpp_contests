@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE Matrix // NOLINT(cppcoreguidelines-macro-usage)
-#define _CRT_SECURE_NO_WARNINGS  // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define BOOST_TEST_MODULE Matrix
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
@@ -9,7 +9,7 @@ import geometry;
 using cpp_contests::Point;
 using cpp_contests::Triangle;
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
+// NOLINTBEGIN(readability-identifier-length)
 
 BOOST_AUTO_TEST_CASE(triangle_test) {
   constexpr Triangle t1(Point{0.0, 0.0, 0.0}, Point{1.0, 0.0, 0.0}, Point{0.0, 1.0, 0.0});
@@ -32,4 +32,4 @@ BOOST_AUTO_TEST_CASE(triangle_test) {
   // static_assert(intersect(t1, t1));
 }
 
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
+// NOLINTEND(readability-identifier-length)

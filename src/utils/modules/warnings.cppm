@@ -4,7 +4,6 @@ module;
 // https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/
 
 // clang-format off
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #ifdef _MSC_VER
   #define DISABLE_WARNING_PUSH           __pragma(warning( push ))
   #define DISABLE_WARNING_POP            __pragma(warning( pop ))
@@ -23,7 +22,6 @@ module;
   #define DISABLE_WARNING_UNREFERENCED_FUNCTION            DISABLE_WARNING(-Wunused-function)
   // other warnings you want to deactivate...
 #endif
-// NOLINTEND(cppcoreguidelines-macro-usage)
 // clang-format on
 
 export module utils:warnings;
