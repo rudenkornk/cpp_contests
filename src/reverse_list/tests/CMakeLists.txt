@@ -7,4 +7,4 @@ target_link_libraries(reverse_list_tests PRIVATE reverse_list)
 target_allow_instrumentation(reverse_list_tests)
 target_allow_coding_standards(reverse_list_tests)
 
-add_tests(TARGET reverse_list_tests)
+add_tests(reverse_list_tests)

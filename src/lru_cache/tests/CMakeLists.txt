@@ -9,4 +9,4 @@ add_dependencies(lru_cache_tests lru_cache_cli)
 target_allow_instrumentation(lru_cache_tests)
 target_allow_coding_standards(lru_cache_tests)
 
-add_tests(TARGET lru_cache_tests)
+add_tests(lru_cache_tests)

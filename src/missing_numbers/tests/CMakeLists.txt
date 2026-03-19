@@ -8,4 +8,4 @@ add_dependencies(missing_numbers_tests missing_numbers_cli)
 target_allow_instrumentation(missing_numbers_tests)
 target_allow_coding_standards(missing_numbers_tests)
 
-add_tests(TARGET missing_numbers_tests)
+add_tests(missing_numbers_tests)

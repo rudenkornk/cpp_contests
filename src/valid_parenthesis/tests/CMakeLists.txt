@@ -8,4 +8,4 @@ add_dependencies(valid_parenthesis_tests valid_parenthesis_cli)
 target_allow_instrumentation(valid_parenthesis_tests)
 target_allow_coding_standards(valid_parenthesis_tests)
 
-add_tests(TARGET valid_parenthesis_tests)
+add_tests(valid_parenthesis_tests)
