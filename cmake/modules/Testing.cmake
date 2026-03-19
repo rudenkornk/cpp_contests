@@ -89,15 +89,12 @@ function(add_code_coverage_test)
   endif()
 endfunction()
 
-function(add_tests)
+function(add_tests TARGET)
   set(options)
-  set(oneValueArgs TARGET)
+  set(oneValueArgs)
   set(multiValueArgs COMMAND_ARGUMENTS)
-  cmake_parse_arguments(PARSE_ARGV 0 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
+  cmake_parse_arguments(PARSE_ARGV 1 TEST "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
-  if(NOT DEFINED TEST_TARGET)
-    message(FATAL_ERROR "TARGET is required argument.")
-  endif()
   if(DEFINED TEST_UNPARSED_ARGUMENTS)
     message(FATAL_ERROR "Too many arguments.")
   endif()
@@ -111,7 +108,7 @@ function(add_tests)
   endif()
 
   # Inspect dependencies and add executable targets as CLI arguments.
-  get_target_property(dependencies ${TEST_TARGET} MANUALLY_ADDED_DEPENDENCIES)
+  get_target_property(dependencies ${TARGET} MANUALLY_ADDED_DEPENDENCIES)
   if(dependencies)
     list(APPEND TEST_COMMAND_ARGUMENTS "--")
 
@@ -125,14 +122,14 @@ function(add_tests)
     endforeach()
   endif()
 
-  add_test(NAME ${TEST_TARGET} COMMAND ${TEST_TARGET} ${TEST_COMMAND_ARGUMENTS})
+  add_test(NAME ${TARGET} COMMAND ${TARGET} ${TEST_COMMAND_ARGUMENTS})
 
   get_property(code_coverage_enabled GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
-  get_target_property(target_code_coverage_allowed ${TEST_TARGET} CODE_COVERAGE_ALLOWED)
+  get_target_property(target_code_coverage_allowed ${TARGET} CODE_COVERAGE_ALLOWED)
 
   if(code_coverage_enabled AND target_code_coverage_allowed)
     cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "%p.profraw" OUTPUT_VARIABLE llvm_profile)
-    set_tests_properties(${TEST_TARGET} PROPERTIES ENVIRONMENT "LLVM_PROFILE_FILE=${llvm_profile}")
+    set_tests_properties(${TARGET} PROPERTIES ENVIRONMENT "LLVM_PROFILE_FILE=${llvm_profile}")
   endif()
 endfunction()
 

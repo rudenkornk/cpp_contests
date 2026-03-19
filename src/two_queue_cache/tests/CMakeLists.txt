@@ -7,4 +7,4 @@ target_link_libraries(two_queue_cache_tests PRIVATE two_queue_cache)
 target_allow_instrumentation(two_queue_cache_tests)
 target_allow_coding_standards(two_queue_cache_tests)
 
-add_tests(TARGET two_queue_cache_tests)
+add_tests(two_queue_cache_tests)

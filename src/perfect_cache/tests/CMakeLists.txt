@@ -7,4 +7,4 @@ target_link_libraries(perfect_cache_tests PRIVATE lru_cache perfect_cache two_qu
 target_allow_instrumentation(perfect_cache_tests)
 target_allow_coding_standards(perfect_cache_tests)
 
-add_tests(TARGET perfect_cache_tests)
+add_tests(perfect_cache_tests)
