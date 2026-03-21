@@ -1,3 +1,4 @@
+add_subdirectory(artifacts)
 add_subdirectory(geometry)
 add_subdirectory(k_max)
 add_subdirectory(lru_cache)
