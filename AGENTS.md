@@ -46,7 +46,7 @@ Dependencies are declaratively specified in the Nix flake inputs.
 **Nix Ecosystem Usage:**
 The project heavily relies on Nix for reproducible builds and development environments.
 `flake.nix` defines build inputs, native build inputs, and development tools.
-The flake follows nixpkgs version 25.11 for package versions.
+The flake follows nixpkgs version 26.05 for package versions.
 Development shell includes compilers (GCC, Clang), build tools (CMake, Ninja), testing tools (Valgrind, gcovr), and linters.
 The project can be built as a Nix package via `nix build`.
 All CI/CD workflows utilize Nix for dependency provisioning.
