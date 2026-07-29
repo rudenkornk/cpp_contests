@@ -43,7 +43,7 @@
       "inherits": ["llvm_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fstack-protector-strong -fwrapv",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -fstack-protector-strong -fwrapv",
         "CODE_COVERAGE": "ON",
         "LINT": "ON"
       }
