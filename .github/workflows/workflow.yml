@@ -81,7 +81,20 @@ jobs:
       - name: Create package
         run: cd build && cpack -C CPackConfig.cmake
 
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
+      - uses: nicknovitski/nix-develop@9be7cfb4b10451d3390a75dc18ad0465bed4932a # v1.2.1
+      - name: Configure
+        run: cmake -B build --preset gcc_debug
       - name: Check format
         run: |
           cmake --build build --target format
-          if [[ -n "$(git diff)" ]]; then echo "Code is not formatted."; git diff; exit 1; fi
+          if [[ -n "$(git diff)" ]]; then
+            echo "Code is not formatted. Run: cmake --build build --target format"
+            git diff
+            exit 1
+          fi
