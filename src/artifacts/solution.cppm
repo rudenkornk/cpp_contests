@@ -3,6 +3,7 @@ module;
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <ranges>
 #include <set>
@@ -111,7 +112,12 @@ auto solution() -> void {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 extern "C++" auto main() -> int {
-  solution();
+  try {
+    solution();
+  } catch (std::exception const &e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   return 0;
 }
 #pragma GCC diagnostic pop

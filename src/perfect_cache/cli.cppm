@@ -1,15 +1,15 @@
 module;
 
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <vector>
 
 export module perfect_cache.cli;
 import perfect_cache;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-extern "C++" auto main() -> int {
+namespace {
+auto run() -> int {
   std::size_t cache_length = 0;
   std::size_t n_elements = 0;
   std::vector<int> elements{};
@@ -33,5 +33,17 @@ extern "C++" auto main() -> int {
   auto lru = cpp_contests::perfect_cache(elements, cache_length * sizeof(int), 0);
   std::cout << lru << "\n";
   return 0;
+}
+} // namespace
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main() -> int {
+  try {
+    return run();
+  } catch (std::exception const &e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 }
 #pragma GCC diagnostic pop

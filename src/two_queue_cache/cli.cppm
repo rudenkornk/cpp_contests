@@ -1,15 +1,15 @@
 module;
 
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <vector>
 
 export module two_queue_cache.cli;
 import two_queue_cache;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-extern "C++" auto main() -> int {
+namespace {
+auto run() -> int {
   std::size_t cache_size = 0;
   std::size_t n_elements = 0;
   std::vector<int> elements{};
@@ -37,5 +37,17 @@ extern "C++" auto main() -> int {
                                                 virtual_value_size_);
   std::cout << two_queue << "\n";
   return 0;
+}
+} // namespace
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main() -> int {
+  try {
+    return run();
+  } catch (std::exception const &e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 }
 #pragma GCC diagnostic pop
