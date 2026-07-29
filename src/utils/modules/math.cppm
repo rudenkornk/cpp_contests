@@ -2,7 +2,6 @@ module;
 
 #include <cmath>
 #include <limits>
-#include <type_traits>
 
 export module utils:math;
 
@@ -22,16 +21,18 @@ auto constexpr sqrt_newton(double val, double curr, double prev) -> double {
 } // namespace details_
 
 auto constexpr sqrt(double val) -> double {
-  if (!std::is_constant_evaluated()) {
+  if !consteval {
     // Pretty sure I cannot beat the compiler here.
     return std::sqrt(val);
   }
 
-  if (val < 0) {
+  // NaN and infinity must be filtered out explicitly:
+  // sqrt_newton never converges for them, which in constant evaluation means a compile error.
+  if (std::isnan(val) || val < 0) {
     return std::numeric_limits<double>::quiet_NaN();
   }
-  if (val > std::numeric_limits<double>::infinity()) {
-    return std::numeric_limits<double>::infinity();
+  if (val == std::numeric_limits<double>::infinity()) {
+    return val;
   }
 
   return details_::sqrt_newton(val, val, 0);
