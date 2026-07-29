@@ -43,9 +43,9 @@ endfunction()
 function(target_enable_clang_tidy TARGET)
   get_target_property(warnings_enabled ${TARGET} WARNINGS_ENABLED)
   if(warnings_enabled)
-    set_target_properties(${TARGET} PROPERTIES CXX_CLANG_TIDY "clang-tidy;--warnings-as-errors=*")
+    set_target_properties(${TARGET} PROPERTIES CXX_CLANG_TIDY "${clang_tidy};--warnings-as-errors=*")
   else()
-    set_target_properties(${TARGET} PROPERTIES CXX_CLANG_TIDY clang-tidy)
+    set_target_properties(${TARGET} PROPERTIES CXX_CLANG_TIDY "${clang_tidy}")
   endif()
   set_target_properties(${TARGET} PROPERTIES CLANG_TIDY_ENABLED ON)
 endfunction()
@@ -86,9 +86,11 @@ function(add_lint_test)
     NAME cmake_lint
     COMMAND bash -c "${cmake_lint} $(${git} ls-files *.cmake *CMakeLists.txt)"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+  # Lint every tracked YAML file (not just .github). Uses the same quoting trick as cmake_lint above so ctest does not
+  # choke, and git ls-files keeps build/ artifacts out of scope.
   add_test(
     NAME yamllint
-    COMMAND ${yamllint} --strict .github
+    COMMAND bash -c "${yamllint} --strict $(${git} ls-files '*.yaml' '*.yml')"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
   add_test(
     NAME typos
