@@ -86,7 +86,7 @@ struct Pipe {
 
   [[nodiscard]] auto read_end() const noexcept -> int { return fds[0]; }
   [[nodiscard]] auto write_end() const noexcept -> int { return fds[1]; }
-} __attribute__((aligned(8))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+};
 
 enum class ShellState : std::uint8_t { Normal, SingleQuote, DoubleQuote };
 

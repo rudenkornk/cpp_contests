@@ -2,8 +2,7 @@
 Checks: >
   *,
 
-  -altera-id-dependent-backward-branch,
-  -altera-unroll-loops,
+  -altera-*,
 
   -fuchsia-*,
   -linuxkernel-*,
@@ -20,8 +19,11 @@ Checks: >
   -readability-redundant-declaration
 
 # Notes regarding disabled warnings:
-# fuchsia-*, linuxkernel-*, llvm-*, llvmlibc-* are mostly designed for their own codebases, restricting normal C++ features.
+# altera-*, fuchsia-*, linuxkernel-*, llvm-*, llvmlibc-* are mostly designed for their own codebases (or, for altera,
+# FPGA HLS), restricting normal C++ features.
 # We disable them, since this is a generic C++ code.
+# In particular, altera-struct-pack-align used to force nonportable __attribute__((aligned(N))) noise
+# on ordinary structs.
 #
 # portability-avoid-pragma-once is a legitimate warning, but a correct alternative with macro wrappers is too noisy.
 #

@@ -16,7 +16,7 @@ using Key = int;
 struct KeyNextpos {
   Key key;
   std::size_t nextpos;
-} __attribute__((aligned(16))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+};
 
 struct KeyNextposCompare {
   constexpr auto operator()(KeyNextpos const &lhs, KeyNextpos const &rhs) const noexcept -> bool {
