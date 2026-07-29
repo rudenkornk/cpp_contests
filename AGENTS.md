@@ -125,7 +125,83 @@ Copy and move semantics are carefully controlled (often deleted for complex type
 
 ---
 
-## 5. Common C++ Patterns & Idioms
+## 5. Comment Style Guidelines
+
+These rules apply to comments in all source files (C++, CMake, Nix, shell, etc.) as well as to prose text in
+Markdown files.
+
+### Rule 1: Comments are prose
+
+Comments and Markdown prose should be treated as continuous text formatted as paragraphs, with proper punctuation
+and capitalization. Even a single-sentence comment must start with a capital letter and end with punctuation
+(`.`, `!`, or `?`).
+
+**Exceptions:**
+
+- If the comment starts with a backtick-quoted code reference, the capitalization follows the identifier's own casing.
+- If the last word of a comment is a URL, do not append a trailing dot — URL pickers may misparse it.
+  Start a new line for the next sentence instead.
+
+**Good:**
+
+```cpp
+// By default the cache retains every inserted key. Passing a capacity evicts the least-recently-used entry first.
+auto cache = LRUCache<Key, Value>{capacity};
+
+// `is_exact` reports whether the intersection was computed without any rounding.
+return result.is_exact();
+```
+
+**Bad:**
+
+```cpp
+// evict the oldest entry once the cache is full   ← missing capital letter and terminating punctuation
+evict_lru();
+```
+
+### Rule 2: Line length ≤ 120 characters
+
+No comment line may exceed 120 characters. When a sentence does not fit, split it at a meaningful boundary —
+after a comma, or before a conjunction such as "and", "or", "which". A sentence that fits within 120 chars
+may still be split across lines.
+
+**Good:**
+
+```cpp
+// `two_queue_hits` sizes the virtual value so the per-key overhead stays within the cache budget,
+// which keeps the simulated hit rate comparable to the reference implementation.
+```
+
+**Bad:**
+
+```cpp
+// `two_queue_hits` sizes the virtual value so the per-key overhead stays within the cache budget, which keeps the
+// simulated hit rate comparable to the reference implementation.   ← split at a poor boundary
+```
+
+### Rule 3: One sentence per line (generally)
+
+Different sentences should generally each start on their own line. Two short sentences may share a line if together
+they fit within 120 characters. A sentence must never be split across a line boundary with another sentence mixed in.
+
+**Good:**
+
+```cpp
+// The permutation is validated on a non-mutating copy.
+// Building it with ranges avoids an extra allocation.
+// Setup is cumbersome. In the end the bottleneck was very slow validation.
+```
+
+**Bad:**
+
+```cpp
+// The permutation is validated on a non-mutating copy. Building it with
+// ranges avoids an extra allocation.
+```
+
+---
+
+## 6. Common C++ Patterns & Idioms
 
 **Memory Management:**
 RAII is the primary memory management pattern throughout the codebase.
@@ -165,7 +241,7 @@ Cache-aware data structure design (implicit in cache problem solutions).
 
 ---
 
-## 6. Key Files & Entrypoints
+## 7. Key Files & Entrypoints
 
 **Main Entrypoint:**
 Each problem typically has its own CLI entrypoint implemented as a C++ module in `src/<problem>/cli.cppm`.
@@ -200,7 +276,7 @@ two GCC sanitizer presets are temporarily disabled pending a GCC 16 upgrade (mod
 
 ---
 
-## 7. Development & Testing Workflow
+## 8. Development & Testing Workflow
 
 **Local Development Setup:**
 The recommended approach uses Nix for dependency management:
@@ -277,7 +353,7 @@ The Nix store and ccache are cached between runs to speed up compilation.
 
 ---
 
-## 8. Specific Instructions for AI Collaboration
+## 9. Specific Instructions for AI Collaboration
 
 **Contribution Guidelines:**
 Follow the existing code formatting rules enforced by `.clang-format`.
@@ -333,7 +409,7 @@ High confidence: C++ standard (C++23), build system (CMake), Nix-based workflow,
 Medium confidence: Some advanced template patterns might be project-specific innovations.
 Low confidence: Long-term roadmap and future dependency changes are not documented.
 
-## 9. IMPORTANT NOTES
+## 10. IMPORTANT NOTES
 
 1. This project uses `nix`.
    All commands should be done in `nix` devshells, i.e. `nix develop --command ...`.
