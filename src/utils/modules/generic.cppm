@@ -161,7 +161,12 @@ public:
     swap(originalValue, other.originalValue);
   }
 
-  ~SaveRestore() { *restoreTo = std::move(originalValue.value()); }
+  ~SaveRestore() {
+    // Moved-from objects have restoreTo == nullptr and nothing to restore.
+    if (restoreTo != nullptr) {
+      *restoreTo = std::move(originalValue);
+    }
+  }
 };
 
 template <typename T> void swap(SaveRestore<T> &left, SaveRestore<T> &right) noexcept { left.swap(right); }

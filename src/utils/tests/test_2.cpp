@@ -38,3 +38,34 @@ static_assert(cpp_contests::isInstanceOf<std::vector, std::vector<int>>);
 static_assert(!cpp_contests::isInstanceOf<std::vector, int>);
 
 } // namespace
+
+BOOST_AUTO_TEST_CASE(save_restore_restores_on_scope_exit) {
+  int value = 1;
+  {
+    auto const guard = cpp_contests::SaveRestore{value};
+    value = 2;
+    BOOST_TEST(value == 2);
+  }
+  BOOST_TEST(value == 1);
+}
+
+BOOST_AUTO_TEST_CASE(save_restore_moved_from_is_inert) {
+  int value = 1;
+  {
+    auto inner = cpp_contests::SaveRestore{value};
+    auto const outer = std::move(inner);
+    value = 2;
+    BOOST_TEST(value == 2); // The guard moved into outer; nothing has restored yet.
+    // Only outer restores; the moved-from inner must not touch value (nor crash).
+  }
+  BOOST_TEST(value == 1);
+}
+
+BOOST_AUTO_TEST_CASE(save_restore_rvalue_with_external_target) {
+  std::string target = "target";
+  {
+    auto const guard = cpp_contests::SaveRestore<std::string>{std::string{"saved"}, target};
+    target = "changed";
+  }
+  BOOST_TEST(target == "saved");
+}
