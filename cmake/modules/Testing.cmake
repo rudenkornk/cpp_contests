@@ -66,24 +66,9 @@ function(add_code_coverage_test)
     # lcov --summary ${PROJECT_BINARY_DIR}/coverage_report/coverage.info
     add_test(
       NAME code_coverage_report
-      COMMAND
-        bash -c
-        "gcovr ${PROJECT_BINARY_DIR} --exclude ${PROJECT_BINARY_DIR} | tee ${PROJECT_BINARY_DIR}/code_coverage_report"
+      COMMAND gcovr ${PROJECT_BINARY_DIR} --exclude ${PROJECT_BINARY_DIR} --fail-under-line ${ARG_THRESHOLD}
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
     set_tests_properties(code_coverage_report PROPERTIES DEPENDS "${tests}")
-    set_tests_properties(code_coverage_report PROPERTIES FIXTURES_SETUP code_coverage_report)
-
-    add_test(
-      NAME code_coverage_check
-      COMMAND
-        bash -c "(( \
-        $(\
-        grep --only-matching --perl-regexp \
-        \"TOTAL(\\s+\\d+){2}\\s+\\K\\d+\" \
-        ${PROJECT_BINARY_DIR}/code_coverage_report\
-        ) >= ${ARG_THRESHOLD} ))"
-      WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
-    set_tests_properties(code_coverage_check PROPERTIES FIXTURES_REQUIRED code_coverage_report)
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(WARNING "Code coverage test not implemented for MSVC.")
   endif()
