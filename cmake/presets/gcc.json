@@ -57,7 +57,7 @@
     },
     {
       "name": "gcc_release_tsan",
-      "displayName": "Debug gcc tsan config.",
+      "displayName": "Release gcc tsan config.",
       "inherits": ["gcc_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
