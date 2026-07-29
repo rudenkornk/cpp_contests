@@ -53,7 +53,20 @@ Besides general tests you can also check installation integrity.
 
 ```bash
 cmake -G Ninja -S build/test_install -B build/test_install/build \
-    --preset gcc_release -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests)"
+    -Dcpp_contests_DIR="$(realpath build/install/lib*/cmake/cpp_contests)"
 cmake --build build/test_install/build
 cd build && cpack -C CPackConfig.cmake
 ```
+
+## `import std` (experimental)
+
+C++23 `import std;` was spiked with CMake 4.1.2 (gated behind `CMAKE_EXPERIMENTAL_CXX_IMPORT_STD` plus
+`CMAKE_CXX_MODULE_STD=ON`):
+
+- **GCC 15.2 + libstdc++**: builds and runs.
+- **Clang 21 (this devshell's libstdc++)**: fails to configure the `std` module; it would need
+  `-stdlib=libc++`.
+
+Because the project targets both toolchains, the sources keep using classic global-module-fragment
+`#include`s for now.
+Once Clang can consume the same `std` module, they can switch to `import std;`.
