@@ -59,6 +59,22 @@ constexpr auto sqrt_check() -> bool {
 
 BOOST_AUTO_TEST_CASE(sqrt_test) { static_assert(sqrt_check()); }
 
+BOOST_AUTO_TEST_CASE(sqrt_special_values) {
+  constexpr double inf = std::numeric_limits<double>::infinity();
+  constexpr double perfect_square = 4.0;
+  constexpr double its_root = 2.0;
+  static_assert(cpp_contests::sqrt(0.0) == 0.0);
+  static_assert(cpp_contests::sqrt(perfect_square) == its_root);
+  static_assert(cpp_contests::sqrt(inf) == inf);
+  // NaN is the only value that is not equal to itself.
+  // NOLINTNEXTLINE(misc-redundant-expression)
+  static_assert(cpp_contests::sqrt(-1.0) != cpp_contests::sqrt(-1.0));
+  // NOLINTNEXTLINE(misc-redundant-expression)
+  static_assert(cpp_contests::sqrt(std::numeric_limits<double>::quiet_NaN()) !=
+                cpp_contests::sqrt(std::numeric_limits<double>::quiet_NaN()));
+  BOOST_TEST(cpp_contests::sqrt(perfect_square) == its_root);
+}
+
 BOOST_AUTO_TEST_CASE(run_shell_basic) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("echo hello");
   BOOST_TEST(exit_code == 0);
