@@ -54,7 +54,7 @@
       "inherits": ["llvm_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TEST_LAUNCHER": "valgrind"
+        "CMAKE_TEST_LAUNCHER": "valgrind;--error-exitcode=1;--leak-check=full"
       }
     },
     {
