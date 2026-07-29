@@ -40,6 +40,13 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
                           ${PROJECT_SOURCE_DIR}/compile_commands.json)
 endif()
 
+# Workaround for the Clang toolchain shipped by nixpkgs 26.05 (Clang 21 paired with the gcc 15 libstdc++). clang-tidy
+# parses each module in a driver mode whose `-fstrict-flex-arrays` default differs from the value clang++ baked into the
+# precompiled `.pcm`, so every module fails to load with a configuration mismatch. Pin the flag to keep the module build
+# and clang-tidy in agreement. The generator expression keeps it Clang-only, so the gcc presets and non-Clang consumers
+# of the installed modules never see it.
+add_compile_options($<$<CXX_COMPILER_ID:Clang>:-fstrict-flex-arrays=0>)
+
 add_subdirectory(src)
 
 if(CODE_COVERAGE)
