@@ -11,11 +11,11 @@ module;
 #include <functional>
 #include <numeric>
 #include <random>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
 
 export module utils:generic;
 import :type_traits;
@@ -106,9 +106,8 @@ template <typename Vector, typename VectorIndexers> void permute(Vector &vec, Ve
 
 template <typename Vector, typename Comparator>
 auto get_sort_permutation(Vector const &vec, Comparator const &cmp) -> std::vector<size_t> {
-  auto permutation = get_indices(vec.size());
-  std::sort(permutation.begin(), permutation.end(),
-            [&](size_t index0, size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
+  auto permutation = std::views::iota(size_t{0}, vec.size()) | std::ranges::to<std::vector>();
+  std::ranges::sort(permutation, [&](size_t index0, size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
   return permutation;
 }
 

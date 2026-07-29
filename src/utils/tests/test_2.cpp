@@ -123,3 +123,13 @@ BOOST_AUTO_TEST_CASE(exception_saver_multithreaded_capture) {
   BOOST_TEST(saver.nsaved() == n_threads);
   saver.drop();
 }
+
+BOOST_AUTO_TEST_CASE(sort_permutation_roundtrip) {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+  auto values = std::vector<int>{30, 10, 20, 50, 40};
+  auto const expected = std::vector<std::size_t>{1, 2, 0, 4, 3};
+  auto permutation = cpp_contests::get_sort_permutation(values);
+  BOOST_TEST(permutation == expected);
+  cpp_contests::permute(values, permutation);
+  BOOST_TEST(std::ranges::is_sorted(values));
+}
