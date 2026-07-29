@@ -69,3 +69,57 @@ BOOST_AUTO_TEST_CASE(save_restore_rvalue_with_external_target) {
   }
   BOOST_TEST(target == "saved");
 }
+
+BOOST_AUTO_TEST_CASE(exception_saver_captures_and_rethrows) {
+  auto saver = cpp_contests::ExceptionSaver{};
+  auto wrapped = saver.wrap([](int value) -> int {
+    if (value < 0) {
+      throw std::runtime_error{"negative"};
+    }
+    return 2 * value;
+  });
+  BOOST_TEST(wrapped(1) == 2);
+  BOOST_TEST(saver.ncaptured() == 0);
+  BOOST_TEST(wrapped(-1) == 0); // Value-initialized result on a captured exception.
+  BOOST_TEST(saver.ncaptured() == 1);
+  BOOST_TEST(saver.nsaved() == 1);
+  BOOST_CHECK_THROW(saver.rethrow(), std::runtime_error);
+  BOOST_TEST(saver.nsaved() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(exception_saver_wrapper_outlives_temporary_callable) {
+  auto saver = cpp_contests::ExceptionSaver{};
+  // The lambda passed to wrap() is a temporary: the wrapper must own it, not reference it.
+  constexpr std::size_t payload_len = 64;
+  auto wrapped =
+      saver.wrap([captured = std::string(payload_len, 'x')](std::size_t idx) -> char { return captured.at(idx); });
+  BOOST_TEST(wrapped(0) == 'x');
+  BOOST_TEST(wrapped(payload_len - 1) == 'x');
+  BOOST_TEST(saver.ncaptured() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(exception_saver_overflow_counts_but_saves_up_to_max) {
+  auto saver = cpp_contests::ExceptionSaver{1};
+  auto wrapped = saver.wrap([]() -> void { throw std::runtime_error{"boom"}; });
+  wrapped();
+  wrapped();
+  BOOST_TEST(saver.ncaptured() == 2);
+  BOOST_TEST(saver.nsaved() == 1);
+  saver.drop();
+  BOOST_TEST(saver.nsaved() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(exception_saver_multithreaded_capture) {
+  constexpr std::size_t n_threads = 8;
+  auto saver = cpp_contests::ExceptionSaver{n_threads};
+  {
+    auto threads = std::vector<std::jthread>{};
+    threads.reserve(n_threads);
+    for (std::size_t i = 0; i != n_threads; ++i) {
+      threads.emplace_back(saver.wrap([]() -> void { throw std::runtime_error{"boom"}; }));
+    }
+  }
+  BOOST_TEST(saver.ncaptured() == n_threads);
+  BOOST_TEST(saver.nsaved() == n_threads);
+  saver.drop();
+}

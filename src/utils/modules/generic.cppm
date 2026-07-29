@@ -203,7 +203,7 @@ public:
     using ReturnType = typename CallableTraits<Callable>::template Type<0>;
     static_assert(std::is_void_v<ReturnType> ||
                   (std::is_nothrow_default_constructible_v<ReturnType> && !std::is_reference_v<ReturnType>));
-    return _wrap(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::nArguments>{});
+    return wrap_(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::nArguments>{});
   }
 
   void rethrow() {
@@ -233,9 +233,13 @@ public:
 
 private:
   template <class Callable, size_t... Indices>
-  auto wrap_(Callable const &callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
+  auto wrap_(Callable callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
     using ReturnType = typename CallableTraits<Callable>::ReturnType;
-    return [&](typename CallableTraits<Callable>::template ArgType<Indices>... args) noexcept -> auto {
+    // The callable is captured by value: capturing by reference would dangle for the common
+    // `saver.wrap([...]{...})` pattern where the argument is a temporary.
+    // The saver itself must outlive the wrapper, hence capturing `this` is fine.
+    return [this, callable = std::move(callable)](
+               typename CallableTraits<Callable>::template ArgType<Indices>... args) noexcept -> auto {
       try {
         return callable(std::forward<typename CallableTraits<Callable>::template ArgType<Indices>>(args)...);
       } catch (...) {
