@@ -159,3 +159,10 @@ BOOST_AUTO_TEST_CASE(benchmark_runs_callable_n_times) {
   BOOST_TEST(calls == 10);
   BOOST_TEST((duration >= std::chrono::nanoseconds{0}));
 }
+
+BOOST_AUTO_TEST_CASE(get_indices_is_iota) {
+  auto const indices = cpp_contests::get_indices<4>();
+  BOOST_TEST(indices.size() == 4);
+  BOOST_TEST(indices.front() == 0);
+  BOOST_TEST(indices.back() == 3);
+}
