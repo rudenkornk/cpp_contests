@@ -43,7 +43,7 @@ endif()
 add_subdirectory(src)
 
 if(CODE_COVERAGE)
-  add_code_coverage_test(THRESHOLD 5)
+  add_code_coverage_test(THRESHOLD 70)
 endif()
 
 generic_install()
