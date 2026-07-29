@@ -108,6 +108,8 @@ function(add_tests TARGET)
   endif()
 
   add_test(NAME ${TARGET} COMMAND ${TARGET} ${TEST_COMMAND_ARGUMENTS})
+  # Guard against a hung test (e.g. a deadlocked run_shell pipe) stalling CI indefinitely.
+  set_tests_properties(${TARGET} PROPERTIES TIMEOUT 300)
 
   get_property(code_coverage_enabled GLOBAL PROPERTY CODE_COVERAGE_ENABLED)
   get_target_property(target_code_coverage_allowed ${TARGET} CODE_COVERAGE_ALLOWED)
