@@ -54,7 +54,7 @@ struct Segment {
   Point e; // NOLINT(misc-non-private-member-variables-in-classes)
 
   [[nodiscard]] constexpr auto line() const noexcept -> Line { return Line{s, e - s}; }
-} __attribute__((aligned(64))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+};
 
 class Plane final {
 private:
