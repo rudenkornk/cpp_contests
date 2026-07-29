@@ -37,7 +37,7 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
   # See https://gitlab.kitware.com/cmake/cmake/-/issues/20912#note_795673
   set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_BINARY_DIR}/compile_commands.json
-                        ${PROJECT_SOURCE_DIR}/compile_commands.json)
+                          ${PROJECT_SOURCE_DIR}/compile_commands.json)
 endif()
 
 add_subdirectory(src)

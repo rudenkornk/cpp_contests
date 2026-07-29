@@ -13,7 +13,6 @@ import :matrix;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
-
 using Point = Vector<3, double>;
 
 class Line final {
@@ -194,8 +193,7 @@ constexpr auto complanar_intersection(Line const &l, Segment const &s) noexcept 
   return complanar_intersection(s, l);
 }
 
-constexpr auto
-complanar_intersection(Segment const &s1, Segment const &s2) noexcept -> std::optional<Point> {
+constexpr auto complanar_intersection(Segment const &s1, Segment const &s2) noexcept -> std::optional<Point> {
   auto l1 = s1.line();
   auto l2 = s2.line();
   auto i1 = complanar_intersection(s1, l2);

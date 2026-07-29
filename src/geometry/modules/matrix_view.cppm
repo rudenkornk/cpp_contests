@@ -25,7 +25,6 @@ import utils;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
-
 template <std::size_t N> using MatrixIndices = std::array<std::size_t, N>;
 
 template <std::random_access_iterator Iterator, size_t X, size_t Y> class MatrixIterator final {
