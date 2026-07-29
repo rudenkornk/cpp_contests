@@ -59,7 +59,8 @@ Custom test harness utilities are provided in the `utils` module.
 **Key Libraries:**
 Boost is the primary external dependency, specifically `program_options` and `unit_test_framework`.
 The standard library is heavily utilized with modern C++23 features.
-Shell command execution in utility code is implemented using POSIX `fork`/`exec` APIs (no Boost.Process dependency for now).
+Shell command execution in utility code is implemented using POSIX `fork`/`exec` plus a single-threaded
+`poll()` I/O multiplexer that drains stdout/stderr while feeding stdin (no Boost.Process dependency for now).
 
 **Platforms:**
 Linux is the primary supported platform.
@@ -146,7 +147,7 @@ Concepts and `requires` clauses enforce type constraints (C++20).
 SFINAE is applied through `std::enable_if_t` and similar constructs.
 Compile-time computation via `constexpr` and `static_assert`.
 Variadic templates for generic benchmarking and callable wrapping.
-Custom type trait utilities in `utils/type_traits.hpp`.
+Custom type trait utilities in `utils/modules/type_traits.cppm`.
 
 **Concurrency:**
 Thread-safe exception handling via `ExceptionSaver`.
@@ -171,7 +172,7 @@ Each problem typically has its own CLI entrypoint implemented as a C++ module in
 These executables read from stdin and write solutions to stdout.
 Some targets instead define `main` in a different module file (for example, `src/valid_parenthesis/solution.cppm`),
 so always consult the corresponding `CMakeLists.txt` or target configuration to locate the actual entrypoint.
-Example: `src/lru_cache/cli.cppm`, `src/geometry/cli.cppm`, `src/valid_parenthesis/solution.cppm`.
+Example: `src/lru_cache/cli.cppm`, `src/missing_numbers/cli.cppm`, `src/valid_parenthesis/solution.cppm`.
 
 **Build Configuration:**
 `CMakeLists.txt` - Root CMake configuration defining project options and subdirectories.
@@ -194,7 +195,8 @@ Example: `src/lru_cache/cli.cppm`, `src/geometry/cli.cppm`, `src/valid_parenthes
 `.github/workflows/workflow.yml` - Main CI/CD workflow.
 Runs on push to main and pull request events.
 Uses Nix for reproducible builds via `cachix/install-nix-action`.
-Matrix strategy tests 10 different configurations (GCC/LLVM × debug/release × sanitizers).
+Matrix strategy tests 8 different configurations (GCC/LLVM × debug/release × sanitizers);
+two GCC sanitizer presets are temporarily disabled pending a GCC 16 upgrade (module ICEs).
 
 ---
 
@@ -253,7 +255,7 @@ Sanitizer flags are applied via `CMAKE_CXX_FLAGS` in presets.
 Enabled via the `CODE_COVERAGE=ON` CMake option.
 GCC uses gcovr for coverage reporting.
 Clang uses llvm-profdata and llvm-cov for coverage analysis.
-Coverage threshold is set to 5% in the root CMakeLists.txt.
+Coverage threshold is set to 70% (line coverage) in the root CMakeLists.txt.
 Coverage reports are generated during test execution.
 
 **Formatting:**
@@ -268,10 +270,10 @@ CI enforces that code is formatted by checking for git diffs after formatting.
 
 **CI/CD Process:**
 GitHub Actions workflow runs on every push and pull request.
-Two jobs: `build` (Nix package build) and `test` (matrix of 10 configurations).
+Three jobs: `build` (Nix package build plus `nix flake check`), `test` (matrix of 8 configurations),
+and `format` (a single format-and-diff check).
 Tests include building, running unit tests, installation verification, and package creation.
-Format checking is performed in each test configuration.
-ccache is used to speed up compilation.
+The Nix store and ccache are cached between runs to speed up compilation.
 
 ---
 
