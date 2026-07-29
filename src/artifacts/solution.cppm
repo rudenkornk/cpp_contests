@@ -5,6 +5,7 @@ module;
 #include <cstdint>
 #include <exception>
 #include <iostream>
+#include <print>
 #include <ranges>
 #include <set>
 #include <utility>
@@ -103,7 +104,7 @@ auto solution() -> void {
     if (seen_epochs.contains(epoch)) {
       continue;
     }
-    std::cout << art << " ";
+    std::print("{} ", art);
     seen_epochs.insert(epoch);
   }
 }

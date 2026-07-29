@@ -3,6 +3,7 @@ module;
 #include <cstddef>
 #include <exception>
 #include <iostream>
+#include <print>
 #include <vector>
 
 export module perfect_cache.cli;
@@ -26,12 +27,12 @@ auto run() -> int {
       elements.push_back(n_el);
     }
   } catch (std::ios_base::failure const &e) {
-    std::cout << "Incorrect input! \n";
-    std::cout << e.what() << "\n";
+    std::println("Incorrect input!");
+    std::println("{}", e.what());
   }
 
   auto lru = cpp_contests::perfect_cache(elements, cache_length * sizeof(int), 0);
-  std::cout << lru << "\n";
+  std::println("{}", lru);
   return 0;
 }
 } // namespace

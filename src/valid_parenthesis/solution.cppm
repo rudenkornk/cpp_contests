@@ -5,6 +5,7 @@ module;
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <print>
 #include <span>
 #include <stack>
 #include <string>
@@ -64,19 +65,19 @@ public:
 namespace {
 auto run(std::span<char *> args) -> int {
   if (args.size() < 2) {
-    std::cerr << "Provide exactly one file input\n";
+    std::println(std::cerr, "Provide exactly one file input");
     return 1;
   }
   std::string const filename = args[1];
 
   auto input = std::ifstream{filename};
   if (!input.good()) {
-    std::cerr << "Error opening '" << filename << "'\n";
+    std::println(std::cerr, "Error opening '{}'", filename);
     return 1;
   }
   std::string parens{};
   input >> parens;
-  std::cout << cpp_contests::Solution::isValid(parens);
+  std::println("{:d}", cpp_contests::Solution::isValid(parens));
   return 0;
 }
 } // namespace
