@@ -124,11 +124,14 @@ template <typename Generator = std::mt19937, unsigned seed = 0> auto get_random_
 
 template <size_t NRuns = 1, typename FG, typename... Args>
 auto benchmark(FG const &Func, Args &&...args) -> std::chrono::nanoseconds {
+  static_assert(NRuns > 0);
   static_assert(CallableTraits<FG>::nArguments == sizeof...(args));
   auto start = std::chrono::steady_clock::now();
-  for (auto i = size_t{0}; i != NRuns; ++i) {
-    Func(std::forward<Args>(args)...);
+  for (auto i = size_t{1}; i < NRuns; ++i) {
+    // Arguments may only be forwarded on the last run: moving from them more than once would be a bug.
+    Func(args...);
   }
+  Func(std::forward<Args>(args)...);
   auto end = std::chrono::steady_clock::now();
   return (end - start) / NRuns;
 }
@@ -260,4 +263,3 @@ private:
 inline void swap(ExceptionSaver &left, ExceptionSaver &right) noexcept { left.swap(right); }
 
 } // namespace cpp_contests
-

@@ -151,3 +151,11 @@ BOOST_AUTO_TEST_CASE(permute_with_index_projection) {
   cpp_contests::permute(values, permutation, [](auto const &pair) noexcept -> std::size_t { return pair.first; });
   BOOST_TEST(values == (std::vector<std::string>{"a", "b", "c"}));
 }
+
+BOOST_AUTO_TEST_CASE(benchmark_runs_callable_n_times) {
+  std::size_t calls = 0;
+  auto const duration = cpp_contests::benchmark<10>(
+      [&calls](int increment_by) -> void { calls += static_cast<std::size_t>(increment_by); }, 1);
+  BOOST_TEST(calls == 10);
+  BOOST_TEST((duration >= std::chrono::nanoseconds{0}));
+}
