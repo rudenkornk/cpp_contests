@@ -1,6 +1,7 @@
 module;
 
 #include <cstddef>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <span>
@@ -10,11 +11,8 @@ module;
 export module missing_numbers.cli;
 import missing_numbers;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-extern "C++" auto main(int argc, char **argv) -> int {
-  auto const args = std::span(argv, static_cast<std::size_t>(argc));
-
+namespace {
+auto run(std::span<char *> args) -> int {
   if (args.size() < 2) {
     std::cerr << "Provide exactly one file input\n";
     return 1;
@@ -34,5 +32,17 @@ extern "C++" auto main(int argc, char **argv) -> int {
   auto res = cpp_contests::missing_numbers(numbers);
   std::cout << res.first << " " << res.second;
   return 0;
+}
+} // namespace
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+extern "C++" auto main(int argc, char **argv) -> int {
+  try {
+    return run(std::span(argv, static_cast<std::size_t>(argc)));
+  } catch (std::exception const &e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 }
 #pragma GCC diagnostic pop
