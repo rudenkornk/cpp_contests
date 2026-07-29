@@ -59,7 +59,7 @@
     },
     {
       "name": "llvm_release_tsan",
-      "displayName": "Debug LLVM tsan config.",
+      "displayName": "Release LLVM tsan config.",
       "inherits": ["llvm_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
