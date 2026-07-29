@@ -6,7 +6,7 @@
   };
 
   outputs =
-    { nixpkgs, ... }:
+    { self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -71,5 +71,7 @@
           echo "Welcome to the project devshell!"
         '';
       };
+
+      checks.${system}.default = self.packages.${system}.default;
     };
 }
