@@ -100,8 +100,8 @@ function(add_format_target)
   add_custom_target(
     format
     # DONT TOUCH QUOTES AND BACKTICKS -- ninja goes crazy with $(...) syntax in SOME cases.
-    COMMAND bash -c 'clang-format -i `git ls-files *.h *.c *.hpp *.cpp`'
-    COMMAND bash -c 'cmake-format --in-place `git ls-files *.cmake *.CMakeLists.txt`'
+    COMMAND bash -c 'clang-format -i `git ls-files *.h *.c *.hpp *.cpp *.cppm`'
+    COMMAND bash -c 'cmake-format --in-place `git ls-files *.cmake *CMakeLists.txt`'
     COMMAND bash -c 'prettier --log-level warn --write .'
     COMMENT "Format all source files"
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
