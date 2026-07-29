@@ -139,7 +139,6 @@ endfunction()
 
 # Enable code coverage for targets, which called target_allow_instrumentation.
 function(enable_code_coverage)
-  find_package(Python3 REQUIRED)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     find_program(llvm_profdata llvm-profdata REQUIRED)
     find_program(llvm_cov llvm-cov REQUIRED)
