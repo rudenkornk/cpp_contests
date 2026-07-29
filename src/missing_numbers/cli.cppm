@@ -4,6 +4,7 @@ module;
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <print>
 #include <span>
 #include <string>
 #include <vector>
@@ -14,14 +15,14 @@ import missing_numbers;
 namespace {
 auto run(std::span<char *> args) -> int {
   if (args.size() < 2) {
-    std::cerr << "Provide exactly one file input\n";
+    std::println(std::cerr, "Provide exactly one file input");
     return 1;
   }
 
   std::string const filename = args[1];
   auto input = std::ifstream{filename};
   if (!input.good()) {
-    std::cerr << "Error opening '" << filename << "'\n";
+    std::println(std::cerr, "Error opening '{}'", filename);
     return 1;
   }
   std::vector<unsigned> numbers{};
@@ -30,7 +31,7 @@ auto run(std::span<char *> args) -> int {
     numbers.push_back(value);
   }
   auto res = cpp_contests::missing_numbers(numbers);
-  std::cout << res.first << " " << res.second;
+  std::println("{} {}", res.first, res.second);
   return 0;
 }
 } // namespace
