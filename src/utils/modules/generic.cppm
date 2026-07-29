@@ -70,14 +70,16 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
     return;
   }
 #ifndef NDEBUG
-  assert(std::unique(perm.begin(), perm.end(), [&](Indexer const &lhs, Indexer const &rhs) -> auto {
-           return Index(lhs) == Index(rhs);
-         }) == perm.end());
-  assert(Index(*std::min_element(perm.begin(), perm.end(),
-                                 [&](Indexer const &lhs, Indexer const &rhs) -> auto { return lhs < rhs; })) == 0);
-  assert(Index(*std::max_element(perm.begin(), perm.end(), [&](Indexer const &lhs, Indexer const &rhs) -> auto {
-           return lhs < rhs;
-         })) == perm.size() - 1);
+  {
+    // A valid permutation maps onto every index in [0, size) exactly once.
+    // Validate on a copy: mutating checks (e.g. std::unique) would corrupt perm on violation.
+    auto indices = std::vector<size_t>(perm.size());
+    std::ranges::transform(perm, indices.begin(), Index);
+    std::ranges::sort(indices);
+    assert(std::ranges::adjacent_find(indices) == indices.end());
+    assert(indices.front() == 0);
+    assert(indices.back() == perm.size() - 1);
+  }
   if constexpr (std::is_same_v<T, Indexer>) {
     assert(&vec != &perm);
   }

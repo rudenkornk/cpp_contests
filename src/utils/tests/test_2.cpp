@@ -133,3 +133,21 @@ BOOST_AUTO_TEST_CASE(sort_permutation_roundtrip) {
   cpp_contests::permute(values, permutation);
   BOOST_TEST(std::ranges::is_sorted(values));
 }
+
+BOOST_AUTO_TEST_CASE(permute_identity_and_reverse) {
+  auto values = std::vector<int>{1, 2, 3, 4};
+  auto identity = std::vector<std::size_t>{0, 1, 2, 3};
+  cpp_contests::permute(values, identity);
+  BOOST_TEST(values == (std::vector<int>{1, 2, 3, 4}));
+
+  auto reverse = std::vector<std::size_t>{3, 2, 1, 0};
+  cpp_contests::permute(values, reverse);
+  BOOST_TEST(values == (std::vector<int>{4, 3, 2, 1}));
+}
+
+BOOST_AUTO_TEST_CASE(permute_with_index_projection) {
+  auto values = std::vector<std::string>{"c", "a", "b"};
+  auto permutation = std::vector<std::pair<std::size_t, char>>{{1, 'x'}, {2, 'y'}, {0, 'z'}};
+  cpp_contests::permute(values, permutation, [](auto const &pair) noexcept -> std::size_t { return pair.first; });
+  BOOST_TEST(values == (std::vector<std::string>{"a", "b", "c"}));
+}
