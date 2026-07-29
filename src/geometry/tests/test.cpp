@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
 
   constexpr Matrix<1, 1, double> m1{9};
   constexpr auto res1 = inv(m1);
-  static_assert(n(m1 * res1 - eye<1, 1, double>()) < eps);
+  static_assert(n((m1 * res1) - eye<1, 1, double>()) < eps);
 
   // clang-format off
   constexpr Matrix<2, 2, double> m2{
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res2 = inv(m2);
-  static_assert(n(m2 * res2 - eye<2, 2, double>()) < eps);
+  static_assert(n((m2 * res2) - eye<2, 2, double>()) < eps);
 
   // clang-format off
   constexpr Matrix<3, 3, double> m3{
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res3 = inv(m3);
-  static_assert(n(m3 * res3 - eye<3, 3, double>()) < eps);
+  static_assert(n((m3 * res3) - eye<3, 3, double>()) < eps);
 
   // clang-format off
   constexpr Matrix<4, 4, double> m4{
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res4 = inv(m4);
-  static_assert(n(m4 * res4 - eye<4, 4, double>()) < eps);
+  static_assert(n((m4 * res4) - eye<4, 4, double>()) < eps);
 
   // clang-format off
   constexpr Matrix<6, 6, double> m6{
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE(matrix_inv) {
   };
   // clang-format on
   constexpr auto res6 = inv(m6);
-  static_assert(n(m6 * res6 - eye<6, 6, double>()) < eps);
+  static_assert(n((m6 * res6) - eye<6, 6, double>()) < eps);
 }
 
 BOOST_AUTO_TEST_CASE(plane_test) {
