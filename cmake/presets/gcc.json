@@ -42,7 +42,7 @@
       "inherits": ["gcc_base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all",
         "CODE_COVERAGE": "ON"
       }
     },
