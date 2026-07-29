@@ -11,7 +11,6 @@ target_sources(
            modules/test_utils.cppm
            modules/type_traits.cppm
            modules/utils.cppm
-           modules/warnings.cppm
 )
 
 target_compile_features(utils PUBLIC cxx_std_23)
