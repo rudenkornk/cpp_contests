@@ -1,9 +1,12 @@
-#define BOOST_TEST_MODULE Matrix
+#define BOOST_TEST_MODULE Utils
 #define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 
 #include <cstddef>
 #include <cstdlib>
+#include <format>
+#include <limits>
 #include <stdexcept>
+#include <string>
 
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/tools/interface.hpp>
@@ -100,4 +103,48 @@ BOOST_AUTO_TEST_CASE(run_shell_quoted_args) {
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out == "hello world\n");
   BOOST_TEST(err.empty());
+}
+
+namespace {
+// Well above the typical 64 KiB pipe capacity: stresses the poll()-based multiplexer.
+constexpr std::size_t large_io_size = std::size_t{1} << 20U;
+} // namespace
+
+BOOST_AUTO_TEST_CASE(run_shell_large_roundtrip) {
+  // A sequential write-then-read implementation deadlocks here: the child echoes data back
+  // while run_shell is still feeding stdin.
+  auto const input = std::string(large_io_size, 'x');
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("cat", input);
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out.size() == input.size());
+  BOOST_TEST(err.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_large_interleaved_output) {
+  // Both streams exceed the pipe capacity: deadlocks unless stdout and stderr are drained concurrently.
+  auto const command =
+      std::format(R"(sh -c 'head -c {0} /dev/zero | tr "\0" a; head -c {0} /dev/zero | tr "\0" b >&2')", large_io_size);
+  auto const &[exit_code, out, err] = cpp_contests::run_shell(command);
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out.size() == large_io_size);
+  BOOST_TEST(err.size() == large_io_size);
+  BOOST_TEST(out.front() == 'a');
+  BOOST_TEST(err.front() == 'b');
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_child_ignores_stdin) {
+  // The child exits without reading: run_shell must survive EPIPE/SIGPIPE instead of dying.
+  auto const input = std::string(large_io_size, 'x');
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("true", input);
+  BOOST_TEST(exit_code == 0);
+  BOOST_TEST(out.empty());
+  BOOST_TEST(err.empty());
+}
+
+BOOST_AUTO_TEST_CASE(run_shell_signal_exit_code) {
+  // Signal deaths follow the shell convention: 128 + signal number (SIGTERM == 15).
+  auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'kill -TERM $$'", "", {}, {}, {}, false);
+  BOOST_TEST(exit_code == 128 + 15);
+  (void)out;
+  (void)err;
 }

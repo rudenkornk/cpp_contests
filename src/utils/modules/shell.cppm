@@ -3,6 +3,7 @@ module;
 #include <array>
 #include <cctype>
 #include <cerrno>
+#include <csignal>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -10,6 +11,7 @@ module;
 #include <filesystem>
 #include <format>
 #include <map>
+#include <poll.h>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -174,39 +176,110 @@ inline auto shlex_split(std::string_view cmd) -> std::vector<std::string> {
   return tokens;
 }
 
-// Read all bytes from a file descriptor into a string.
-inline auto read_all(int file_fd) -> std::string {
-  std::string result;
-  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-  std::array<char, 4096> buf{};
-  for (;;) {
-    ssize_t const num_bytes = ::read(file_fd, buf.data(), buf.size());
-    if (num_bytes > 0) {
-      result.append(buf.data(), static_cast<std::size_t>(num_bytes));
-    } else if (num_bytes == 0) {
-      break; // EOF
-    } else {
-      if (errno == EINTR) {
-        continue; // Interrupted by signal; retry.
-      }
-      throw std::runtime_error(std::format("run_shell: read() failed with errno {}", errno));
-    }
+constexpr std::size_t PIPE_READ_BUF_SIZE = 4096;
+constexpr int EXIT_CODE_SIGNAL_BASE = 128; // Shell convention: report signal death as 128 + signal number.
+
+// Temporarily ignore SIGPIPE so that writing to an already-exited child yields EPIPE
+// instead of killing the whole process. The disposition is process-wide, which is
+// acceptable for a test utility; the previous handler is restored on scope exit.
+class SigPipeGuard final {
+  struct sigaction old_action_{};
+
+public:
+  SigPipeGuard() {
+    struct sigaction ignore_action{};
+    ignore_action.sa_handler = SIG_IGN;
+    ::sigaction(SIGPIPE, &ignore_action, &old_action_);
   }
-  return result;
+  SigPipeGuard(SigPipeGuard const &) = delete;
+  SigPipeGuard(SigPipeGuard &&) = delete;
+  auto operator=(SigPipeGuard const &) -> SigPipeGuard & = delete;
+  auto operator=(SigPipeGuard &&) -> SigPipeGuard & = delete;
+  ~SigPipeGuard() { ::sigaction(SIGPIPE, &old_action_, nullptr); }
+};
+
+inline void set_nonblocking(int fdesc) {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+  int const flags = ::fcntl(fdesc, F_GETFL);
+  // O_NONBLOCK and the fcntl flags are a POSIX signed-int bitmask.
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg,hicpp-signed-bitwise)
+  if (flags < 0 || ::fcntl(fdesc, F_SETFL, flags | O_NONBLOCK) < 0) {
+    throw std::runtime_error(std::format("run_shell: fcntl() failed with errno {}", errno));
+  }
 }
 
-// Write all bytes of data to a file descriptor.
-inline void write_all(int file_fd, std::string_view data) {
-  while (!data.empty()) {
-    ssize_t const num_bytes = ::write(file_fd, data.data(), data.size());
-    if (num_bytes > 0) {
-      data.remove_prefix(static_cast<std::size_t>(num_bytes));
-    } else {
-      if (errno == EINTR) {
-        continue; // Interrupted by signal; retry.
-      }
-      throw std::runtime_error(std::format("run_shell: write() failed with errno {}", errno));
+// POSIX poll() exposes its event flags as a signed `short` bitmask.
+// Pre-combine the masks we test as `unsigned`, and widen `revents` to `int` at the boundary,
+// so the checks below avoid signed-bitwise pitfalls.
+constexpr unsigned POLL_READABLE =
+    static_cast<unsigned>(POLLIN) | static_cast<unsigned>(POLLHUP) | static_cast<unsigned>(POLLERR);
+constexpr unsigned POLL_WRITABLE = static_cast<unsigned>(POLLOUT) | static_cast<unsigned>(POLLERR);
+
+[[nodiscard]] inline auto flag_set(int revents, unsigned mask) -> bool {
+  return (static_cast<unsigned>(revents) & mask) != 0;
+}
+
+// Read whatever is ready from pipe into result; close the read end on EOF.
+inline void drain_pipe(Pipe &pipe, std::string &result, int revents, std::array<char, PIPE_READ_BUF_SIZE> &buf) {
+  if (!flag_set(revents, POLL_READABLE)) {
+    return;
+  }
+  ssize_t const num_bytes = ::read(pipe.read_end(), buf.data(), buf.size());
+  if (num_bytes > 0) {
+    result.append(buf.data(), static_cast<std::size_t>(num_bytes));
+  } else if (num_bytes == 0) {
+    pipe.close_end(0); // EOF
+  } else if (errno != EINTR && errno != EAGAIN) {
+    throw std::runtime_error(std::format("run_shell: read() failed with errno {}", errno));
+  }
+}
+
+// Push as much of the remaining stdin_data as the pipe accepts; close the write end once it is drained
+// or the child stopped reading (EPIPE).
+inline void feed_stdin(Pipe &stdin_pipe, std::string_view &stdin_data, int revents) {
+  if (!flag_set(revents, POLL_WRITABLE)) {
+    return;
+  }
+  ssize_t const num_bytes = ::write(stdin_pipe.write_end(), stdin_data.data(), stdin_data.size());
+  if (num_bytes >= 0) {
+    stdin_data.remove_prefix(static_cast<std::size_t>(num_bytes));
+    if (stdin_data.empty()) {
+      stdin_pipe.close_end(1);
     }
+  } else if (errno == EPIPE) {
+    stdin_pipe.close_end(1);
+  } else if (errno != EINTR && errno != EAGAIN) {
+    throw std::runtime_error(std::format("run_shell: write() failed with errno {}", errno));
+  }
+}
+
+// Feed stdin_data to the child while draining its stdout and stderr, multiplexed with poll().
+// A sequential write-then-read implementation deadlocks once the child fills a pipe buffer
+// (typically 64 KiB) with output before consuming all of its input, or vice versa.
+inline void pump_pipes(Pipe &stdin_pipe, std::string_view stdin_data, Pipe &stdout_pipe, std::string &stdout_result,
+                       Pipe &stderr_pipe, std::string &stderr_result) {
+  set_nonblocking(stdin_pipe.write_end());
+  set_nonblocking(stdout_pipe.read_end());
+  set_nonblocking(stderr_pipe.read_end());
+  if (stdin_data.empty()) {
+    stdin_pipe.close_end(1);
+  }
+
+  std::array<char, PIPE_READ_BUF_SIZE> buf{};
+  while (stdin_pipe.write_end() != -1 || stdout_pipe.read_end() != -1 || stderr_pipe.read_end() != -1) {
+    // poll() ignores negative fds, which conveniently matches the closed-end sentinel.
+    auto fds = std::array<pollfd, 3>{{{.fd = stdin_pipe.write_end(), .events = POLLOUT, .revents = 0},
+                                      {.fd = stdout_pipe.read_end(), .events = POLLIN, .revents = 0},
+                                      {.fd = stderr_pipe.read_end(), .events = POLLIN, .revents = 0}}};
+    if (::poll(fds.data(), fds.size(), -1) < 0) {
+      if (errno == EINTR) {
+        continue;
+      }
+      throw std::runtime_error(std::format("run_shell: poll() failed with errno {}", errno));
+    }
+    feed_stdin(stdin_pipe, stdin_data, fds[0].revents);
+    drain_pipe(stdout_pipe, stdout_result, fds[1].revents, buf);
+    drain_pipe(stderr_pipe, stderr_result, fds[2].revents, buf);
   }
 }
 
@@ -246,11 +319,10 @@ inline auto build_env_map(std::map<std::string, std::string> const &extra_env,
 // NOLINTEND(misc-use-internal-linkage)
 } // namespace detail
 
-export auto
-run_shell(std::string const &cmd, std::string const &stdin_data = "",
-          std::map<std::string, std::string> const &extra_env = {},
-          std::vector<std::filesystem::path> const &extra_paths = {},
-          std::filesystem::path const &cwd = std::filesystem::current_path(), bool check = true)
+export auto run_shell(std::string const &cmd, std::string const &stdin_data = "",
+                      std::map<std::string, std::string> const &extra_env = {},
+                      std::vector<std::filesystem::path> const &extra_paths = {},
+                      std::filesystem::path const &cwd = std::filesystem::current_path(), bool check = true)
     -> std::tuple<int, std::string, std::string> {
 
   // --- Split command into argv ---
@@ -324,50 +396,24 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
   stdout_pipe.close_end(1);
   stderr_pipe.close_end(1);
 
-  // This initially was written using std::thread, spawning read and writes into separate threads
-  // to avoid potential locks.
-  // However, current version of GCC (gcc 15) have bugs, which do not play well with combination
-  // of C++20 modules and std::thread.
-  // gcc in that context failed with internal compiler error.
-  // Specifically, reproduction could be reached with these commands:
-  // ```cpp
-  // // utils.cppm
-  // export module utils;
-  // export import :shell;
-  // ```
-  //
-  // ```cpp
-  // // shell.cppm
-  // module;
-  // #include <thread>
-  // export module utils:shell;
-  // export void run_shell() {
-  //   auto stdout_thread = std::thread([] -> void {});
-  // }
-  // ```
-  // ```bash
-  // g++ -std=c++23 -fmodules-ts -x c++ -c shell.cppm -o shell.o
-  // g++ -std=c++23 -fmodules-ts -x c++ -c utils.cppm -o utils.o
-  // ```
-  // The error:
-  // ```
-  // utils.cppm:1:8: internal compiler error: Segmentation fault
-  //     1 | export module utils;
-  //       |        ^~~~~~
-  // ```
+  // Historical note: this was first written using std::thread, spawning reads and writes into
+  // separate threads to avoid potential deadlocks.
+  // However, GCC 15 fails with an internal compiler error on the combination of C++20 modules
+  // and std::thread (reduced repro: `#include <thread>` plus a std::thread in a module partition
+  // re-exported by a primary interface; see this repo's git history, commit
+  // "refactor(utils): remove bug-triggering std::thread from shell.cppm").
   // The error seems to be related to this resolved issue:
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103701
-  // Indeed, compilation of reduced example with trunk gcc succeeds.
-
-  // Read stdout & stderr in threads.
-  detail::write_all(stdin_pipe.write_end(), stdin_data);
-  stdin_pipe.close_end(1);
-
-  auto stdout_result = detail::read_all(stdout_pipe.read_end());
-  stdout_pipe.close_end(0);
-
-  auto stderr_result = detail::read_all(stderr_pipe.read_end());
-  stderr_pipe.close_end(0);
+  // TODO(gcc16): GCC 16.1 (released 2026-04-30) carries the module ICE fixes; once nixpkgs ships
+  // gcc16 a threaded implementation becomes possible again. Not that it is needed:
+  // the poll()-based multiplexer below stays single-threaded and, unlike the old sequential
+  // write-then-read implementation, cannot deadlock on pipe buffer pressure.
+  auto stdout_result = std::string{};
+  auto stderr_result = std::string{};
+  {
+    detail::SigPipeGuard const sigpipe_guard{};
+    detail::pump_pipes(stdin_pipe, stdin_data, stdout_pipe, stdout_result, stderr_pipe, stderr_result);
+  }
 
   // Wait for child.
   int wstatus = 0;
@@ -377,7 +423,9 @@ run_shell(std::string const &cmd, std::string const &stdin_data = "",
     }
   }
   // NOLINTNEXTLINE(misc-include-cleaner)
-  int const exit_code = WIFEXITED(wstatus) ? WEXITSTATUS(wstatus) : -1;
+  int const exit_code = WIFEXITED(wstatus)     ? WEXITSTATUS(wstatus)
+                        : WIFSIGNALED(wstatus) ? detail::EXIT_CODE_SIGNAL_BASE + WTERMSIG(wstatus)
+                                               : -1;
 
   if (check && exit_code != 0) {
     throw std::runtime_error("Command failed with exit code " + std::to_string(exit_code));
