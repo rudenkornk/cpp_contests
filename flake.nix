@@ -34,6 +34,7 @@
       ];
 
       linters = with pkgs; [
+        clang-tools
         cmake-format
         cmake-lint
         prettier
