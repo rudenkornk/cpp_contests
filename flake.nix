@@ -37,6 +37,7 @@
         clang-tools
         cmake-format
         cmake-lint
+        nixfmt
         prettier
         typos
         yamllint
