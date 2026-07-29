@@ -3,10 +3,6 @@
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-25.11";
     };
-    nur = {
-      url = "github:nix-community/nur";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
