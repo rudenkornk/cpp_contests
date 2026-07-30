@@ -1,16 +1,11 @@
 module;
 
+// `<cassert>` stays because `import std;` does not export the `assert` macro.
 #include <cassert>
-#include <concepts>
-#include <cstddef>
-#include <functional>
-#include <list>
-#include <queue>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 export module two_queue_cache;
+
+import std;
 
 export namespace cpp_contests {
 

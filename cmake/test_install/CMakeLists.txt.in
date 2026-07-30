@@ -1,6 +1,21 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 4.0)
 
-project(test_install)
+# The installed libraries carry `import std` module interfaces that this consumer project recompiles, so it must opt
+# into the same experimental `import std` support as the main build (see the root CMakeLists for details on the UUID and
+# the Clang-specific wiring). This must be set before the CXX language is enabled, i.e. before `project()`.
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
+
+project(test_install CXX)
+
+set(CMAKE_CXX_MODULE_STD ON)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # Same nixpkgs-clang workaround as the main build: point CMake at the libstdc++ `import std` manifest and add the
+  # `backward/` header directory, since the clang wrapper hides both from `-print-file-name`. The devshell exports these
+  # paths (also available in CI, which builds this project inside `nix develop`).
+  set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES} $ENV{IMPORT_STD_BACKWARD_INC})
+  set(CMAKE_CXX_STDLIB_MODULES_JSON $ENV{IMPORT_STD_MANIFEST})
+endif()
 
 find_package(@CMAKE_PROJECT_NAME@ REQUIRED)
 @FIND_PACKAGES@

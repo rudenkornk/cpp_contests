@@ -1,13 +1,11 @@
 module;
 
-#include <algorithm>
-#include <array>
+// `<cassert>` stays because `import std;` does not export the `assert` macro.
 #include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <optional>
 
 export module geometry:triangle;
+
+import std;
 
 import :matrix;
 import :primitives;

@@ -1,28 +1,20 @@
 module;
 
-#include <array>
-#include <cctype>
+// `import std;` covers the C++ standard library only, not macros or POSIX APIs. Keep `<cerrno>` (the `errno` and `E*`
+// macros) and `<csignal>` (the `SIG*` macros and `sigaction`), plus the POSIX headers that declare the syscalls used
+// below along with their `O_*`, `POLL*` and `W*` macros. All C++ standard facilities now come from `import std;`.
 #include <cerrno>
 #include <csignal>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
+
 #include <fcntl.h>
-#include <filesystem>
-#include <format>
-#include <map>
 #include <poll.h>
-#include <stdexcept>
-#include <string>
-#include <string_view>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <tuple>
 #include <unistd.h>
-#include <utility>
-#include <vector>
 
 export module utils:shell;
+
+import std;
 
 // This is the implementation of run_shell util, written only with stdlib and POSIX.
 // Initially, run_shell was written in a much simpler way with a use of <boost/process.hpp>.

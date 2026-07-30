@@ -1,16 +1,11 @@
 module;
 
+// `<cassert>` stays because `import std;` does not export the `assert` macro.
 #include <cassert>
-#include <cstddef>
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <print>
-#include <span>
-#include <stack>
-#include <string>
 
 export module valid_parenthesis;
+
+import std;
 
 export namespace cpp_contests {
 

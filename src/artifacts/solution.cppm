@@ -1,17 +1,14 @@
 module;
-#include <algorithm>
+
+// `import std;` exports neither macros nor global-namespace C names, so keep `<cassert>` (for `assert`), `<cstddef>`
+// (for the unqualified `size_t` used below) and `<cstdint>` (for the unqualified fixed-width integer types).
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <exception>
-#include <iostream>
-#include <print>
-#include <ranges>
-#include <set>
-#include <utility>
-#include <vector>
 
 export module artifacts;
+
+import std;
 
 namespace {
 auto solution() -> void {

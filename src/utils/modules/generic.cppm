@@ -1,23 +1,13 @@
 module;
 
-#include <algorithm>
-#include <array>
-#include <atomic>
+// Keep `<cassert>` (for `assert`) and `<cstddef>` (for the unqualified `size_t` used below); `import std;` exports
+// neither macros nor global-namespace C names.
 #include <cassert>
-#include <chrono>
 #include <cstddef>
-#include <exception>
-#include <format>
-#include <functional>
-#include <numeric>
-#include <random>
-#include <ranges>
-#include <string>
-#include <string_view>
-#include <utility>
-#include <vector>
 
 export module utils:generic;
+
+import std;
 import :type_traits;
 
 export namespace cpp_contests {
@@ -108,7 +98,10 @@ template <typename Vector, typename VectorIndexers> void permute(Vector &vec, Ve
 
 template <typename Vector, typename Comparator>
 auto get_sort_permutation(Vector const &vec, Comparator const &cmp) -> std::vector<size_t> {
-  auto permutation = std::views::iota(size_t{0}, vec.size()) | std::ranges::to<std::vector>();
+  // Use the function-call form of `std::ranges::to` rather than the `|` pipe: the range-adaptor `operator|` is a hidden
+  // friend of libstdc++'s closure types, and Clang fails to find it once these types cross the `import std` module
+  // boundary into a consumer, so the equivalent non-pipe spelling is used here.
+  auto permutation = std::ranges::to<std::vector>(std::views::iota(size_t{0}, vec.size()));
   std::ranges::sort(permutation, [&](size_t index0, size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
   return permutation;
 }

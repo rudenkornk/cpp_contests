@@ -1,10 +1,6 @@
-module;
-
-#include <cstddef>
-#include <set>
-#include <vector>
-
 export module k_max;
+
+import std;
 
 export namespace cpp_contests {
 

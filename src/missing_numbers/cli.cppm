@@ -1,15 +1,6 @@
-module;
-
-#include <cstddef>
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <print>
-#include <span>
-#include <string>
-#include <vector>
-
 export module missing_numbers.cli;
+
+import std;
 import missing_numbers;
 
 namespace {

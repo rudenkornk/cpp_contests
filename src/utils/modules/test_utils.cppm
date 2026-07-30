@@ -1,5 +1,9 @@
 module;
 
+// This module deliberately does NOT use `import std;`. The Boost.Test headers are not modularized and must be included
+// textually into the global module fragment; under Clang, Boost.Test's textual `<map>` (and friends) then conflict with
+// the same types re-declared by `import std` ("cannot befriend target of using declaration"). Keeping the standard
+// headers textual too sidesteps the clash. The rest of the project still uses `import std;`.
 #include <cstddef>
 #include <map>
 #include <span>

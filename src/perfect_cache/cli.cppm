@@ -1,12 +1,6 @@
-module;
-
-#include <cstddef>
-#include <exception>
-#include <iostream>
-#include <print>
-#include <vector>
-
 export module perfect_cache.cli;
+
+import std;
 import perfect_cache;
 
 namespace {

@@ -16,7 +16,8 @@ Checks: >
   -portability-avoid-pragma-once,
 
   -misc-include-cleaner,
-  -readability-redundant-declaration
+  -readability-redundant-declaration,
+  -cert-dcl58-cpp
 
 # Notes regarding disabled warnings:
 # altera-*, fuchsia-*, linuxkernel-*, llvm-*, llvmlibc-* are mostly designed for their own codebases (or, for altera,
@@ -35,3 +36,9 @@ Checks: >
 # readability-redundant-declaration produces false positives when C++20 modules are used:
 # operator new/delete get declared in both the system <new> header and via module interface exports,
 # causing spurious "redundant declaration" warnings in system headers that cannot be suppressed with NOLINT.
+#
+# cert-dcl58-cpp fires spuriously on every translation unit that uses `import std;`:
+# clang-tidy attributes the standard library module's own `namespace std { ... }` definitions
+# (deserialized from libstdc++ headers such as <type_traits>) to the importing module, and reports them as an illegal
+# modification of namespace std. Our code never reopens namespace std, and the offending declaration lives in a system
+# header with no user-code location to attach a NOLINT to, so the check must be disabled globally.

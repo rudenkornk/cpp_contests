@@ -1,11 +1,6 @@
-module;
-
-#include <cassert>
-#include <climits>
-#include <type_traits>
-#include <utility>
-
 export module reverse_list;
+
+import std;
 
 export namespace cpp_contests {
 

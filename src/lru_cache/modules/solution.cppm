@@ -1,14 +1,12 @@
 module;
 
+// `import std;` does not export macros, so `<cassert>` (for `assert`) must stay a textual include in the global module
+// fragment. Every other standard header this module used is now provided by `import std;` below.
 #include <cassert>
-#include <concepts>
-#include <cstddef>
-#include <functional>
-#include <list>
-#include <unordered_map>
-#include <vector>
 
 export module lru_cache;
+
+import std;
 
 export namespace cpp_contests {
 

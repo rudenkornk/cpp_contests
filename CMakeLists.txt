@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 4.0)
 
+# Opt into CMake's still-experimental `import std;` support. The gate is keyed by a UUID that changes with every CMake
+# release, so a nixpkgs bump that moves CMake will need the new value (CMake prints it in a fatal error when the token
+# goes stale). This must be set before the CXX language is enabled, i.e. before `project()`. The current value matches
+# the CMake 4.3 shipped by the flake.
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "451f2fe2-a8a2-47c3-bc32-94786d8fc91b")
+
 project(
   cpp_contests
   VERSION 0.1.0
@@ -38,6 +44,21 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
   set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_BINARY_DIR}/compile_commands.json
                           ${PROJECT_SOURCE_DIR}/compile_commands.json)
+endif()
+
+# Build the standard library module so translation units can `import std;` instead of textually including headers.
+# Combined with the experimental gate above, this makes CMake compile libstdc++'s `std`/`std.compat` module and attach
+# it to every C++23 target automatically.
+set(CMAKE_CXX_MODULE_STD ON)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # CMake normally locates the libstdc++ `import std` manifest through `clang++
+  # -print-file-name=libstdc++.modules.json`, but the nixpkgs clang wrapper supplies libstdc++ via wrapper flags, so
+  # that query returns nothing. The devshell exports the manifest path (and the `backward/` header directory that g++
+  # adds implicitly but the clang wrapper does not; libstdc++'s `std.cc` includes `<strstream>` from there) for the
+  # exact gcc this clang compiles against.
+  set(CMAKE_CXX_STDLIB_MODULES_JSON "$ENV{IMPORT_STD_MANIFEST}")
+  list(APPEND CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES "$ENV{IMPORT_STD_BACKWARD_INC}")
 endif()
 
 # Workaround for the Clang toolchain shipped by nixpkgs 26.05 (Clang 21 paired with the gcc 15 libstdc++). clang-tidy

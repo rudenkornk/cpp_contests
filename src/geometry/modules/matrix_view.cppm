@@ -8,18 +8,14 @@ module;
 // the iterator, which is quite expensive and makes the whole point of static
 // matrices irrelevant.
 
-#include <algorithm>
-#include <array>
+// Keep `<cassert>` (for `assert`) and `<cstddef>` (for the unqualified `size_t` used below); `import std;` exports
+// neither macros nor global-namespace C names. Everything else comes from the standard library module.
 #include <cassert>
-#include <compare>
-#include <concepts>
 #include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <numeric>
-#include <type_traits>
 
 export module geometry.matrix_view;
+
+import std;
 import utils;
 
 export namespace cpp_contests {

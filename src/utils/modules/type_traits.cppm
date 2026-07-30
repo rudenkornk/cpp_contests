@@ -1,13 +1,11 @@
 module;
 
+// `<cstddef>` stays for the unqualified `size_t` used below; `import std;` does not export global-namespace C names.
 #include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 
 export module utils:type_traits;
+
+import std;
 
 export namespace cpp_contests {
 

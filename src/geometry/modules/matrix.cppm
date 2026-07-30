@@ -1,18 +1,13 @@
 module;
 
-#include <algorithm>
-#include <array>
+// Keep `<cassert>` (for `assert`) and `<cstddef>` (for the unqualified `size_t` used below); `import std;` exports
+// neither macros nor global-namespace C names. Everything else comes from the standard library module.
 #include <cassert>
-#include <compare>
-#include <concepts>
 #include <cstddef>
-#include <initializer_list>
-#include <iostream>
-#include <iterator>
-#include <numeric>
-#include <type_traits>
 
 export module geometry:matrix;
+
+import std;
 import utils;
 
 export namespace cpp_contests {

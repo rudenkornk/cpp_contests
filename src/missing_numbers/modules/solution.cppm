@@ -1,14 +1,16 @@
 module;
 
+// Keep `<cassert>` (the `assert` macro) and `<climits>` (the `CHAR_BIT` macro); `import std;` exports no macros.
+// The Boost headers are not modularized, so they remain textual includes as well.
 #include <cassert>
 #include <climits>
-#include <utility>
-#include <vector>
 
 #include <boost/algorithm/cxx17/reduce.hpp>
 #include <boost/range/numeric.hpp>
 
 export module missing_numbers;
+
+import std;
 
 export namespace cpp_contests {
 

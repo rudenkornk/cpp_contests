@@ -1,12 +1,6 @@
-module;
-
-#include <cstddef>
-#include <exception>
-#include <iostream>
-#include <print>
-#include <vector>
-
 export module lru_cache.cli;
+
+import std;
 import lru_cache;
 
 namespace {

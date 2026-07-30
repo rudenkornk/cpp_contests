@@ -1,9 +1,6 @@
-module;
-
-#include <cmath>
-#include <limits>
-
 export module utils:math;
+
+import std;
 
 export namespace cpp_contests {
 
