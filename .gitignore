@@ -9,3 +9,4 @@ CMakeUserPresets.json
 clang-tidy-fixes.yaml
 /.venv
 /result
+/.direnv
