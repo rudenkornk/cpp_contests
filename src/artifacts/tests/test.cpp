@@ -26,7 +26,6 @@ auto run_artifacts(std::string const &input) -> std::string {
   stdout_str.erase(last_nonspace.base(), stdout_str.end());
   return stdout_str;
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   std::string input;
@@ -108,3 +107,4 @@ BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   )";
   BOOST_TEST(run_artifacts(input) == "3 10 100");
 }
+} // namespace

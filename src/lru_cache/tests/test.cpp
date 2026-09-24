@@ -21,7 +21,6 @@ auto run_cli_test(std::string const &input) -> int {
   auto &&[exit_code, stdout, stderr] = cpp_contests::run_shell(TestArgsFixture::cli_tools.at("lru_cache_cli"), input);
   return std::stoi(stdout);
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST(lru_hits({}, 0, 0) == 0);
@@ -52,3 +51,4 @@ BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST(run_cli_test("2 5 1 2 3 2 3\n") == 2);
   BOOST_TEST(run_cli_test("4 14 1 2 3 1 2 4 5 1 7 3 2 6 1 2\n") == 4);
 }
+} // namespace

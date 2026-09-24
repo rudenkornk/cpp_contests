@@ -19,7 +19,7 @@ template <typename T> struct ListNode final {
 template <typename T> auto reverse_list(ListNode<T> *head) noexcept -> ListNode<T> * {
   ListNode<T> *new_head = nullptr;
   while (head) {
-    ListNode<T> *next = head->next;
+    ListNode<T> *const next = head->next;
     head->next = new_head;
     new_head = head;
     head = next;

@@ -13,7 +13,7 @@ export module lru_cache;
 export namespace cpp_contests {
 
 template <typename Key, typename Value, std::invocable<Key> Load> class LRUCache final {
-  using position = typename std::list<Key>::const_iterator;
+  using position = std::list<Key>::const_iterator;
   Load load_;
   std::size_t max_length_;
   std::list<Key> keys_;

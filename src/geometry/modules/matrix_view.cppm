@@ -32,10 +32,10 @@ public:
   using iterator_type = Iterator;
   using iterator_concept = std::random_access_iterator_tag;
   using iterator_category = std::random_access_iterator_tag;
-  using difference_type = typename std::iter_difference_t<Iterator>;
-  using value_type = typename std::iter_value_t<Iterator>;
-  using pointer = typename std::iterator_traits<Iterator>::pointer;
-  using reference = typename std::iter_reference_t<Iterator>;
+  using difference_type = std::iter_difference_t<Iterator>;
+  using value_type = std::iter_value_t<Iterator>;
+  using pointer = std::iterator_traits<Iterator>::pointer;
+  using reference = std::iter_reference_t<Iterator>;
   static_assert(std::is_signed_v<difference_type>);
 
   static constexpr std::size_t kSizeX = X;
@@ -120,7 +120,7 @@ public:
     return tmp;
   }
 
-  constexpr auto operator-(typename MatrixIterator::difference_type n) const -> MatrixIterator {
+  constexpr auto operator-(MatrixIterator::difference_type n) const -> MatrixIterator {
     auto tmp = it_;
     tmp -= n;
     return tmp;
@@ -169,9 +169,9 @@ private:
     auto col = cols[virt_col];
 
     if (!transposed) {
-      return begin + (col + row * real_x);
+      return begin + (col + (row * real_x));
     }
-    return begin + (row + col * real_y);
+    return begin + (row + (col * real_y));
   }
 };
 template <std::random_access_iterator Iterator, size_t X, size_t Y>
@@ -202,8 +202,8 @@ class Matrix final {
 public:
   using value_type = T;
   using container = std::array<value_type, X * Y>;
-  using iterator = typename container::iterator;
-  using const_iterator = typename container::const_iterator;
+  using iterator = container::iterator;
+  using const_iterator = container::const_iterator;
 
   static constexpr std::size_t kSizeX = X;
   static constexpr std::size_t kSizeY = Y;
@@ -245,7 +245,7 @@ template <std::size_t X, std::size_t Y, typename T>
   requires(X > 0 && Y > 0)
 class MatrixView final {
 private:
-  using mi = typename Matrix<X, Y, T>::iterator;
+  using mi = Matrix<X, Y, T>::iterator;
 
 public:
   using value_type = T;

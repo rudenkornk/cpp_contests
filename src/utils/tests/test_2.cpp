@@ -37,8 +37,6 @@ static_assert(lambda_traits::kIsLValueReference<1>);
 static_assert(cpp_contests::kIsInstanceOf<std::vector, std::vector<int>>);
 static_assert(!cpp_contests::kIsInstanceOf<std::vector, int>);
 
-} // namespace
-
 BOOST_AUTO_TEST_CASE(SaveRestoreRestoresOnScopeExit) {
   int value = 1;
   {
@@ -167,3 +165,4 @@ BOOST_AUTO_TEST_CASE(GetIndicesIsIota) {
   BOOST_TEST(indices.front() == 0);
   BOOST_TEST(indices.back() == 3);
 }
+} // namespace

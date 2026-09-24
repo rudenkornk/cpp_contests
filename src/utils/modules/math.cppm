@@ -16,7 +16,7 @@ auto constexpr sqrt_newton(double val, double curr, double prev) -> double {
     return curr;
   }
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-  return sqrt_newton(val, 0.5 * (curr + val / curr), curr);
+  return sqrt_newton(val, 0.5 * (curr + (val / curr)), curr);
 }
 } // namespace details
 

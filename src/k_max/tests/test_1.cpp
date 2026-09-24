@@ -11,6 +11,7 @@ import k_max;
 
 using cpp_contests::k_max;
 
+namespace {
 BOOST_AUTO_TEST_CASE(MainTest) {
   BOOST_TEST((std::vector{5} == k_max({5}, 1)));
   BOOST_TEST((std::vector{0, 1, 2, 3, 4} == k_max({0, 1, 2, 3, 4}, 1)));
@@ -22,3 +23,4 @@ BOOST_AUTO_TEST_CASE(MainTest) {
   BOOST_TEST((std::vector{6, 2, 2, 4, 6, 6, 6, 6, 5, 8, 8, 8, 8} ==
               k_max({6, 1, 2, 0, 0, 2, 4, 6, 1, 2, 3, 5, 8, 8, 8, 3}, 4)));
 }
+} // namespace

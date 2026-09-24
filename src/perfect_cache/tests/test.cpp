@@ -30,7 +30,6 @@ namespace {
 auto perfect_cache_wrapper(std::vector<int> const &keys, std::size_t pages) -> std::size_t {
   return perfect_cache(keys, pages * sizeof(int), 0);
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(CorrectnessTest) {
   BOOST_TEST(perfect_cache_wrapper({}, 0) == std::size_t{0});
@@ -47,10 +46,10 @@ BOOST_AUTO_TEST_CASE(CorrectnessTest) {
 }
 
 using key_type = int;
-static constexpr std::size_t kTypicalWebPageSizeInBytes = std::size_t{2} * 1024 * 1024;
-static constexpr std::size_t kTypicalDbKeySizeInBytes = 32;
-static constexpr std::size_t kActualKeySizeInBenchmark = sizeof(key_type);
-static constexpr std::size_t kVirtualWebPageSizeInBenchmark =
+constexpr std::size_t kTypicalWebPageSizeInBytes = std::size_t{2} * 1024 * 1024;
+constexpr std::size_t kTypicalDbKeySizeInBytes = 32;
+constexpr std::size_t kActualKeySizeInBenchmark = sizeof(key_type);
+constexpr std::size_t kVirtualWebPageSizeInBenchmark =
     kTypicalWebPageSizeInBytes / kTypicalDbKeySizeInBytes * kActualKeySizeInBenchmark;
 
 BOOST_AUTO_TEST_CASE(UniformDistributionCacheTest) {
@@ -59,7 +58,8 @@ BOOST_AUTO_TEST_CASE(UniformDistributionCacheTest) {
   const std::size_t n_elements = 10000;
   const int min = 1;
   const int max = 300;
-  std::mt19937 gen{0}; // NOLINT(cert-msc32-c,cert-msc51-cpp)
+  // Fixed seeds keep the cache comparisons reproducible.
+  std::mt19937 gen{0}; // NOLINT(bugprone-random-generator-seed,cert-msc32-c,cert-msc51-cpp)
   std::uniform_int_distribution<> d{min, max};
   std::vector<key_type> elements{};
   elements.reserve(n_elements);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(BinomialDistributionCacheTest) {
   const std::size_t cache_size_in_bytes = 100 * kVirtualWebPageSizeInBenchmark;
   const std::size_t n_elements = 10000;
   const int max = 2999;
-  std::mt19937 gen{0}; // NOLINT(cert-msc32-c,cert-msc51-cpp)
+  std::mt19937 gen{0}; // NOLINT(bugprone-random-generator-seed,cert-msc32-c,cert-msc51-cpp)
   std::binomial_distribution<> d(max);
   std::vector<key_type> elements{};
   elements.reserve(n_elements);
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(PoissonDistributionCacheTest) {
   const std::size_t cache_size_in_bytes = 100 * kVirtualWebPageSizeInBenchmark;
   const std::size_t n_elements = 10000;
   const int lambda = 1000;
-  std::mt19937 gen{0}; // NOLINT(cert-msc32-c,cert-msc51-cpp)
+  std::mt19937 gen{0}; // NOLINT(bugprone-random-generator-seed,cert-msc32-c,cert-msc51-cpp)
   std::poisson_distribution<> d(lambda);
   std::vector<key_type> elements{};
   elements.reserve(n_elements);
@@ -130,5 +130,7 @@ BOOST_AUTO_TEST_CASE(PoissonDistributionCacheTest) {
   std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
+
+} // namespace
 
 // NOLINTEND(readability-identifier-length)

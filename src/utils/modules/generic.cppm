@@ -59,8 +59,8 @@ template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
 
 template <typename Vector, typename VectorIndexers, typename IndexFunction>
 void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &index) {
-  using value_type = typename Vector::value_type;
-  using indexer = typename VectorIndexers::value_type;
+  using value_type = Vector::value_type;
+  using indexer = VectorIndexers::value_type;
   static_assert(std::is_nothrow_swappable_v<value_type>);
   static_assert(std::is_nothrow_swappable_v<indexer>);
   static_assert(std::is_nothrow_invocable_v<IndexFunction, indexer>);
@@ -204,7 +204,7 @@ public:
 
   // Wraps callable in a thread-save wrapper
   template <typename Callable> auto wrap(Callable &&callable) {
-    using return_type = typename CallableTraits<Callable>::template type<0>;
+    using return_type = CallableTraits<Callable>::template type<0>;
     static_assert(std::is_void_v<return_type> ||
                   (std::is_nothrow_default_constructible_v<return_type> && !std::is_reference_v<return_type>));
     return wrap(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::kNArguments>{});
@@ -253,12 +253,12 @@ private:
 
   template <class Callable, size_t... Indices>
   auto wrap(Callable callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
-    using return_type = typename CallableTraits<Callable>::return_type;
+    using return_type = CallableTraits<Callable>::return_type;
     // The callable is captured by value: capturing by reference would dangle for the common
     // `saver.wrap([...]{...})` pattern where the argument is a temporary.
     // The saver itself must outlive the wrapper, hence capturing `this` is fine.
     return [this, callable = std::move(callable)](
-               typename CallableTraits<Callable>::template arg_type<Indices>... args) noexcept -> auto {
+               CallableTraits<Callable>::template arg_type<Indices>... args) noexcept -> auto {
       try {
         return callable(std::forward<typename CallableTraits<Callable>::template arg_type<Indices>>(args)...);
       } catch (...) {

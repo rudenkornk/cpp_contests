@@ -11,6 +11,7 @@ using cpp_contests::Triangle;
 
 // NOLINTBEGIN(readability-identifier-length)
 
+namespace {
 BOOST_AUTO_TEST_CASE(TriangleTest) {
   constexpr Triangle t1(point{0.0, 0.0, 0.0}, point{1.0, 0.0, 0.0}, point{0.0, 1.0, 0.0});
   constexpr Triangle t2(point{0.0, 0.0, 0.0}, point{1.0, 1.0, 1.0}, point{1.0, 1.0, -1.0});
@@ -31,5 +32,7 @@ BOOST_AUTO_TEST_CASE(TriangleTest) {
 
   // static_assert(intersect(t1, t1));
 }
+
+} // namespace
 
 // NOLINTEND(readability-identifier-length)

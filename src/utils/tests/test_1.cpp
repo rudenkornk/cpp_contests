@@ -16,6 +16,7 @@ import utils;
 
 using cpp_contests::size_to_string;
 
+namespace {
 BOOST_AUTO_TEST_CASE(SizeToStringTest) {
   BOOST_TEST(size_to_string(std::size_t{0}) == "0 B");
   BOOST_TEST(size_to_string(std::size_t{1}) == "1 B");
@@ -30,7 +31,6 @@ BOOST_AUTO_TEST_CASE(SizeToStringTest) {
   BOOST_TEST(size_to_string(std::size_t{1129}) == "1.1 KiB");
 }
 
-namespace {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr auto pow2(double val, std::size_t n) -> double {
   double res = 1;
@@ -54,8 +54,6 @@ constexpr auto sqrt_check() -> bool {
   }
   return result;
 }
-
-} // namespace
 
 BOOST_AUTO_TEST_CASE(SqrtTest) { static_assert(sqrt_check()); }
 
@@ -119,10 +117,8 @@ BOOST_AUTO_TEST_CASE(RunShellQuotedArgs) {
   BOOST_TEST(err.empty());
 }
 
-namespace {
 // Well above the typical 64 KiB pipe capacity: stresses the poll()-based multiplexer.
 constexpr std::size_t kLargeIoSize = std::size_t{1} << 20U;
-} // namespace
 
 BOOST_AUTO_TEST_CASE(RunShellLargeRoundtrip) {
   // A sequential write-then-read implementation deadlocks here: the child echoes data back
@@ -162,3 +158,4 @@ BOOST_AUTO_TEST_CASE(RunShellSignalExitCode) {
   (void)out;
   (void)err;
 }
+} // namespace

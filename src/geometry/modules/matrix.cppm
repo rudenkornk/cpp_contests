@@ -17,6 +17,8 @@ import utils;
 
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
+// Matrix storage and transpose iterators use dimension-bounded offsets, with assertions on public indices.
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
 
 constexpr double kEpsMin = 1e-100;
 constexpr double kEpsMax = 1e-6;
@@ -26,10 +28,10 @@ public:
   using iterator_type = Iterator;
   using iterator_concept = std::random_access_iterator_tag;
   using iterator_category = std::random_access_iterator_tag;
-  using difference_type = typename std::iter_difference_t<Iterator>;
-  using value_type = typename std::iter_value_t<Iterator>;
-  using pointer = typename std::iterator_traits<Iterator>::pointer;
-  using reference = typename std::iter_reference_t<Iterator>;
+  using difference_type = std::iter_difference_t<Iterator>;
+  using value_type = std::iter_value_t<Iterator>;
+  using pointer = std::iterator_traits<Iterator>::pointer;
+  using reference = std::iter_reference_t<Iterator>;
   static_assert(std::is_signed_v<difference_type>);
 
 private:
@@ -100,7 +102,7 @@ public:
   }
 
 private:
-  constexpr auto transform(difference_type i_tr) const noexcept(noexcept(begin_ + i_tr)) -> Iterator {
+  [[nodiscard]] constexpr auto transform(difference_type i_tr) const noexcept(noexcept(begin_ + i_tr)) -> Iterator {
     return transform(begin_, i_tr);
   }
 
@@ -153,8 +155,8 @@ template <std::size_t X, std::size_t Y, typename T> class Matrix final {
 public:
   using value_type = T;
   using container = std::array<value_type, X * Y>;
-  using iterator = typename container::iterator;
-  using const_iterator = typename container::const_iterator;
+  using iterator = container::iterator;
+  using const_iterator = container::const_iterator;
   using transpose_iterator = TransposeIterator<iterator, X, Y>;
   using const_transpose_iterator = TransposeIterator<const_iterator, X, Y>;
 
@@ -255,12 +257,16 @@ public:
 
   constexpr auto begin() noexcept -> iterator { return data_.begin(); }
   constexpr auto end() noexcept -> iterator { return data_.end(); }
-  constexpr auto begin() const noexcept -> const_iterator { return data_.begin(); }
-  constexpr auto end() const noexcept -> const_iterator { return data_.end(); }
+  [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return data_.begin(); }
+  [[nodiscard]] constexpr auto end() const noexcept -> const_iterator { return data_.end(); }
   constexpr auto tbegin() noexcept -> transpose_iterator { return transpose_iterator(begin(), 0); }
   constexpr auto tend() noexcept -> transpose_iterator { return transpose_iterator(begin(), X * Y); }
-  constexpr auto tbegin() const noexcept -> const_transpose_iterator { return const_transpose_iterator(begin(), 0); }
-  constexpr auto tend() const noexcept -> const_transpose_iterator { return const_transpose_iterator(begin(), X * Y); }
+  [[nodiscard]] constexpr auto tbegin() const noexcept -> const_transpose_iterator {
+    return const_transpose_iterator(begin(), 0);
+  }
+  [[nodiscard]] constexpr auto tend() const noexcept -> const_transpose_iterator {
+    return const_transpose_iterator(begin(), X * Y);
+  }
 
   constexpr auto operator[](std::size_t i) const noexcept -> value_type {
     assert(i < X * Y);
@@ -291,13 +297,13 @@ public:
     }
     return m;
   }
-  constexpr auto row(std::size_t y) const noexcept -> Matrix<X, 1, value_type> {
+  [[nodiscard]] constexpr auto row(std::size_t y) const noexcept -> Matrix<X, 1, value_type> {
     assert(y < Y);
     Matrix<X, 1, value_type> m{};
     std::copy(begin() + y * X, begin() + (y + 1) * X, m.begin());
     return m;
   }
-  constexpr auto col(std::size_t x) const noexcept -> Matrix<1, Y, value_type> {
+  [[nodiscard]] constexpr auto col(std::size_t x) const noexcept -> Matrix<1, Y, value_type> {
     assert(x < X);
     Matrix<1, Y, value_type> m;
     for (std::size_t i = 0; i < Y; ++i) {
@@ -363,7 +369,7 @@ public:
 private:
   static constexpr auto splat(std::array<std::array<value_type, X>, Y> const &m) noexcept
       -> std::array<value_type, X * Y> {
-    std::array<value_type, X * Y> result;
+    std::array<value_type, X * Y> result{};
     for (std::size_t i = 0; i < X * Y; ++i) {
       result[i] = m[i / X][i % X];
     }
@@ -484,7 +490,7 @@ template <typename T> constexpr auto cross(vector<3, T> const &a, vector<3, T> c
 
 template <std::size_t N, typename T> constexpr auto det(Matrix<N, N, T> const &a) noexcept -> T {
   T res{};
-  m_inds<N - 1> rows = iota<N - 1>() + 1;
+  m_inds<N - 1> const rows = iota<N - 1>() + 1;
   m_inds<N - 1> cols = iota<N - 1>() + 1;
   for (std::size_t i = 0; i < N; ++i) {
     T sign = T{1} - 2 * (i % 2);
@@ -532,7 +538,7 @@ template <std::size_t N, typename T> constexpr auto inv(Matrix<N, N, T> const &a
   for (std::size_t x = 0; x < N; ++x) {
     m_inds<N - 1> rows = iota<N - 1>() + 1;
     for (std::size_t y = 0; y < N; ++y) {
-      Matrix<N - 1, N - 1, T> minor = a[cols, rows];
+      Matrix<N - 1, N - 1, T> const minor = a[cols, rows];
       auto d = det(minor);
       auto sign = T{1} - 2 * ((x + y) % 2);
       auto adj = sign * d;
@@ -551,7 +557,7 @@ template <std::size_t N, typename T> constexpr auto inv(Matrix<N, N, T> const &a
 template <typename T> constexpr auto inv(Matrix<3, 3, T> const &a) noexcept -> Matrix<3, 3, T> {
   assert(invertible(a));
   // clang-format off
-  Matrix<3, 3, T> adj {
+  Matrix<3, 3, T> const adj {
     {a[1, 1] * a[2, 2] - a[2, 1] * a[1, 2],   a[2, 0] * a[1, 2] - a[1, 0] * a[2, 2],   a[1, 0] * a[2, 1] - a[2, 0] * a[1, 1]},
     {a[2, 1] * a[0, 2] - a[0, 1] * a[2, 2],   a[0, 0] * a[2, 2] - a[2, 0] * a[0, 2],   a[2, 0] * a[0, 1] - a[0, 0] * a[2, 1]},
     {a[0, 1] * a[1, 2] - a[1, 1] * a[0, 2],   a[1, 0] * a[0, 2] - a[0, 0] * a[1, 2],   a[0, 0] * a[1, 1] - a[1, 0] * a[0, 1]},
@@ -562,7 +568,7 @@ template <typename T> constexpr auto inv(Matrix<3, 3, T> const &a) noexcept -> M
 
 template <typename T> constexpr auto inv(Matrix<2, 2, T> const &a) noexcept -> Matrix<2, 2, T> {
   assert(invertible(a));
-  Matrix<2, 2, T> adj{{a[1, 1], -a[1, 0]}, {-a[0, 1], a[0, 0]}};
+  Matrix<2, 2, T> const adj{{a[1, 1], -a[1, 0]}, {-a[0, 1], a[0, 0]}};
   return adj / det(a);
 }
 
@@ -582,5 +588,6 @@ auto operator<<(std::ostream &os, Matrix<X, Y, T> const &m) -> std::ostream & {
   return os;
 }
 
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
 // NOLINTEND(readability-identifier-length)
 } // namespace cpp_contests
