@@ -23,7 +23,7 @@ export namespace cpp_contests {
 constexpr double kEpsMin = 1e-100;
 constexpr double kEpsMax = 1e-6;
 
-template <std::random_access_iterator Iterator, size_t X, size_t Y> class TransposeIterator final {
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y> class TransposeIterator final {
 public:
   using iterator_type = Iterator;
   using iterator_concept = std::random_access_iterator_tag;
@@ -52,19 +52,19 @@ public:
 
   constexpr auto operator*() const -> reference {
     assert(i_ >= 0);
-    assert(static_cast<size_t>(i_) < X * Y);
+    assert(static_cast<std::size_t>(i_) < X * Y);
     return *it_;
   }
   constexpr auto operator->() const -> pointer
     requires(std::is_pointer_v<Iterator> || requires(Iterator const &it) { it.operator->(); })
   {
     assert(i_ >= 0);
-    assert(static_cast<size_t>(i_) < X * Y);
+    assert(static_cast<std::size_t>(i_) < X * Y);
     return it_.operator->();
   }
   constexpr auto operator[](difference_type n) const -> value_type const & {
     assert(i_ + n >= 0);
-    assert(static_cast<size_t>(i_ + n) < X * Y);
+    assert(static_cast<std::size_t>(i_ + n) < X * Y);
     return *transform(i_ + n);
   }
 
@@ -108,7 +108,7 @@ private:
 
   static constexpr auto transform(Iterator begin, difference_type i_tr) noexcept(noexcept(begin + i_tr)) -> Iterator {
     assert(i_tr >= 0);
-    assert(static_cast<size_t>(i_tr) <= X * Y);
+    assert(static_cast<std::size_t>(i_tr) <= X * Y);
     if (i_tr == X * Y) {
       return begin + i_tr;
     }
@@ -118,7 +118,7 @@ private:
     return begin + i;
   }
 };
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y>
 constexpr auto operator+(TransposeIterator<Iterator, X, Y> const &it,
                          typename TransposeIterator<Iterator, X, Y>::difference_type n)
     -> TransposeIterator<Iterator, X, Y> {
@@ -126,14 +126,14 @@ constexpr auto operator+(TransposeIterator<Iterator, X, Y> const &it,
   tmp += n;
   return tmp;
 }
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y>
 constexpr auto operator+(typename TransposeIterator<Iterator, X, Y>::difference_type n,
                          TransposeIterator<Iterator, X, Y> const &it) -> TransposeIterator<Iterator, X, Y> {
   auto tmp = it;
   tmp += n;
   return tmp;
 }
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y>
 constexpr auto operator-(TransposeIterator<Iterator, X, Y> const &it,
                          typename TransposeIterator<Iterator, X, Y>::difference_type n)
     -> TransposeIterator<Iterator, X, Y> {

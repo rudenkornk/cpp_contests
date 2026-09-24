@@ -73,8 +73,8 @@ private:
     return CallableKind::Method;
   }
 
-  template <class CallableType, size_t... Indices>
-  constexpr static auto generate_function_type(std::integer_sequence<size_t, Indices...>)
+  template <class CallableType, std::size_t... Indices>
+  constexpr static auto generate_function_type(std::integer_sequence<std::size_t, Indices...>)
       -> std::function<typename CallableTraits<CallableType>::return_type(
           typename CallableTraits<CallableType>::template arg_type<Indices>...)>;
 
@@ -83,20 +83,20 @@ private:
   using types = arg_types::types;
 
 public:
-  constexpr static size_t kNTypes = std::tuple_size_v<types>;
-  constexpr static size_t kNArguments = kNTypes - 1;
-  template <size_t N> using type = std::tuple_element_t<N, types>;
-  template <size_t N> using arg_type = std::tuple_element_t<N + 1, types>;
+  constexpr static std::size_t kNTypes = std::tuple_size_v<types>;
+  constexpr static std::size_t kNArguments = kNTypes - 1;
+  template <std::size_t N> using type = std::tuple_element_t<N, types>;
+  template <std::size_t N> using arg_type = std::tuple_element_t<N + 1, types>;
   using return_type = std::tuple_element_t<0, types>;
   using std_function = decltype(generate_function_type<raw_callable>(std::make_index_sequence<kNArguments>{}));
-  template <size_t N> constexpr static bool kIsLValueReference = std::is_lvalue_reference_v<type<N>>;
-  template <size_t N> constexpr static bool kIsRValueReference = std::is_rvalue_reference_v<type<N>>;
-  template <size_t N> constexpr static bool kIsReference = std::is_reference_v<type<N>>;
-  template <size_t N> constexpr static bool kIsValue = !kIsReference<N> && !std::is_void_v<type<N>>;
-  template <size_t N> constexpr static bool kIsConst = std::is_const_v<std::remove_reference_t<type<N>>>;
+  template <std::size_t N> constexpr static bool kIsLValueReference = std::is_lvalue_reference_v<type<N>>;
+  template <std::size_t N> constexpr static bool kIsRValueReference = std::is_rvalue_reference_v<type<N>>;
+  template <std::size_t N> constexpr static bool kIsReference = std::is_reference_v<type<N>>;
+  template <std::size_t N> constexpr static bool kIsValue = !kIsReference<N> && !std::is_void_v<type<N>>;
+  template <std::size_t N> constexpr static bool kIsConst = std::is_const_v<std::remove_reference_t<type<N>>>;
   constexpr static bool kIsCallableConst = arg_types::kIsCallableConst;
 
-  template <size_t N>
+  template <std::size_t N>
   constexpr static auto forward(std::add_lvalue_reference_t<std::remove_reference_t<type<N>>> arg) noexcept
       -> decltype(auto) {
     if constexpr (kIsValue<N> || kIsRValueReference<N>) {

@@ -17,35 +17,35 @@ namespace {
 // Keep the sliding-window state and its advance operation in one place.
 // NOLINTNEXTLINE(readability-function-size)
 auto solution() -> void {
-  size_t n_epochs = 0;
-  size_t m_arts = 0;
+  std::size_t n_epochs = 0;
+  std::size_t m_arts = 0;
 
   std::cin >> n_epochs >> m_arts;
 
-  std::vector<uint64_t> arts(n_epochs * m_arts);
-  for (size_t i = 0; i < n_epochs * m_arts; ++i) {
+  std::vector<std::uint64_t> arts(n_epochs * m_arts);
+  for (std::size_t i = 0; i < n_epochs * m_arts; ++i) {
     std::cin >> arts[i];
   }
 
   // a[EPOCH * num_arts + i_art]
 
-  std::vector<std::pair<uint64_t, size_t>> tagged(m_arts * n_epochs);
-  auto indexed = std::ranges::views::zip(arts, std::views::iota(size_t{0}));
+  std::vector<std::pair<std::uint64_t, std::size_t>> tagged(m_arts * n_epochs);
+  auto indexed = std::ranges::views::zip(arts, std::views::iota(std::size_t{0}));
 
-  std::ranges::transform(indexed, tagged.begin(), [m_arts](auto &&pair) -> std::pair<uint64_t, size_t> {
+  std::ranges::transform(indexed, tagged.begin(), [m_arts](auto &&pair) -> std::pair<std::uint64_t, std::size_t> {
     auto [art, idx] = pair;
     return {art, idx / m_arts};
   });
 
   std::ranges::sort(tagged);
 
-  std::vector<size_t> epoch_counters(n_epochs);
+  std::vector<std::size_t> epoch_counters(n_epochs);
 
   // ------------  Initialization block. -------------------
-  std::set<size_t> seen_epochs;
+  std::set<std::size_t> seen_epochs;
 
-  size_t begin_ptr = 0;
-  size_t end_ptr = -1;
+  std::size_t begin_ptr = 0;
+  std::size_t end_ptr = -1;
   while (seen_epochs.size() < n_epochs) {
     ++end_ptr;
     const auto &[art, epoch] = tagged[end_ptr];
@@ -53,10 +53,10 @@ auto solution() -> void {
     seen_epochs.insert(epoch);
   }
 
-  size_t optimal_begin = begin_ptr;
-  size_t optimal_end = end_ptr;
-  uint64_t optimal_score = -1;
-  size_t last_being_art = -1;
+  std::size_t optimal_begin = begin_ptr;
+  std::size_t optimal_end = end_ptr;
+  std::uint64_t optimal_score = -1;
+  std::size_t last_being_art = -1;
   // ----------- Compute block. -------------------
 
   auto advance = [&]() -> bool {
@@ -91,7 +91,7 @@ auto solution() -> void {
   };
 
   while (advance()) {
-    const uint64_t score = tagged[end_ptr].first - tagged[begin_ptr].first;
+    const std::uint64_t score = tagged[end_ptr].first - tagged[begin_ptr].first;
     if (score < optimal_score) {
       optimal_score = score;
       optimal_begin = begin_ptr;
@@ -100,7 +100,7 @@ auto solution() -> void {
   }
 
   seen_epochs.clear();
-  for (size_t i = optimal_begin; i <= optimal_end; ++i) {
+  for (std::size_t i = optimal_begin; i <= optimal_end; ++i) {
     const auto &[art, epoch] = tagged[i];
 
     if (seen_epochs.contains(epoch)) {
