@@ -22,7 +22,7 @@ import :type_traits;
 
 export namespace cpp_contests {
 
-inline auto size_to_string(size_t size) -> std::string {
+inline auto size_to_string(std::size_t size) -> std::string {
   constexpr std::array<std::string_view, 8> units = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"};
   constexpr std::size_t base = 1024;
   if (size == 0) {
@@ -51,9 +51,9 @@ inline auto size_to_string(size_t size) -> std::string {
   return std::format("{:.1f} {}", result, units[tier]);
 }
 
-template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
-  auto indices = std::array<size_t, N>();
-  std::iota(indices.begin(), indices.end(), size_t{0});
+template <std::size_t N> inline auto get_indices() -> std::array<std::size_t, N> {
+  auto indices = std::array<std::size_t, N>();
+  std::iota(indices.begin(), indices.end(), std::size_t{0});
   return indices;
 }
 
@@ -73,7 +73,7 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &index) {
   {
     // A valid permutation maps onto every index in [0, size) exactly once.
     // Validate on a copy: mutating checks (e.g. std::unique) would corrupt perm on violation.
-    auto indices = std::vector<size_t>(perm.size());
+    auto indices = std::vector<std::size_t>(perm.size());
     std::ranges::transform(perm, indices.begin(), index);
     std::ranges::sort(indices);
     assert(std::ranges::adjacent_find(indices) == indices.end());
@@ -85,15 +85,15 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &index) {
   }
 #endif // !NDEBUG
 
-  auto &&control = std::vector<size_t>(vec.size());
-  std::ranges::iota(control, size_t{0});
-  for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
+  auto &&control = std::vector<std::size_t>(vec.size());
+  std::ranges::iota(control, std::size_t{0});
+  for (auto i = std::size_t{0}, end = vec.size(); i != end; ++i) {
     while (index(perm[i]) != i) {
       swap(control[i], control[index(perm[i])]);
       swap(perm[i], perm[index(perm[i])]);
     }
   }
-  for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
+  for (auto i = std::size_t{0}, end = vec.size(); i != end; ++i) {
     while (control[i] != i) {
       swap(vec[i], vec[control[i]]);
       swap(perm[i], perm[control[i]]);
@@ -107,13 +107,14 @@ template <typename Vector, typename VectorIndexers> void permute(Vector &vec, Ve
 }
 
 template <typename Vector, typename Comparator>
-auto get_sort_permutation(Vector const &vec, Comparator const &cmp) -> std::vector<size_t> {
-  auto permutation = std::views::iota(size_t{0}, vec.size()) | std::ranges::to<std::vector>();
-  std::ranges::sort(permutation, [&](size_t index0, size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
+auto get_sort_permutation(Vector const &vec, Comparator const &cmp) -> std::vector<std::size_t> {
+  auto permutation = std::views::iota(std::size_t{0}, vec.size()) | std::ranges::to<std::vector>();
+  std::ranges::sort(permutation,
+                    [&](std::size_t index0, std::size_t index1) -> auto { return cmp(vec[index0], vec[index1]); });
   return permutation;
 }
 
-template <typename Vector> auto get_sort_permutation(Vector const &vec) -> std::vector<size_t> {
+template <typename Vector> auto get_sort_permutation(Vector const &vec) -> std::vector<std::size_t> {
   return get_sort_permutation(vec, std::less<>{});
 }
 
@@ -122,12 +123,12 @@ template <typename Generator = std::mt19937, unsigned Seed = 0> auto get_random_
   return generator;
 }
 
-template <size_t NRuns = 1, typename FG, typename... Args>
+template <std::size_t NRuns = 1, typename FG, typename... Args>
 auto benchmark(FG const &func, Args &&...args) -> std::chrono::nanoseconds {
   static_assert(NRuns > 0);
   static_assert(CallableTraits<FG>::kNArguments == sizeof...(args));
   auto start = std::chrono::steady_clock::now();
-  for (auto i = size_t{1}; i < NRuns; ++i) {
+  for (auto i = std::size_t{1}; i < NRuns; ++i) {
     // Arguments may only be forwarded on the last run: moving from them more than once would be a bug.
     func(args...);
   }
@@ -177,12 +178,12 @@ template <typename T> void swap(SaveRestore<T> &left, SaveRestore<T> &right) noe
 
 // Save exceptions in multithreading environment
 class ExceptionSaver final {
-  std::atomic<size_t> n_captured_exceptions_ = 0;
-  std::atomic<size_t> n_saved_exceptions_ = 0;
+  std::atomic<std::size_t> n_captured_exceptions_ = 0;
+  std::atomic<std::size_t> n_saved_exceptions_ = 0;
   std::vector<std::exception_ptr> exceptions_;
 
 public:
-  explicit ExceptionSaver(size_t max_exceptions = 1) { exceptions_.resize(max_exceptions); }
+  explicit ExceptionSaver(std::size_t max_exceptions = 1) { exceptions_.resize(max_exceptions); }
   ExceptionSaver(ExceptionSaver const &) = delete;
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
   auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
@@ -192,8 +193,8 @@ public:
   }
   ~ExceptionSaver() noexcept(false) { rethrow(); }
 
-  [[nodiscard]] auto ncaptured() const noexcept -> size_t { return n_captured_exceptions_; }
-  [[nodiscard]] auto nsaved() const noexcept -> size_t { return n_saved_exceptions_; }
+  [[nodiscard]] auto ncaptured() const noexcept -> std::size_t { return n_captured_exceptions_; }
+  [[nodiscard]] auto nsaved() const noexcept -> std::size_t { return n_saved_exceptions_; }
 
   void swap(ExceptionSaver &other) noexcept {
     using std::swap;
@@ -212,7 +213,7 @@ public:
 
   void rethrow() {
 #ifndef NDEBUG
-    for (auto i = size_t{0}, end = exceptions_.size(); i != end; ++i) {
+    for (auto i = std::size_t{0}, end = exceptions_.size(); i != end; ++i) {
       assert(static_cast<bool>(exceptions_[i]) == (i < n_saved_exceptions_));
     }
 #endif // !NDEBUG
@@ -233,11 +234,11 @@ public:
     }
 #endif // !NDEBUG
   }
-  void set_max_exceptions(size_t max_exceptions) { exceptions_.resize(max_exceptions); }
+  void set_max_exceptions(std::size_t max_exceptions) { exceptions_.resize(max_exceptions); }
 
 private:
   void save_current_exception() noexcept {
-    size_t const index = n_captured_exceptions_++;
+    std::size_t const index = n_captured_exceptions_++;
     if (index >= exceptions_.size()) {
       return;
     }
@@ -251,8 +252,8 @@ private:
     }
   }
 
-  template <class Callable, size_t... Indices>
-  auto wrap(Callable callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
+  template <class Callable, std::size_t... Indices>
+  auto wrap(Callable callable, std::integer_sequence<std::size_t, Indices...> /*unused*/) {
     using return_type = CallableTraits<Callable>::return_type;
     // The callable is captured by value: capturing by reference would dangle for the common
     // `saver.wrap([...]{...})` pattern where the argument is a temporary.

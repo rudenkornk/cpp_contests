@@ -27,7 +27,7 @@ export namespace cpp_contests {
 
 template <std::size_t N> using matrix_indices = std::array<std::size_t, N>;
 
-template <std::random_access_iterator Iterator, size_t X, size_t Y> class MatrixIterator final {
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y> class MatrixIterator final {
 public:
   using iterator_type = Iterator;
   using iterator_concept = std::random_access_iterator_tag;
@@ -174,14 +174,14 @@ private:
     return begin + (row + (col * real_y));
   }
 };
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y>
 constexpr auto operator+(MatrixIterator<Iterator, X, Y> const &it,
                          typename MatrixIterator<Iterator, X, Y>::difference_type n) -> MatrixIterator<Iterator, X, Y> {
   auto tmp = it;
   tmp += n;
   return tmp;
 }
-template <std::random_access_iterator Iterator, size_t X, size_t Y>
+template <std::random_access_iterator Iterator, std::size_t X, std::size_t Y>
 constexpr auto operator+(typename MatrixIterator<Iterator, X, Y>::difference_type n,
                          MatrixIterator<Iterator, X, Y> const &it) -> MatrixIterator<Iterator, X, Y> {
   return it + n;
