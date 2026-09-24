@@ -1,0 +1,11 @@
+add_executable(min_max_arrays_tests)
+target_sources(min_max_arrays_tests PRIVATE test.cpp)
+
+target_link_libraries(min_max_arrays_tests PRIVATE utils)
+target_link_libraries(min_max_arrays_tests PRIVATE Boost::headers)
+add_dependencies(min_max_arrays_tests min_max_arrays_cli)
+
+target_allow_instrumentation(min_max_arrays_tests)
+target_allow_coding_standards(min_max_arrays_tests)
+
+add_tests(min_max_arrays_tests)
