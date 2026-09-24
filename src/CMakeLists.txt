@@ -1,6 +1,7 @@
 add_subdirectory(artifacts)
 add_subdirectory(geometry)
 add_subdirectory(k_max)
+add_subdirectory(longest_alternating_seq)
 add_subdirectory(lru_cache)
 add_subdirectory(min_max_arrays)
 add_subdirectory(missing_numbers)

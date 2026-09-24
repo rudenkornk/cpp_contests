@@ -1,0 +1,11 @@
+add_executable(longest_alternating_seq_tests)
+target_sources(longest_alternating_seq_tests PRIVATE test.cpp)
+
+target_link_libraries(longest_alternating_seq_tests PRIVATE utils)
+target_link_libraries(longest_alternating_seq_tests PRIVATE Boost::headers)
+add_dependencies(longest_alternating_seq_tests longest_alternating_seq_cli)
+
+target_allow_instrumentation(longest_alternating_seq_tests)
+target_allow_coding_standards(longest_alternating_seq_tests)
+
+add_tests(longest_alternating_seq_tests)
