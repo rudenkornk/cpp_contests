@@ -15,8 +15,8 @@
       };
 
       nativeBuildInputs = with pkgs; [
-        clang
-        gcc15
+        clang_22
+        gcc_latest
 
         cmake
         ninja
