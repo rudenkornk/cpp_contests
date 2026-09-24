@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <cassert>
 #include <cstddef>
@@ -13,7 +13,7 @@
 
 import reverse_list;
 
-using cpp_contests::list_node;
+using cpp_contests::ListNode;
 using cpp_contests::reverse_list;
 
 // NOLINTBEGIN(readability-identifier-length)
@@ -21,11 +21,11 @@ using cpp_contests::reverse_list;
 namespace {
 void test_reverse_list(std::initializer_list<int> init) {
   // Use vector as container to avoid memory leaks
-  std::vector<list_node<int>> container;
+  std::vector<ListNode<int>> container;
   std::size_t n = init.size();
   container.reserve(n);
 
-  list_node<int> *head = nullptr;
+  ListNode<int> *head = nullptr;
   for (int const it : std::ranges::reverse_view(init)) {
     container.emplace_back(it, head);
     head = &container.back();
@@ -37,14 +37,14 @@ void test_reverse_list(std::initializer_list<int> init) {
   auto *it = head;
   auto reference_it = reference_list.begin();
   while (n-- != 0 && it != nullptr) {
-    assert(it->data_ == *reference_it);
-    it = it->next_;
+    assert(it->data == *reference_it);
+    it = it->next;
     ++reference_it;
   }
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(main_test) {
+BOOST_AUTO_TEST_CASE(MainTest) {
   test_reverse_list({});
   test_reverse_list({0});
   test_reverse_list({0, 1, 2, 3, 4});

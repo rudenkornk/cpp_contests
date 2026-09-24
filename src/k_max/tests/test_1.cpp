@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <vector>
 
@@ -11,7 +11,7 @@ import k_max;
 
 using cpp_contests::k_max;
 
-BOOST_AUTO_TEST_CASE(main_test) {
+BOOST_AUTO_TEST_CASE(MainTest) {
   BOOST_TEST((std::vector{5} == k_max({5}, 1)));
   BOOST_TEST((std::vector{0, 1, 2, 3, 4} == k_max({0, 1, 2, 3, 4}, 1)));
   BOOST_TEST((std::vector{4, 3, 2, 1, 0} == k_max({4, 3, 2, 1, 0}, 1)));

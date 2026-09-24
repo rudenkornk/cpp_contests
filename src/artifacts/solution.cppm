@@ -14,6 +14,8 @@ module;
 export module artifacts;
 
 namespace {
+// Keep the sliding-window state and its advance operation in one place.
+// NOLINTNEXTLINE(readability-function-size)
 auto solution() -> void {
   size_t n_epochs = 0;
   size_t m_arts = 0;

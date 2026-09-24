@@ -7,7 +7,7 @@ export module utils:math;
 
 export namespace cpp_contests {
 
-namespace details_ {
+namespace details {
 // See https://gist.github.com/alexshtf/eb5128b3e3e143187794
 // NOLINTNEXTLINE(misc-no-recursion)
 auto constexpr sqrt_newton(double val, double curr, double prev) -> double {
@@ -18,7 +18,7 @@ auto constexpr sqrt_newton(double val, double curr, double prev) -> double {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
   return sqrt_newton(val, 0.5 * (curr + val / curr), curr);
 }
-} // namespace details_
+} // namespace details
 
 auto constexpr sqrt(double val) -> double {
   if !consteval {
@@ -35,7 +35,7 @@ auto constexpr sqrt(double val) -> double {
     return val;
   }
 
-  return details_::sqrt_newton(val, val, 0);
+  return details::sqrt_newton(val, val, 0);
 }
 
 } // namespace cpp_contests

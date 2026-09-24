@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Artifacts
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <algorithm>
 #include <cctype>
@@ -28,7 +28,7 @@ auto run_artifacts(std::string const &input) -> std::string {
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(cli_integration_tests) {
+BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   std::string input;
 
   // Test 1: trivial single artifact.

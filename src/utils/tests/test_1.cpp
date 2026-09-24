@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Utils
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <cstddef>
 #include <cstdlib>
@@ -16,7 +16,7 @@ import utils;
 
 using cpp_contests::size_to_string;
 
-BOOST_AUTO_TEST_CASE(size_to_string_test) {
+BOOST_AUTO_TEST_CASE(SizeToStringTest) {
   BOOST_TEST(size_to_string(std::size_t{0}) == "0 B");
   BOOST_TEST(size_to_string(std::size_t{1}) == "1 B");
   BOOST_TEST(size_to_string(std::size_t{1024}) == "1 KiB");
@@ -44,9 +44,9 @@ constexpr auto sqrt_check() -> bool {
   const double start = 1e-6;
   const double mult = 1.1;
   const double eps = 1e-7;
-  const std::size_t N_iter = 300;
+  const std::size_t n_iter = 300;
   bool result = true;
-  for (std::size_t i = 0; i < N_iter; ++i) {
+  for (std::size_t i = 0; i < n_iter; ++i) {
     double const curr = pow2(mult, i) * start;
     double const res = cpp_contests::sqrt(curr * curr);
     double const diff = res - curr;
@@ -57,9 +57,9 @@ constexpr auto sqrt_check() -> bool {
 
 } // namespace
 
-BOOST_AUTO_TEST_CASE(sqrt_test) { static_assert(sqrt_check()); }
+BOOST_AUTO_TEST_CASE(SqrtTest) { static_assert(sqrt_check()); }
 
-BOOST_AUTO_TEST_CASE(sqrt_special_values) {
+BOOST_AUTO_TEST_CASE(SqrtSpecialValues) {
   constexpr double inf = std::numeric_limits<double>::infinity();
   constexpr double perfect_square = 4.0;
   constexpr double its_root = 2.0;
@@ -75,46 +75,44 @@ BOOST_AUTO_TEST_CASE(sqrt_special_values) {
   BOOST_TEST(cpp_contests::sqrt(perfect_square) == its_root);
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_basic) {
+BOOST_AUTO_TEST_CASE(RunShellBasic) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("echo hello");
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out == "hello\n");
   BOOST_TEST(err.empty());
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_stdin) {
+BOOST_AUTO_TEST_CASE(RunShellStdin) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("cat", "world\n");
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out == "world\n");
   BOOST_TEST(err.empty());
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_exit_code) {
+BOOST_AUTO_TEST_CASE(RunShellExitCode) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("false", "", {}, {}, {}, false);
   BOOST_TEST(exit_code == 1);
   (void)out;
   (void)err;
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_check_throws) {
-  BOOST_CHECK_THROW(cpp_contests::run_shell("false"), std::runtime_error);
-}
+BOOST_AUTO_TEST_CASE(RunShellCheckThrows) { BOOST_CHECK_THROW(cpp_contests::run_shell("false"), std::runtime_error); }
 
-BOOST_AUTO_TEST_CASE(run_shell_extra_env) {
+BOOST_AUTO_TEST_CASE(RunShellExtraEnv) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'echo $MY_VAR'", "", {{"MY_VAR", "hello_env"}});
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out == "hello_env\n");
   BOOST_TEST(err.empty());
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_stderr) {
+BOOST_AUTO_TEST_CASE(RunShellStderr) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'echo errline >&2'", "", {}, {}, {}, false);
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out.empty());
   BOOST_TEST(err == "errline\n");
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_quoted_args) {
+BOOST_AUTO_TEST_CASE(RunShellQuotedArgs) {
   auto const &[exit_code, out, err] = cpp_contests::run_shell("echo \"hello world\"");
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out == "hello world\n");
@@ -123,41 +121,41 @@ BOOST_AUTO_TEST_CASE(run_shell_quoted_args) {
 
 namespace {
 // Well above the typical 64 KiB pipe capacity: stresses the poll()-based multiplexer.
-constexpr std::size_t large_io_size = std::size_t{1} << 20U;
+constexpr std::size_t kLargeIoSize = std::size_t{1} << 20U;
 } // namespace
 
-BOOST_AUTO_TEST_CASE(run_shell_large_roundtrip) {
+BOOST_AUTO_TEST_CASE(RunShellLargeRoundtrip) {
   // A sequential write-then-read implementation deadlocks here: the child echoes data back
   // while run_shell is still feeding stdin.
-  auto const input = std::string(large_io_size, 'x');
+  auto const input = std::string(kLargeIoSize, 'x');
   auto const &[exit_code, out, err] = cpp_contests::run_shell("cat", input);
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out.size() == input.size());
   BOOST_TEST(err.empty());
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_large_interleaved_output) {
+BOOST_AUTO_TEST_CASE(RunShellLargeInterleavedOutput) {
   // Both streams exceed the pipe capacity: deadlocks unless stdout and stderr are drained concurrently.
   auto const command =
-      std::format(R"(sh -c 'head -c {0} /dev/zero | tr "\0" a; head -c {0} /dev/zero | tr "\0" b >&2')", large_io_size);
+      std::format(R"(sh -c 'head -c {0} /dev/zero | tr "\0" a; head -c {0} /dev/zero | tr "\0" b >&2')", kLargeIoSize);
   auto const &[exit_code, out, err] = cpp_contests::run_shell(command);
   BOOST_TEST(exit_code == 0);
-  BOOST_TEST(out.size() == large_io_size);
-  BOOST_TEST(err.size() == large_io_size);
+  BOOST_TEST(out.size() == kLargeIoSize);
+  BOOST_TEST(err.size() == kLargeIoSize);
   BOOST_TEST(out.front() == 'a');
   BOOST_TEST(err.front() == 'b');
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_child_ignores_stdin) {
+BOOST_AUTO_TEST_CASE(RunShellChildIgnoresStdin) {
   // The child exits without reading: run_shell must survive EPIPE/SIGPIPE instead of dying.
-  auto const input = std::string(large_io_size, 'x');
+  auto const input = std::string(kLargeIoSize, 'x');
   auto const &[exit_code, out, err] = cpp_contests::run_shell("true", input);
   BOOST_TEST(exit_code == 0);
   BOOST_TEST(out.empty());
   BOOST_TEST(err.empty());
 }
 
-BOOST_AUTO_TEST_CASE(run_shell_signal_exit_code) {
+BOOST_AUTO_TEST_CASE(RunShellSignalExitCode) {
   // Signal deaths follow the shell convention: 128 + signal number (SIGTERM == 15).
   auto const &[exit_code, out, err] = cpp_contests::run_shell("sh -c 'kill -TERM $$'", "", {}, {}, {}, false);
   BOOST_TEST(exit_code == 128 + 15);

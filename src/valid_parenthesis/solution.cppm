@@ -16,46 +16,22 @@ export namespace cpp_contests {
 
 class Solution {
 public:
-  static auto isValid(std::string const &seq) -> bool {
+  static auto is_valid(std::string const &seq) -> bool {
     auto p_stack = std::stack<char>{};
     for (auto chr : seq) {
-      switch (chr) {
-      case '(':
-      case '[':
-      case '{':
+      if (chr == '(' || chr == '[' || chr == '{') {
         p_stack.push(chr);
-        break;
-      case ')':
-        if (p_stack.empty()) {
-          return false;
-        }
-        if (p_stack.top() != '(') {
-          return false;
-        }
-        p_stack.pop();
-        break;
-      case ']':
-        if (p_stack.empty()) {
-          return false;
-        }
-        if (p_stack.top() != '[') {
-          return false;
-        }
-        p_stack.pop();
-        break;
-      case '}':
-        if (p_stack.empty()) {
-          return false;
-        }
-        if (p_stack.top() != '{') {
-          return false;
-        }
-        p_stack.pop();
-        break;
-      default:
-        assert(false);
-        break;
+        continue;
       }
+      assert(chr == ')' || chr == ']' || chr == '}');
+      if (p_stack.empty()) {
+        return false;
+      }
+      auto top = p_stack.top();
+      if ((chr == ')' && top != '(') || (chr == ']' && top != '[') || (chr == '}' && top != '{')) {
+        return false;
+      }
+      p_stack.pop();
     }
     return p_stack.empty();
   }
@@ -77,7 +53,7 @@ auto run(std::span<char *> args) -> int {
   }
   std::string parens{};
   input >> parens;
-  std::println("{:d}", cpp_contests::Solution::isValid(parens));
+  std::println("{:d}", cpp_contests::Solution::is_valid(parens));
   return 0;
 }
 } // namespace

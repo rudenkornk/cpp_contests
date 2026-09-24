@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <cstdlib>
 #include <filesystem>
@@ -43,7 +43,7 @@ auto run_cli_test(std::string const &file_content) -> bool {
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(cli_integration_tests) {
+BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST(run_cli_test("()") == true);
   BOOST_TEST(run_cli_test("()[]{}") == true);
   BOOST_TEST(run_cli_test("(]") == false);

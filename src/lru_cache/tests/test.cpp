@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@ auto run_cli_test(std::string const &input) -> int {
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(library_function_tests) {
+BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST(lru_hits({}, 0, 0) == 0);
   BOOST_TEST(lru_hits({1}, 0, 0) == 0);
   BOOST_TEST(lru_hits({1, 2, 3, 4, 5}, 0, 0) == 0);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(library_function_tests) {
   BOOST_TEST(lru_hits({1, 2, 3, 1, 2, 4, 5, 1, 7, 3, 2, 6, 1, 2}, 4 * sizeof(int), 0) == 4);
 }
 
-BOOST_AUTO_TEST_CASE(cli_integration_tests) {
+BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST(run_cli_test("0 0\n") == 0);
   BOOST_TEST(run_cli_test("0 1 1\n") == 0);
   BOOST_TEST(run_cli_test("0 5 1 2 3 4 5\n") == 0);
