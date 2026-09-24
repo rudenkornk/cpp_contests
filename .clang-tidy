@@ -16,9 +16,13 @@ Checks: >
   -portability-avoid-pragma-once,
 
   -misc-include-cleaner,
+  -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,
   -readability-redundant-declaration
 
 # Notes regarding disabled warnings:
+# cppcoreguidelines-pro-bounds-avoid-unchecked-container-access does not attempt to prove bounds safety.
+# It ignores assertions and bounds guards and provides no annotation for expressing such guarantees.
+#
 # altera-*, fuchsia-*, linuxkernel-*, llvm-*, llvmlibc-* are mostly designed for their own codebases (or, for altera,
 # FPGA HLS), restricting normal C++ features.
 # We disable them, since this is a generic C++ code.

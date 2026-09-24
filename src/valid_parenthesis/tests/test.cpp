@@ -41,7 +41,6 @@ auto run_cli_test(std::string const &file_content) -> bool {
   iss >> result;
   return result != 0;
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST(run_cli_test("()") == true);
@@ -58,3 +57,4 @@ BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST(run_cli_test("(())") == true);
   BOOST_TEST(run_cli_test("(()())") == true);
 }
+} // namespace

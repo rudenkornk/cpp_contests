@@ -24,42 +24,42 @@ private:
 
   template <typename CallableType> struct FunctionArgTypes;
   template <typename CallableType, typename... Args> struct FunctionArgTypes<CallableType(Args...)> {
-    using types = typename std::tuple<CallableType, Args...>;
+    using types = std::tuple<CallableType, Args...>;
   };
   template <typename CallableAddress> struct LambdaOrMethodArgTypes;
   template <typename CallableAddress, typename Result, typename... Args>
   struct LambdaOrMethodArgTypes<Result (CallableAddress::*)(Args...) const> {
-    using types = typename std::tuple<Result, Args...>;
+    using types = std::tuple<Result, Args...>;
     auto constexpr static kIsCallableConst = true;
   };
   template <typename CallableAddress, typename Result, typename... Args>
   struct LambdaOrMethodArgTypes<Result (CallableAddress::*)(Args...) const noexcept> {
-    using types = typename std::tuple<Result, Args...>;
+    using types = std::tuple<Result, Args...>;
     constexpr static auto kIsCallableConst = true;
   };
   template <typename CallableAddress, typename Result, typename... Args>
   struct LambdaOrMethodArgTypes<Result (CallableAddress::*)(Args...)> {
-    using types = typename std::tuple<Result, Args...>;
+    using types = std::tuple<Result, Args...>;
     constexpr static auto kIsCallableConst = false;
   };
   template <typename CallableAddress, typename Result, typename... Args>
   struct LambdaOrMethodArgTypes<Result (CallableAddress::*)(Args...) noexcept> {
-    using types = typename std::tuple<Result, Args...>;
+    using types = std::tuple<Result, Args...>;
     constexpr static auto kIsCallableConst = false;
   };
 
   template <typename CallableType, CallableKind> struct ArgTypes_;
   template <typename CallableType> struct ArgTypes_<CallableType, CallableKind::Function> {
-    using types = typename FunctionArgTypes<CallableType>::types;
+    using types = FunctionArgTypes<CallableType>::types;
     constexpr static auto kIsCallableConst = true;
   };
   template <typename CallableType> struct ArgTypes_<CallableType, CallableKind::Lambda> {
-    using types = typename LambdaOrMethodArgTypes<decltype(&CallableType::operator())>::types;
+    using types = LambdaOrMethodArgTypes<decltype(&CallableType::operator())>::types;
     constexpr static auto kIsCallableConst =
         LambdaOrMethodArgTypes<decltype(&CallableType::operator())>::kIsCallableConst;
   };
   template <typename CallableType> struct ArgTypes_<CallableType, CallableKind::Method> {
-    using types = typename LambdaOrMethodArgTypes<CallableType>::types;
+    using types = LambdaOrMethodArgTypes<CallableType>::types;
     constexpr static auto kIsCallableConst = LambdaOrMethodArgTypes<CallableType>::kIsCallableConst;
   };
 
@@ -78,9 +78,9 @@ private:
       -> std::function<typename CallableTraits<CallableType>::return_type(
           typename CallableTraits<CallableType>::template arg_type<Indices>...)>;
 
-  using raw_callable = typename std::remove_cv_t<std::remove_reference_t<Callable>>;
+  using raw_callable = std::remove_cv_t<std::remove_reference_t<Callable>>;
   using arg_types = ArgTypes_<raw_callable, get_callable_kind<raw_callable>()>;
-  using types = typename arg_types::types;
+  using types = arg_types::types;
 
 public:
   constexpr static size_t kNTypes = std::tuple_size_v<types>;

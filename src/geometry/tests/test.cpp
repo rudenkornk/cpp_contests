@@ -21,6 +21,7 @@ using cpp_contests::point;
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
+namespace {
 BOOST_AUTO_TEST_CASE(MatrixCtorsTest) {
   constexpr std::size_t x = 3;
   constexpr std::size_t y = 2;
@@ -296,5 +297,7 @@ BOOST_AUTO_TEST_CASE(PlaneTest) {
   BOOST_TEST(diff23 < eps);
   BOOST_TEST(diff31 < eps);
 }
+
+} // namespace
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-identifier-length,readability-magic-numbers)

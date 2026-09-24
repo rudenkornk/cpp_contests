@@ -23,6 +23,7 @@ using cpp_contests::TestArgsFixture;
 
 BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
+namespace {
 BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({})));
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({2})));
@@ -33,7 +34,6 @@ BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST((std::pair(2U, 5U) == missing_numbers({7, 4, 1, 0, 3, 6, 9, 11, 10, 8})));
 }
 
-namespace {
 auto run_cli_test(std::string const &file_content) -> std::pair<unsigned, unsigned> {
   auto content_hash = std::hash<std::string>{}(file_content);
   auto temp_path =
@@ -56,9 +56,9 @@ auto run_cli_test(std::string const &file_content) -> std::pair<unsigned, unsign
   iss >> first >> second;
   return {first, second};
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST((std::pair(0U, 1U) == run_cli_test("")));
   BOOST_TEST((std::pair(2U, 5U) == run_cli_test("7 4 1 0 3 6")));
 }
+} // namespace

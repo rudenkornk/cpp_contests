@@ -17,7 +17,7 @@ export namespace cpp_contests {
 template <typename Key, typename Value, std::invocable<Key> Load> class TwoQueueCache final {
   using cold_list = std::queue<Key>;
   using hot_list = std::list<Key>;
-  using hot_position = typename hot_list::const_iterator;
+  using hot_position = hot_list::const_iterator;
 
   static constexpr double kColdInRatio = 0.25;
   static constexpr double kColdOutRatio = 0.5;
@@ -43,7 +43,7 @@ public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   TwoQueueCache(Load const &load, std::size_t max_size_in_bytes, std::size_t override_value_size = sizeof(Value))
       : load_(load), max_size_(max_size_in_bytes), value_size_(override_value_size),
-        max_length_(static_cast<std::size_t>(max_size_ / (value_size_ + kKeySize * (1 + kColdOutRatio)))),
+        max_length_(static_cast<std::size_t>(max_size_ / (value_size_ + (kKeySize * (1 + kColdOutRatio))))),
         cold_in_max_length_(static_cast<std::size_t>(max_length_ * kColdInRatio)),
         cold_out_max_length_(static_cast<std::size_t>(max_length_ * kColdOutRatio)),
         hot_max_length_(max_length_ - cold_in_max_length_) {}

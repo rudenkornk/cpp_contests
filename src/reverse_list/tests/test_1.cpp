@@ -42,12 +42,12 @@ void test_reverse_list(std::initializer_list<int> init) {
     ++reference_it;
   }
 }
-} // namespace
 
 BOOST_AUTO_TEST_CASE(MainTest) {
   test_reverse_list({});
   test_reverse_list({0});
   test_reverse_list({0, 1, 2, 3, 4});
 }
+} // namespace
 
 // NOLINTEND(readability-identifier-length)

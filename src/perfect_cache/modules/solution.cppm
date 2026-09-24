@@ -55,7 +55,7 @@ auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
     }
 
     auto const nextpos = positions.at(key).empty() ? keys.size() : positions.at(key).back();
-    auto const res = fartherst_keys.insert({key, nextpos});
+    auto const res = fartherst_keys.insert({.key = key, .nextpos = nextpos});
     assert(res.second);
     cache.insert_or_assign(key, res.first);
     if (cache.size() > max_length) {

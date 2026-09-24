@@ -75,6 +75,11 @@ function(add_code_coverage_test)
 endfunction()
 
 function(add_tests TARGET)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 22)
+    # Boost.Test expands __COUNTER__ in test declarations, which Clang 22 diagnoses under -pedantic.
+    target_compile_options(${TARGET} PRIVATE -Wno-c2y-extensions)
+  endif()
+
   set(options)
   set(oneValueArgs)
   set(multiValueArgs COMMAND_ARGUMENTS)

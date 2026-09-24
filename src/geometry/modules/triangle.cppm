@@ -70,7 +70,7 @@ constexpr auto complanar_intersection(Triangle const &t, Line const &l) -> std::
     if (!intersection) {
       continue;
     }
-    result[j] = intersection.value();
+    result[j] = *intersection;
     ++j;
   }
   assert(j == 0 || j == 2 || j == 3);
@@ -107,7 +107,7 @@ constexpr auto intersection(Triangle const &t1, Triangle const &t2) noexcept -> 
     return std::nullopt;
   }
 
-  auto intersection = intersection_opt.value();
+  auto intersection = *intersection_opt;
   auto i1 = complanar_intersection(t1, intersection);
   if (!i1) {
     return std::nullopt;
@@ -118,10 +118,10 @@ constexpr auto intersection(Triangle const &t1, Triangle const &t2) noexcept -> 
   }
 
   using std::swap;
-  auto s1 = intersection.param(i1.value().s);
-  auto e1 = intersection.param(i1.value().e);
-  auto s2 = intersection.param(i2.value().s);
-  auto e2 = intersection.param(i2.value().e);
+  auto s1 = intersection.param(i1->s);
+  auto e1 = intersection.param(i1->e);
+  auto s2 = intersection.param(i2->s);
+  auto e2 = intersection.param(i2->e);
   if (s1 > e1) {
     swap(s1, e1);
   }

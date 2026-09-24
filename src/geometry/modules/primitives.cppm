@@ -160,8 +160,8 @@ constexpr auto intersection(Plane const &p1, Plane const &p2) noexcept -> std::o
   auto d1 = p1.dist();
   auto d2 = p2.dist();
   auto nn = dot(p1.normal(), p2.normal());
-  auto c1 = (d1 - d2 * nn) / (1 - nn * nn);
-  auto c2 = (d2 - d1 * nn) / (1 - nn * nn);
+  auto c1 = (d1 - (d2 * nn)) / (1 - (nn * nn));
+  auto c2 = (d2 - (d1 * nn)) / (1 - (nn * nn));
   auto r0 = (c1 * p1.normal()) + (c2 * p2.normal());
   auto r = cross(p1.normal(), p2.normal());
   return Line{r0, r};
@@ -185,7 +185,7 @@ constexpr auto complanar_intersection(Segment const &s, Line const &l) noexcept 
     return std::nullopt;
   }
 
-  auto param = seg.param(intersection.value());
+  auto param = seg.param(*intersection);
   if (0.0 <= param && param <= n(s.e - s.s)) {
     return intersection;
   }
@@ -208,7 +208,7 @@ constexpr auto complanar_intersection(Segment const &s1, Segment const &s2) noex
     return std::nullopt;
   }
 
-  assert(n(i1.value() - i2.value()) <= kEpsMax * n(i1.value()));
+  assert(n(*i1 - *i2) <= kEpsMax * n(*i1));
   return i1;
 }
 
