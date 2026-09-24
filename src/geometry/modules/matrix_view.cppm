@@ -25,7 +25,7 @@ import utils;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
-template <std::size_t N> using MatrixIndices = std::array<std::size_t, N>;
+template <std::size_t N> using matrix_indices = std::array<std::size_t, N>;
 
 template <std::random_access_iterator Iterator, size_t X, size_t Y> class MatrixIterator final {
 public:
@@ -38,8 +38,8 @@ public:
   using reference = typename std::iter_reference_t<Iterator>;
   static_assert(std::is_signed_v<difference_type>);
 
-  static constexpr std::size_t size_x = X;
-  static constexpr std::size_t size_y = Y;
+  static constexpr std::size_t kSizeX = X;
+  static constexpr std::size_t kSizeY = Y;
 
 private:
   Iterator begin_;
@@ -48,19 +48,21 @@ private:
   bool transposed_ = false;
   std::size_t real_x_ = X;
   std::size_t real_y_ = Y;
-  MatrixIndices<X> cols_ = get_indices<X>();
-  MatrixIndices<Y> rows_ = get_indices<Y>();
+  matrix_indices<X> cols_ = get_indices<X>();
+  matrix_indices<Y> rows_ = get_indices<Y>();
 
 public:
   // clang-format off
+  // The iterator constructor mirrors the underlying view's state.
+  // NOLINTNEXTLINE(readability-function-size)
   constexpr explicit MatrixIterator(
       Iterator begin,
       difference_type i,
       bool transposed,
       std::size_t real_x,
       std::size_t real_y,
-      MatrixIndices<X> cols,
-      MatrixIndices<Y> rows
+      matrix_indices<X> cols,
+      matrix_indices<Y> rows
     ) noexcept(std::is_nothrow_move_constructible_v<Iterator>)
       : begin_(std::move(begin)),
         i_(i),
@@ -89,7 +91,7 @@ public:
     return *it_;
   }
   constexpr auto operator->() const -> pointer
-    requires(std::is_pointer_v<Iterator> || requires(Iterator const i) { i.operator->(); })
+    requires(std::is_pointer_v<Iterator> || requires(Iterator const &it) { it.operator->(); })
   {
     assert(i_ >= 0 && i_ < X * Y);
     return it_.operator->();
@@ -139,8 +141,8 @@ public:
     return lhs.i_ <=> rhs.i_;
   }
 
-  [[nodiscard]] constexpr auto rows() const noexcept -> MatrixIndices<Y> const & { return rows_; }
-  [[nodiscard]] constexpr auto cols() const noexcept -> MatrixIndices<X> const & { return cols_; }
+  [[nodiscard]] constexpr auto rows() const noexcept -> matrix_indices<Y> const & { return rows_; }
+  [[nodiscard]] constexpr auto cols() const noexcept -> matrix_indices<X> const & { return cols_; }
   constexpr auto begin() const noexcept -> Iterator { return begin_; }
   [[nodiscard]] constexpr auto real_x() const noexcept -> std::size_t { return real_x_; }
   [[nodiscard]] constexpr auto real_y() const noexcept -> std::size_t { return real_y_; }
@@ -151,9 +153,10 @@ private:
     return transform(begin_, i, transposed_, real_x_, real_y_, cols_, rows_);
   }
 
+  // NOLINTNEXTLINE(readability-function-size)
   static constexpr auto transform(Iterator begin, difference_type i, bool transposed, std::size_t real_x,
-                                  std::size_t real_y, MatrixIndices<X> const &cols,
-                                  MatrixIndices<Y> const &rows) noexcept -> Iterator {
+                                  std::size_t real_y, matrix_indices<X> const &cols,
+                                  matrix_indices<Y> const &rows) noexcept -> Iterator {
     assert(i >= 0 && i <= X * Y);
 
     if (i == X * Y) {
@@ -198,16 +201,16 @@ template <std::size_t X, std::size_t Y, typename T>
 class Matrix final {
 public:
   using value_type = T;
-  using Container = std::array<value_type, X * Y>;
-  using iterator = typename Container::iterator;
-  using const_iterator = typename Container::const_iterator;
+  using container = std::array<value_type, X * Y>;
+  using iterator = typename container::iterator;
+  using const_iterator = typename container::const_iterator;
 
-  static constexpr std::size_t size_x = X;
-  static constexpr std::size_t size_y = Y;
-  static constexpr std::size_t size = X * Y;
+  static constexpr std::size_t kSizeX = X;
+  static constexpr std::size_t kSizeY = Y;
+  static constexpr std::size_t kSize = X * Y;
 
 private:
-  Container data_;
+  container data_;
 
 public:
   constexpr Matrix() noexcept { data_.fill(value_type{}); }
@@ -230,11 +233,11 @@ public:
 private:
   static constexpr auto splat(std::array<std::array<value_type, X>, Y> const &m) noexcept
       -> std::array<value_type, X * Y> {
-    std::array<value_type, X * Y> m_;
+    std::array<value_type, X * Y> result;
     for (std::size_t i = 0; i < X * Y; ++i) {
-      m_[i] = m[i / X][i % X];
+      result[i] = m[i / X][i % X];
     }
-    return m_;
+    return result;
   }
 };
 
@@ -242,11 +245,11 @@ template <std::size_t X, std::size_t Y, typename T>
   requires(X > 0 && Y > 0)
 class MatrixView final {
 private:
-  using MI = typename Matrix<X, Y, T>::iterator;
+  using mi = typename Matrix<X, Y, T>::iterator;
 
 public:
   using value_type = T;
-  using iterator = MatrixIterator<MI, X, Y>;
+  using iterator = MatrixIterator<mi, X, Y>;
 
 private:
   iterator begin_;
@@ -255,7 +258,7 @@ public:
   constexpr explicit MatrixView(Matrix<X, Y, value_type> &m) noexcept : begin_(m.begin()) {}
 
   template <std::size_t XR, std::size_t YR>
-  constexpr auto operator()(MatrixIndices<XR> cols, MatrixIndices<XR> rows) const noexcept -> MatrixView<XR, YR, T> {
+  constexpr auto operator()(matrix_indices<XR> cols, matrix_indices<XR> rows) const noexcept -> MatrixView<XR, YR, T> {
     return MatrixView<XR, YR, T>(begin_, std::move(cols), std::move(rows), false);
   }
 
@@ -317,18 +320,19 @@ public:
 
 private:
   template <std::size_t XR, std::size_t YR>
-  constexpr MatrixView(MatrixIterator<MI, XR, YR> const &mi, MatrixIndices<X> &&cols, MatrixIndices<Y> &&rows) noexcept
-      : begin_(mi.begin(), 0, transpose, mi.real_x(), mi.real_y(), reindex(mi.cols(), std::move(cols)),
-               reindex(mi.rows(), std::move(rows))) {}
+  constexpr MatrixView(MatrixIterator<mi, XR, YR> const &it, matrix_indices<X> &&cols,
+                       matrix_indices<Y> &&rows) noexcept
+      : begin_(it.begin(), 0, transpose, it.real_x(), it.real_y(), reindex(it.cols(), std::move(cols)),
+               reindex(it.rows(), std::move(rows))) {}
 
-  constexpr MatrixView(MatrixIterator<MI, Y, X> const &mi, bool /*unused*/) noexcept
-      : begin_(mi.begin(), 0, !mi.transposed(), mi.real_y(), mi.real_x(), MatrixIndices<Y>(mi.cols()),
-               MatrixIndices<X>(mi.rows())) {}
+  constexpr MatrixView(MatrixIterator<mi, Y, X> const &it, bool /*unused*/) noexcept
+      : begin_(it.begin(), 0, !it.transposed(), it.real_y(), it.real_x(), matrix_indices<Y>(it.cols()),
+               matrix_indices<X>(it.rows())) {}
 
   template <std::size_t N, std::size_t M>
-  static constexpr auto reindex(MatrixIndices<M> const &original, MatrixIndices<N> const &permutation) noexcept
-      -> MatrixIndices<N> {
-    MatrixIndices<N> indices;
+  static constexpr auto reindex(matrix_indices<M> const &original, matrix_indices<N> const &permutation) noexcept
+      -> matrix_indices<N> {
+    matrix_indices<N> indices;
     for (std::size_t i = 0; i < N; ++i) {
       indices[i] = original[permutation[i]];
     }

@@ -58,12 +58,12 @@ template <std::size_t N> inline auto get_indices() -> std::array<size_t, N> {
 }
 
 template <typename Vector, typename VectorIndexers, typename IndexFunction>
-void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
-  using T = typename Vector::value_type;
-  using Indexer = typename VectorIndexers::value_type;
-  static_assert(std::is_nothrow_swappable_v<T>);
-  static_assert(std::is_nothrow_swappable_v<Indexer>);
-  static_assert(std::is_nothrow_invocable_v<IndexFunction, Indexer>);
+void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &index) {
+  using value_type = typename Vector::value_type;
+  using indexer = typename VectorIndexers::value_type;
+  static_assert(std::is_nothrow_swappable_v<value_type>);
+  static_assert(std::is_nothrow_swappable_v<indexer>);
+  static_assert(std::is_nothrow_invocable_v<IndexFunction, indexer>);
   using std::swap;
   assert(vec.size() == perm.size());
   if (vec.size() == 0) {
@@ -74,13 +74,13 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
     // A valid permutation maps onto every index in [0, size) exactly once.
     // Validate on a copy: mutating checks (e.g. std::unique) would corrupt perm on violation.
     auto indices = std::vector<size_t>(perm.size());
-    std::ranges::transform(perm, indices.begin(), Index);
+    std::ranges::transform(perm, indices.begin(), index);
     std::ranges::sort(indices);
     assert(std::ranges::adjacent_find(indices) == indices.end());
     assert(indices.front() == 0);
     assert(indices.back() == perm.size() - 1);
   }
-  if constexpr (std::is_same_v<T, Indexer>) {
+  if constexpr (std::is_same_v<value_type, indexer>) {
     assert(&vec != &perm);
   }
 #endif // !NDEBUG
@@ -88,9 +88,9 @@ void permute(Vector &vec, VectorIndexers &perm, IndexFunction const &Index) {
   auto &&control = std::vector<size_t>(vec.size());
   std::ranges::iota(control, size_t{0});
   for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
-    while (Index(perm[i]) != i) {
-      swap(control[i], control[Index(perm[i])]);
-      swap(perm[i], perm[Index(perm[i])]);
+    while (index(perm[i]) != i) {
+      swap(control[i], control[index(perm[i])]);
+      swap(perm[i], perm[index(perm[i])]);
     }
   }
   for (auto i = size_t{0}, end = vec.size(); i != end; ++i) {
@@ -117,21 +117,21 @@ template <typename Vector> auto get_sort_permutation(Vector const &vec) -> std::
   return get_sort_permutation(vec, std::less<>{});
 }
 
-template <typename Generator = std::mt19937, unsigned seed = 0> auto get_random_generator() -> Generator & {
-  auto static thread_local generator = Generator{seed};
+template <typename Generator = std::mt19937, unsigned Seed = 0> auto get_random_generator() -> Generator & {
+  auto static thread_local generator = Generator{Seed};
   return generator;
 }
 
 template <size_t NRuns = 1, typename FG, typename... Args>
-auto benchmark(FG const &Func, Args &&...args) -> std::chrono::nanoseconds {
+auto benchmark(FG const &func, Args &&...args) -> std::chrono::nanoseconds {
   static_assert(NRuns > 0);
-  static_assert(CallableTraits<FG>::nArguments == sizeof...(args));
+  static_assert(CallableTraits<FG>::kNArguments == sizeof...(args));
   auto start = std::chrono::steady_clock::now();
   for (auto i = size_t{1}; i < NRuns; ++i) {
     // Arguments may only be forwarded on the last run: moving from them more than once would be a bug.
-    Func(args...);
+    func(args...);
   }
-  Func(std::forward<Args>(args)...);
+  func(std::forward<Args>(args)...);
   auto end = std::chrono::steady_clock::now();
   return (end - start) / NRuns;
 }
@@ -139,16 +139,16 @@ auto benchmark(FG const &Func, Args &&...args) -> std::chrono::nanoseconds {
 template <typename T> class SaveRestore final {
   static_assert(std::is_nothrow_move_assignable_v<T>);
   static_assert(!std::is_reference_v<T>);
-  T originalValue;
-  T *restoreTo = nullptr;
+  T original_value_;
+  T *restore_to_ = nullptr;
 
 public:
   explicit SaveRestore(T &value) noexcept(std::is_nothrow_copy_constructible_v<T>)
-      : originalValue{std::as_const(value)}, restoreTo{&value} {}
+      : original_value_{std::as_const(value)}, restore_to_{&value} {}
   explicit SaveRestore(T &&value) noexcept(std::is_nothrow_move_constructible_v<T>)
-      : originalValue{std::move(value)}, restoreTo{&value} {}
-  explicit SaveRestore(T &&value, T &restoreTo) noexcept(std::is_nothrow_move_constructible_v<T>)
-      : originalValue{std::move(value)}, restoreTo{&restoreTo} {}
+      : original_value_{std::move(value)}, restore_to_{&value} {}
+  explicit SaveRestore(T &&value, T &restore_to) noexcept(std::is_nothrow_move_constructible_v<T>)
+      : original_value_{std::move(value)}, restore_to_{&restore_to} {}
 
   SaveRestore(SaveRestore const &) = delete;
   SaveRestore(SaveRestore &&other) noexcept { swap(other); }
@@ -161,14 +161,14 @@ public:
   void swap(SaveRestore &other) noexcept {
     static_assert(std::is_nothrow_swappable_v<T>);
     using std::swap;
-    swap(restoreTo, other.restoreTo);
-    swap(originalValue, other.originalValue);
+    swap(restore_to_, other.restore_to_);
+    swap(original_value_, other.original_value_);
   }
 
   ~SaveRestore() {
-    // Moved-from objects have restoreTo == nullptr and nothing to restore.
-    if (restoreTo != nullptr) {
-      *restoreTo = std::move(originalValue);
+    // Moved-from objects have no target to restore.
+    if (restore_to_ != nullptr) {
+      *restore_to_ = std::move(original_value_);
     }
   }
 };
@@ -177,12 +177,12 @@ template <typename T> void swap(SaveRestore<T> &left, SaveRestore<T> &right) noe
 
 // Save exceptions in multithreading environment
 class ExceptionSaver final {
-  std::atomic<size_t> nCapturedExceptions = 0;
-  std::atomic<size_t> nSavedExceptions = 0;
-  std::vector<std::exception_ptr> exceptions;
+  std::atomic<size_t> n_captured_exceptions_ = 0;
+  std::atomic<size_t> n_saved_exceptions_ = 0;
+  std::vector<std::exception_ptr> exceptions_;
 
 public:
-  explicit ExceptionSaver(size_t maxExceptions = 1) { exceptions.resize(maxExceptions); }
+  explicit ExceptionSaver(size_t max_exceptions = 1) { exceptions_.resize(max_exceptions); }
   ExceptionSaver(ExceptionSaver const &) = delete;
   ExceptionSaver(ExceptionSaver &&other) noexcept { swap(other); }
   auto operator=(ExceptionSaver const &) -> ExceptionSaver & = delete;
@@ -192,69 +192,78 @@ public:
   }
   ~ExceptionSaver() noexcept(false) { rethrow(); }
 
-  [[nodiscard]] auto ncaptured() const noexcept -> size_t { return nCapturedExceptions; }
-  [[nodiscard]] auto nsaved() const noexcept -> size_t { return nSavedExceptions; }
+  [[nodiscard]] auto ncaptured() const noexcept -> size_t { return n_captured_exceptions_; }
+  [[nodiscard]] auto nsaved() const noexcept -> size_t { return n_saved_exceptions_; }
 
   void swap(ExceptionSaver &other) noexcept {
     using std::swap;
-    nCapturedExceptions = other.nCapturedExceptions.exchange(nCapturedExceptions);
-    nSavedExceptions = other.nSavedExceptions.exchange(nSavedExceptions);
-    swap(exceptions, other.exceptions);
+    n_captured_exceptions_ = other.n_captured_exceptions_.exchange(n_captured_exceptions_);
+    n_saved_exceptions_ = other.n_saved_exceptions_.exchange(n_saved_exceptions_);
+    swap(exceptions_, other.exceptions_);
   }
 
   // Wraps callable in a thread-save wrapper
   template <typename Callable> auto wrap(Callable &&callable) {
-    using ReturnType = typename CallableTraits<Callable>::template Type<0>;
-    static_assert(std::is_void_v<ReturnType> ||
-                  (std::is_nothrow_default_constructible_v<ReturnType> && !std::is_reference_v<ReturnType>));
-    return wrap_(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::nArguments>{});
+    using return_type = typename CallableTraits<Callable>::template type<0>;
+    static_assert(std::is_void_v<return_type> ||
+                  (std::is_nothrow_default_constructible_v<return_type> && !std::is_reference_v<return_type>));
+    return wrap(std::forward<Callable>(callable), std::make_index_sequence<CallableTraits<Callable>::kNArguments>{});
   }
 
   void rethrow() {
 #ifndef NDEBUG
-    for (auto i = size_t{0}, end = exceptions.size(); i != end; ++i) {
-      assert(static_cast<bool>(exceptions[i]) == (i < nSavedExceptions));
+    for (auto i = size_t{0}, end = exceptions_.size(); i != end; ++i) {
+      assert(static_cast<bool>(exceptions_[i]) == (i < n_saved_exceptions_));
     }
 #endif // !NDEBUG
-    if (nSavedExceptions == 0U) {
+    if (n_saved_exceptions_ == 0U) {
       return;
     }
     using std::swap;
     auto exc = std::exception_ptr{};
-    swap(exc, exceptions[--nSavedExceptions]);
+    swap(exc, exceptions_[--n_saved_exceptions_]);
     std::rethrow_exception(exc);
   }
   void drop() noexcept {
-    std::fill_n(exceptions.begin(), nSavedExceptions.load(), std::exception_ptr{});
-    nSavedExceptions = 0;
+    std::fill_n(exceptions_.begin(), n_saved_exceptions_.load(), std::exception_ptr{});
+    n_saved_exceptions_ = 0;
 #ifndef NDEBUG
-    for (auto &&ptr : exceptions) {
+    for (auto &&ptr : exceptions_) {
       assert(!ptr);
     }
 #endif // !NDEBUG
   }
-  void set_max_exceptions(size_t max_exceptions) { exceptions.resize(max_exceptions); }
+  void set_max_exceptions(size_t max_exceptions) { exceptions_.resize(max_exceptions); }
 
 private:
+  void save_current_exception() noexcept {
+    size_t const index = n_captured_exceptions_++;
+    if (index >= exceptions_.size()) {
+      return;
+    }
+    ++n_saved_exceptions_;
+    exceptions_[index] = std::current_exception();
+  }
+
+  template <typename Result> static auto empty_result() -> Result {
+    if constexpr (!std::is_void_v<Result>) {
+      return Result{};
+    }
+  }
+
   template <class Callable, size_t... Indices>
-  auto wrap_(Callable callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
-    using ReturnType = typename CallableTraits<Callable>::ReturnType;
+  auto wrap(Callable callable, std::integer_sequence<size_t, Indices...> /*unused*/) {
+    using return_type = typename CallableTraits<Callable>::return_type;
     // The callable is captured by value: capturing by reference would dangle for the common
     // `saver.wrap([...]{...})` pattern where the argument is a temporary.
     // The saver itself must outlive the wrapper, hence capturing `this` is fine.
     return [this, callable = std::move(callable)](
-               typename CallableTraits<Callable>::template ArgType<Indices>... args) noexcept -> auto {
+               typename CallableTraits<Callable>::template arg_type<Indices>... args) noexcept -> auto {
       try {
-        return callable(std::forward<typename CallableTraits<Callable>::template ArgType<Indices>>(args)...);
+        return callable(std::forward<typename CallableTraits<Callable>::template arg_type<Indices>>(args)...);
       } catch (...) {
-        size_t const index = nCapturedExceptions++;
-        if (index < exceptions.size()) {
-          ++nSavedExceptions;
-          exceptions[index] = std::current_exception();
-        }
-        if constexpr (!std::is_void_v<ReturnType>) {
-          return ReturnType{};
-        }
+        save_current_exception();
+        return empty_result<return_type>();
       }
     };
   }

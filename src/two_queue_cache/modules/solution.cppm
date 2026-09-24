@@ -15,17 +15,17 @@ export module two_queue_cache;
 export namespace cpp_contests {
 
 template <typename Key, typename Value, std::invocable<Key> Load> class TwoQueueCache final {
-  using ColdList = std::queue<Key>;
-  using HotList = std::list<Key>;
-  using HotPosition = typename HotList::const_iterator;
+  using cold_list = std::queue<Key>;
+  using hot_list = std::list<Key>;
+  using hot_position = typename hot_list::const_iterator;
 
-  static constexpr double cold_in_ratio_ = 0.25;
-  static constexpr double cold_out_ratio_ = 0.5;
-  static constexpr double hot_ratio_ = 1 - cold_in_ratio_;
+  static constexpr double kColdInRatio = 0.25;
+  static constexpr double kColdOutRatio = 0.5;
+  static constexpr double kHotRatio = 1 - kColdInRatio;
 
   Load load_;
   std::size_t max_size_;
-  static constexpr std::size_t key_size_ = sizeof(Key);
+  static constexpr std::size_t kKeySize = sizeof(Key);
   std::size_t value_size_;
   std::size_t max_length_;
   std::size_t cold_in_max_length_;
@@ -33,19 +33,19 @@ template <typename Key, typename Value, std::invocable<Key> Load> class TwoQueue
   std::size_t hot_max_length_;
 
   std::unordered_map<Key, Value> data_;
-  std::unordered_map<Key, HotPosition> hot_positions_;
+  std::unordered_map<Key, hot_position> hot_positions_;
   std::unordered_set<Key> cold_out_set_;
-  ColdList cold_in_;
-  ColdList cold_out_;
-  HotList hot_;
+  cold_list cold_in_;
+  cold_list cold_out_;
+  hot_list hot_;
 
 public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   TwoQueueCache(Load const &load, std::size_t max_size_in_bytes, std::size_t override_value_size = sizeof(Value))
       : load_(load), max_size_(max_size_in_bytes), value_size_(override_value_size),
-        max_length_(static_cast<std::size_t>(max_size_ / (value_size_ + key_size_ * (1 + cold_out_ratio_)))),
-        cold_in_max_length_(static_cast<std::size_t>(max_length_ * cold_in_ratio_)),
-        cold_out_max_length_(static_cast<std::size_t>(max_length_ * cold_out_ratio_)),
+        max_length_(static_cast<std::size_t>(max_size_ / (value_size_ + kKeySize * (1 + kColdOutRatio)))),
+        cold_in_max_length_(static_cast<std::size_t>(max_length_ * kColdInRatio)),
+        cold_out_max_length_(static_cast<std::size_t>(max_length_ * kColdOutRatio)),
         hot_max_length_(max_length_ - cold_in_max_length_) {}
 
   // Forbid all copies and moves, since storing references inside class fields

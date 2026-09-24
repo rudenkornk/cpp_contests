@@ -90,9 +90,9 @@ struct Pipe {
 
 enum class ShellState : std::uint8_t { Normal, SingleQuote, DoubleQuote };
 
-constexpr int EXIT_CODE_DUP2_FAILED = 125;
-constexpr int EXIT_CODE_CHDIR_FAILED = 126;
-constexpr int EXIT_CODE_EXEC_FAILED = 127;
+constexpr int kExitCodeDup2Failed = 125;
+constexpr int kExitCodeChdirFailed = 126;
+constexpr int kExitCodeExecFailed = 127;
 
 // Returns true and advances idx past the escaped character if a backslash escape was consumed.
 inline auto handle_normal_escape(std::string_view cmd, std::size_t &idx, std::string &current) -> bool {
@@ -146,6 +146,14 @@ inline auto handle_doublequote_char(std::string_view cmd, std::size_t &idx, std:
   return ShellState::DoubleQuote;
 }
 
+inline auto handle_singlequote_char(char chr, std::string &current) -> ShellState {
+  if (chr == '\'') {
+    return ShellState::Normal;
+  }
+  current += chr;
+  return ShellState::SingleQuote;
+}
+
 // Minimal shlex-style split: handles single/double quotes and backslash escapes.
 inline auto shlex_split(std::string_view cmd) -> std::vector<std::string> {
   std::vector<std::string> tokens;
@@ -159,11 +167,7 @@ inline auto shlex_split(std::string_view cmd) -> std::vector<std::string> {
       state = handle_normal_char(cmd, idx, current, tokens);
       break;
     case ShellState::SingleQuote:
-      if (chr == '\'') {
-        state = ShellState::Normal;
-      } else {
-        current += chr;
-      }
+      state = handle_singlequote_char(chr, current);
       break;
     case ShellState::DoubleQuote:
       state = handle_doublequote_char(cmd, idx, current);
@@ -176,8 +180,8 @@ inline auto shlex_split(std::string_view cmd) -> std::vector<std::string> {
   return tokens;
 }
 
-constexpr std::size_t PIPE_READ_BUF_SIZE = 4096;
-constexpr int EXIT_CODE_SIGNAL_BASE = 128; // Shell convention: report signal death as 128 + signal number.
+constexpr std::size_t kPipeReadBufSize = 4096;
+constexpr int kExitCodeSignalBase = 128; // Shell convention: report signal death as 128 + signal number.
 
 // Temporarily ignore SIGPIPE so that writing to an already-exited child yields EPIPE
 // instead of killing the whole process. The disposition is process-wide, which is
@@ -211,17 +215,17 @@ inline void set_nonblocking(int fdesc) {
 // POSIX poll() exposes its event flags as a signed `short` bitmask.
 // Pre-combine the masks we test as `unsigned`, and widen `revents` to `int` at the boundary,
 // so the checks below avoid signed-bitwise pitfalls.
-constexpr unsigned POLL_READABLE =
+constexpr unsigned kPollReadable =
     static_cast<unsigned>(POLLIN) | static_cast<unsigned>(POLLHUP) | static_cast<unsigned>(POLLERR);
-constexpr unsigned POLL_WRITABLE = static_cast<unsigned>(POLLOUT) | static_cast<unsigned>(POLLERR);
+constexpr unsigned kPollWritable = static_cast<unsigned>(POLLOUT) | static_cast<unsigned>(POLLERR);
 
 [[nodiscard]] inline auto flag_set(int revents, unsigned mask) -> bool {
   return (static_cast<unsigned>(revents) & mask) != 0;
 }
 
 // Read whatever is ready from pipe into result; close the read end on EOF.
-inline void drain_pipe(Pipe &pipe, std::string &result, int revents, std::array<char, PIPE_READ_BUF_SIZE> &buf) {
-  if (!flag_set(revents, POLL_READABLE)) {
+inline void drain_pipe(Pipe &pipe, std::string &result, int revents, std::array<char, kPipeReadBufSize> &buf) {
+  if (!flag_set(revents, kPollReadable)) {
     return;
   }
   ssize_t const num_bytes = ::read(pipe.read_end(), buf.data(), buf.size());
@@ -237,7 +241,7 @@ inline void drain_pipe(Pipe &pipe, std::string &result, int revents, std::array<
 // Push as much of the remaining stdin_data as the pipe accepts; close the write end once it is drained
 // or the child stopped reading (EPIPE).
 inline void feed_stdin(Pipe &stdin_pipe, std::string_view &stdin_data, int revents) {
-  if (!flag_set(revents, POLL_WRITABLE)) {
+  if (!flag_set(revents, kPollWritable)) {
     return;
   }
   ssize_t const num_bytes = ::write(stdin_pipe.write_end(), stdin_data.data(), stdin_data.size());
@@ -256,6 +260,7 @@ inline void feed_stdin(Pipe &stdin_pipe, std::string_view &stdin_data, int reven
 // Feed stdin_data to the child while draining its stdout and stderr, multiplexed with poll().
 // A sequential write-then-read implementation deadlocks once the child fills a pipe buffer
 // (typically 64 KiB) with output before consuming all of its input, or vice versa.
+// NOLINTNEXTLINE(readability-function-size)
 inline void pump_pipes(Pipe &stdin_pipe, std::string_view stdin_data, Pipe &stdout_pipe, std::string &stdout_result,
                        Pipe &stderr_pipe, std::string &stderr_result) {
   set_nonblocking(stdin_pipe.write_end());
@@ -265,7 +270,7 @@ inline void pump_pipes(Pipe &stdin_pipe, std::string_view stdin_data, Pipe &stdo
     stdin_pipe.close_end(1);
   }
 
-  std::array<char, PIPE_READ_BUF_SIZE> buf{};
+  std::array<char, kPipeReadBufSize> buf{};
   while (stdin_pipe.write_end() != -1 || stdout_pipe.read_end() != -1 || stderr_pipe.read_end() != -1) {
     // poll() ignores negative fds, which conveniently matches the closed-end sentinel.
     auto fds = std::array<pollfd, 3>{{{.fd = stdin_pipe.write_end(), .events = POLLOUT, .revents = 0},
@@ -298,27 +303,30 @@ inline auto build_env_map(std::map<std::string, std::string> const &extra_env,
   for (auto const &[key, val] : extra_env) {
     env_map[key] = val;
   }
-  if (!extra_paths.empty()) {
-    std::string path_prefix;
-    for (auto const &extra_path : extra_paths) {
-      if (!path_prefix.empty()) {
-        path_prefix += ':';
-      }
-      path_prefix += extra_path.string();
-    }
-    auto &path_val = env_map["PATH"];
-    if (!path_val.empty()) {
-      path_prefix += ':';
-      path_prefix += path_val;
-    }
-    path_val = std::move(path_prefix);
+  if (extra_paths.empty()) {
+    return env_map;
   }
+  std::string path_prefix;
+  for (auto const &extra_path : extra_paths) {
+    if (!path_prefix.empty()) {
+      path_prefix += ':';
+    }
+    path_prefix += extra_path.string();
+  }
+  auto &path_val = env_map["PATH"];
+  if (!path_val.empty()) {
+    path_prefix += ':';
+    path_prefix += path_val;
+  }
+  path_val = std::move(path_prefix);
   return env_map;
 }
 
 // NOLINTEND(misc-use-internal-linkage)
 } // namespace detail
 
+// Preserve the existing command interface and keep the fork/exec/wait lifecycle together.
+// NOLINTNEXTLINE(readability-function-size)
 export auto run_shell(std::string const &cmd, std::string const &stdin_data = "",
                       std::map<std::string, std::string> const &extra_env = {},
                       std::vector<std::filesystem::path> const &extra_paths = {},
@@ -371,24 +379,24 @@ export auto run_shell(std::string const &cmd, std::string const &stdin_data = ""
     // dup2 clears O_CLOEXEC on the target fd, so child's stdio fds survive exec.
     // The original pipe fds retain O_CLOEXEC and are closed automatically by execvpe.
     if (::dup2(stdin_pipe.read_end(), STDIN_FILENO) < 0) {
-      ::_exit(detail::EXIT_CODE_DUP2_FAILED);
+      ::_exit(detail::kExitCodeDup2Failed);
     }
     if (::dup2(stdout_pipe.write_end(), STDOUT_FILENO) < 0) {
-      ::_exit(detail::EXIT_CODE_DUP2_FAILED);
+      ::_exit(detail::kExitCodeDup2Failed);
     }
     if (::dup2(stderr_pipe.write_end(), STDERR_FILENO) < 0) {
-      ::_exit(detail::EXIT_CODE_DUP2_FAILED);
+      ::_exit(detail::kExitCodeDup2Failed);
     }
 
     if (!cwd.empty() && ::chdir(cwd.c_str()) != 0) {
-      ::_exit(detail::EXIT_CODE_CHDIR_FAILED);
+      ::_exit(detail::kExitCodeChdirFailed);
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     ::execvpe(argv_ptrs[0], const_cast<char *const *>(argv_ptrs.data()),
               // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
               const_cast<char *const *>(envp_ptrs.data()));
-    ::_exit(detail::EXIT_CODE_EXEC_FAILED);
+    ::_exit(detail::kExitCodeExecFailed);
   }
 
   // Parent: close the child-side ends (our copies; child's copies are in stdin/stdout/stderr).
@@ -424,7 +432,7 @@ export auto run_shell(std::string const &cmd, std::string const &stdin_data = ""
   }
   // NOLINTNEXTLINE(misc-include-cleaner)
   int const exit_code = WIFEXITED(wstatus)     ? WEXITSTATUS(wstatus)
-                        : WIFSIGNALED(wstatus) ? detail::EXIT_CODE_SIGNAL_BASE + WTERMSIG(wstatus)
+                        : WIFSIGNALED(wstatus) ? detail::kExitCodeSignalBase + WTERMSIG(wstatus)
                                                : -1;
 
   if (check && exit_code != 0) {

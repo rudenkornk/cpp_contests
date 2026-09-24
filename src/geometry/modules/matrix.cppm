@@ -18,8 +18,8 @@ import utils;
 export namespace cpp_contests {
 // NOLINTBEGIN(readability-identifier-length)
 
-constexpr double EPSMIN = 1e-100;
-constexpr double EPSMAX = 1e-6;
+constexpr double kEpsMin = 1e-100;
+constexpr double kEpsMax = 1e-6;
 
 template <std::random_access_iterator Iterator, size_t X, size_t Y> class TransposeIterator final {
 public:
@@ -54,7 +54,7 @@ public:
     return *it_;
   }
   constexpr auto operator->() const -> pointer
-    requires(std::is_pointer_v<Iterator> || requires(Iterator const i) { i.operator->(); })
+    requires(std::is_pointer_v<Iterator> || requires(Iterator const &it) { it.operator->(); })
   {
     assert(i_ >= 0);
     assert(static_cast<size_t>(i_) < X * Y);
@@ -152,18 +152,18 @@ constexpr auto operator-(TransposeIterator<Iterator, X, Y> const &it,
 template <std::size_t X, std::size_t Y, typename T> class Matrix final {
 public:
   using value_type = T;
-  using Container = std::array<value_type, X * Y>;
-  using iterator = typename Container::iterator;
-  using const_iterator = typename Container::const_iterator;
+  using container = std::array<value_type, X * Y>;
+  using iterator = typename container::iterator;
+  using const_iterator = typename container::const_iterator;
   using transpose_iterator = TransposeIterator<iterator, X, Y>;
   using const_transpose_iterator = TransposeIterator<const_iterator, X, Y>;
 
 private:
-  Container data_;
+  container data_;
 
 public:
   constexpr Matrix() noexcept { data_.fill(value_type{}); }
-  constexpr explicit Matrix(std::array<std::array<value_type, X>, Y> const &m) noexcept : data_(splat_(m)) {}
+  constexpr explicit Matrix(std::array<std::array<value_type, X>, Y> const &m) noexcept : data_(splat(m)) {}
   constexpr explicit Matrix(std::array<value_type, X * Y> m) noexcept : data_(std::move(m)) {}
   constexpr Matrix(std::initializer_list<value_type> m) noexcept {
     assert(m.size() == X * Y);
@@ -198,7 +198,7 @@ public:
           )
   // clang-format on
   constexpr explicit Matrix(Matrices &&...row_like) noexcept {
-    unpack_row_<0, Matrices...>(std::forward<Matrices>(row_like)...);
+    unpack_row<0, Matrices...>(std::forward<Matrices>(row_like)...);
   }
   // clang-format off
   template <typename... Matrices>
@@ -217,33 +217,33 @@ public:
             )
   // clang-format on
   constexpr explicit Matrix(Matrices &&...col_like) noexcept {
-    unpack_col_<0, Matrices...>(std::forward<Matrices>(col_like)...);
+    unpack_col<0, Matrices...>(std::forward<Matrices>(col_like)...);
   }
 
 private:
   template <std::size_t Unpacked, typename MatrixArg, typename... Matrices>
   // NOLINTNEXTLINE(misc-no-recursion,cppcoreguidelines-missing-std-forward)
-  constexpr void unpack_row_(MatrixArg &&row_like, Matrices &&...rest) noexcept {
+  constexpr void unpack_row(MatrixArg &&row_like, Matrices &&...rest) noexcept {
     if constexpr (std::is_rvalue_reference_v<MatrixArg &&>) {
       std::move(row_like.begin(), row_like.end(), begin() + (X * Unpacked));
     } else {
       std::copy(row_like.begin(), row_like.end(), begin() + (X * Unpacked));
     }
-    unpack_row_<Unpacked + std::remove_cvref_t<MatrixArg>::size_y(), Matrices...>(std::forward<Matrices>(rest)...);
+    unpack_row<Unpacked + std::remove_cvref_t<MatrixArg>::size_y(), Matrices...>(std::forward<Matrices>(rest)...);
   }
-  template <std::size_t Unpacked> constexpr void unpack_row_() noexcept {}
+  template <std::size_t Unpacked> constexpr void unpack_row() noexcept {}
 
   template <std::size_t Unpacked, typename MatrixArg, typename... Matrices>
   // NOLINTNEXTLINE(misc-no-recursion,cppcoreguidelines-missing-std-forward)
-  constexpr void unpack_col_(MatrixArg &&col_like, Matrices &&...rest) noexcept {
+  constexpr void unpack_col(MatrixArg &&col_like, Matrices &&...rest) noexcept {
     if constexpr (std::is_rvalue_reference_v<MatrixArg &&>) {
       std::move(col_like.tbegin(), col_like.tend(), tbegin() + (Y * Unpacked));
     } else {
       std::copy(col_like.tbegin(), col_like.tend(), tbegin() + (Y * Unpacked));
     }
-    unpack_col_<Unpacked + std::remove_cvref_t<MatrixArg>::size_x(), Matrices...>(std::forward<Matrices>(rest)...);
+    unpack_col<Unpacked + std::remove_cvref_t<MatrixArg>::size_x(), Matrices...>(std::forward<Matrices>(rest)...);
   }
-  template <std::size_t Unpacked> constexpr void unpack_col_() noexcept {}
+  template <std::size_t Unpacked> constexpr void unpack_col() noexcept {}
 
 public:
   template <std::size_t X2 = X, std::size_t Y2 = Y>
@@ -361,18 +361,18 @@ public:
   }
 
 private:
-  static constexpr auto splat_(std::array<std::array<value_type, X>, Y> const &m) noexcept
+  static constexpr auto splat(std::array<std::array<value_type, X>, Y> const &m) noexcept
       -> std::array<value_type, X * Y> {
-    std::array<value_type, X * Y> m_;
+    std::array<value_type, X * Y> result;
     for (std::size_t i = 0; i < X * Y; ++i) {
-      m_[i] = m[i / X][i % X];
+      result[i] = m[i / X][i % X];
     }
-    return m_;
+    return result;
   }
 };
 
-template <std::size_t N, typename T> using Vector = Matrix<1, N, T>;
-template <std::size_t N> using MInds = Vector<N, std::size_t>;
+template <std::size_t N, typename T> using vector = Matrix<1, N, T>;
+template <std::size_t N> using m_inds = vector<N, std::size_t>;
 
 template <std::size_t X, std::size_t Y, typename T> constexpr auto eye(T v = T{1}) noexcept -> Matrix<X, Y, T> {
   static_assert(X == Y);
@@ -474,9 +474,9 @@ constexpr auto dot(Matrix<X, Y, T> const &a, Matrix<X, Y, T> const &b) noexcept 
   return std::transform_reduce(a.begin(), a.end(), b.begin(), T{});
 }
 
-template <typename T> constexpr auto cross(Vector<3, T> const &a, Vector<3, T> const &b) noexcept -> Vector<3, T> {
+template <typename T> constexpr auto cross(vector<3, T> const &a, vector<3, T> const &b) noexcept -> vector<3, T> {
   // clang-format off
-  return Vector<3, T>{a[1] * b[2] - a[2] * b[1],
+  return vector<3, T>{a[1] * b[2] - a[2] * b[1],
                       a[2] * b[0] - a[0] * b[2],
                       a[0] * b[1] - a[1] * b[0]};
   // clang-format on
@@ -484,8 +484,8 @@ template <typename T> constexpr auto cross(Vector<3, T> const &a, Vector<3, T> c
 
 template <std::size_t N, typename T> constexpr auto det(Matrix<N, N, T> const &a) noexcept -> T {
   T res{};
-  MInds<N - 1> rows = iota<N - 1>() + 1;
-  MInds<N - 1> cols = iota<N - 1>() + 1;
+  m_inds<N - 1> rows = iota<N - 1>() + 1;
+  m_inds<N - 1> cols = iota<N - 1>() + 1;
   for (std::size_t i = 0; i < N; ++i) {
     T sign = T{1} - 2 * (i % 2);
     res += sign * a[i, 0] * det(a[cols, rows]);
@@ -507,7 +507,7 @@ template <typename T> constexpr auto det(Matrix<2, 2, T> const &a) noexcept -> T
 
 template <typename T> constexpr auto det(Matrix<1, 1, T> const &a) noexcept -> T { return a[0, 0]; }
 
-namespace details_ {
+namespace details {
 
 template <typename T, std::size_t N> constexpr auto staticpow(T val) -> T {
   if constexpr (N == 0) {
@@ -516,20 +516,21 @@ template <typename T, std::size_t N> constexpr auto staticpow(T val) -> T {
     return val * staticpow<T, N - 1>(val);
   }
 }
-} // namespace details_
+} // namespace details
 template <std::size_t N, typename T>
-constexpr auto invertible(Matrix<N, N, T> const &a, T eps = T{EPSMIN}) noexcept -> bool {
-  auto det_ = det(a);
-  auto volume = details_::staticpow<T, N>(n(a));
-  return std::abs(det_) > eps * volume;
+constexpr auto invertible(Matrix<N, N, T> const &a, T eps = T{kEpsMin}) noexcept -> bool {
+  auto det = cpp_contests::det(a);
+  auto volume = details::staticpow<T, N>(n(a));
+  return std::abs(det) > eps * volume;
 }
 
+// NOLINTNEXTLINE(readability-function-size)
 template <std::size_t N, typename T> constexpr auto inv(Matrix<N, N, T> const &a) noexcept -> Matrix<N, N, T> {
   assert(invertible(a));
   Matrix<N, N, T> m{};
-  MInds<N - 1> cols = iota<N - 1>() + 1;
+  m_inds<N - 1> cols = iota<N - 1>() + 1;
   for (std::size_t x = 0; x < N; ++x) {
-    MInds<N - 1> rows = iota<N - 1>() + 1;
+    m_inds<N - 1> rows = iota<N - 1>() + 1;
     for (std::size_t y = 0; y < N; ++y) {
       Matrix<N - 1, N - 1, T> minor = a[cols, rows];
       auto d = det(minor);

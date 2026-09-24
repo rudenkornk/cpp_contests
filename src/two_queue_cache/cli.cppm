@@ -31,11 +31,11 @@ auto run() -> int {
     std::println("{}", e.what());
   }
 
-  constexpr std::size_t virtual_value_size_ = std::size_t{1024} * 1024 * 1024;
+  constexpr std::size_t virtual_value_size = std::size_t{1024} * 1024 * 1024;
   constexpr std::size_t key_size = sizeof(int);
 
-  auto two_queue = cpp_contests::two_queue_hits(elements, cache_size * (virtual_value_size_ + (key_size * 3) / 2),
-                                                virtual_value_size_);
+  auto two_queue = cpp_contests::two_queue_hits(elements, cache_size * (virtual_value_size + (key_size * 3) / 2),
+                                                virtual_value_size);
   std::println("{}", two_queue);
   return 0;
 }

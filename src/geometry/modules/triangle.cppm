@@ -18,10 +18,10 @@ export namespace cpp_contests {
 class Triangle final {
 private:
   Plane plane_;
-  std::array<Point, 3> points_;
+  std::array<point, 3> points_;
 
 public:
-  constexpr Triangle(Point p1, Point p2, Point p3) noexcept : plane_(p1, p2, p3), points_({p1, p2, p3}) {
+  constexpr Triangle(point p1, point p2, point p3) noexcept : plane_(p1, p2, p3), points_({p1, p2, p3}) {
 #ifndef NDEBUG
     auto d1 = dist(p1, p2);
     auto d2 = dist(p2, p3);
@@ -30,7 +30,7 @@ public:
 #endif
   }
 
-  [[nodiscard]] constexpr auto operator[](std::size_t i) const noexcept -> Point const & {
+  [[nodiscard]] constexpr auto operator[](std::size_t i) const noexcept -> point const & {
     assert(i < 3);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
     return points_[i];
@@ -38,24 +38,31 @@ public:
   [[nodiscard]] constexpr auto plane() const noexcept -> Plane const & { return plane_; }
 };
 
+constexpr auto intersects_side(Triangle const &triangle, Segment const &side) noexcept -> bool {
+  for (std::size_t j = 0; j < 3; ++j) {
+    auto other = Segment(triangle[j % 3], triangle[(j + 1) % 3]);
+    if (complanar_intersection(side, other)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 constexpr auto complanar_intersects(Triangle const &t1, Triangle const &t2) noexcept -> bool {
-  if (std::abs(t1.plane().dist() - t2.plane().dist()) > EPSMIN) {
+  if (std::abs(t1.plane().dist() - t2.plane().dist()) > kEpsMin) {
     return false;
   }
   for (std::size_t i = 0; i < 3; ++i) {
     auto seg1 = Segment(t1[i % 3], t1[(i + 1) % 3]);
-    for (std::size_t j = 0; j < 3; ++j) {
-      auto seg2 = Segment(t2[j % 3], t2[(j + 1) % 3]);
-      if (complanar_intersection(seg1, seg2)) {
-        return true;
-      }
+    if (intersects_side(t2, seg1)) {
+      return true;
     }
   }
   return false;
 }
 
 constexpr auto complanar_intersection(Triangle const &t, Line const &l) -> std::optional<Segment> {
-  Vector<3, Point> result{};
+  vector<3, point> result{};
   std::size_t j = 0;
   for (std::size_t i = 0; i < 3; ++i) {
     auto side = Segment(t[i % 3], t[(i + 1) % 3]);

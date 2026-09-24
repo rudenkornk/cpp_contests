@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <cstddef>
 #include <vector>
@@ -19,7 +19,7 @@ auto compute_hits(std::vector<int> const &elements, std::size_t cache_size) -> s
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(library_function_tests) {
+BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST(compute_hits({}, 0) == std::size_t{0});
   BOOST_TEST(compute_hits({1}, 0) == std::size_t{0});
   BOOST_TEST(compute_hits({1, 2, 3, 4, 5}, 0) == std::size_t{0});

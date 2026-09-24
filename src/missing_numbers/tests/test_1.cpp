@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE Matrix
-#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
+#define _CRT_SECURE_NO_WARNINGS // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp,readability-identifier-naming)
 
 #include <cassert>
 #include <filesystem>
@@ -23,7 +23,7 @@ using cpp_contests::TestArgsFixture;
 
 BOOST_GLOBAL_FIXTURE(TestArgsFixture);
 
-BOOST_AUTO_TEST_CASE(library_function_tests) {
+BOOST_AUTO_TEST_CASE(LibraryFunctionTests) {
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({})));
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({2})));
   BOOST_TEST((std::pair(0U, 1U) == missing_numbers({3, 2})));
@@ -58,7 +58,7 @@ auto run_cli_test(std::string const &file_content) -> std::pair<unsigned, unsign
 }
 } // namespace
 
-BOOST_AUTO_TEST_CASE(cli_integration_tests) {
+BOOST_AUTO_TEST_CASE(CliIntegrationTests) {
   BOOST_TEST((std::pair(0U, 1U) == run_cli_test("")));
   BOOST_TEST((std::pair(2U, 5U) == run_cli_test("7 4 1 0 3 6")));
 }

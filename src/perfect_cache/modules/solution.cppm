@@ -11,10 +11,10 @@ export module perfect_cache;
 
 export namespace cpp_contests {
 
-using Key = int;
+using key_type = int;
 
 struct KeyNextpos {
-  Key key;
+  key_type key;
   std::size_t nextpos;
 };
 
@@ -25,13 +25,13 @@ struct KeyNextposCompare {
 };
 
 auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
-    std::vector<Key> const &keys, std::size_t max_size_in_bytes, std::size_t value_size_in_bytes) -> std::size_t {
-  std::size_t const max_length = max_size_in_bytes / (value_size_in_bytes + sizeof(Key));
+    std::vector<key_type> const &keys, std::size_t max_size_in_bytes, std::size_t value_size_in_bytes) -> std::size_t {
+  std::size_t const max_length = max_size_in_bytes / (value_size_in_bytes + sizeof(key_type));
   if (max_length == 0) {
     return 0;
   }
 
-  std::unordered_map<Key, std::vector<std::size_t>> positions{};
+  std::unordered_map<key_type, std::vector<std::size_t>> positions{};
   for (std::size_t i = 0, end = keys.size(); i != end; ++i) {
     auto index = keys.size() - i - 1;
     auto &&key = keys[index];
@@ -44,35 +44,25 @@ auto perfect_cache( // NOLINT(readability-function-cognitive-complexity)
 
   std::set<KeyNextpos, KeyNextposCompare> fartherst_keys{};
 
-  std::unordered_map<Key, decltype(fartherst_keys)::const_iterator> cache{};
+  std::unordered_map<key_type, decltype(fartherst_keys)::const_iterator> cache{};
   cache.reserve(max_length);
   std::size_t hits{0};
   for (auto &&key : keys) {
     positions.at(key).pop_back();
-    if (!cache.contains(key)) {
-      std::size_t nextpos = keys.size();
-      if (!positions.at(key).empty()) {
-        nextpos = positions.at(key).back();
-      }
-      auto &&res = fartherst_keys.insert({key, nextpos});
-      assert(res.second);
-      cache.emplace(key, res.first);
-      if (cache.size() > max_length) {
-        assert(cache.size() == max_length + 1);
-        auto erase_key = (*fartherst_keys.begin()).key;
-        fartherst_keys.erase(fartherst_keys.begin());
-        cache.erase(erase_key);
-      }
-    } else {
+    if (cache.contains(key)) {
       ++hits;
       fartherst_keys.erase(cache.at(key));
-      std::size_t nextpos = keys.size();
-      if (!positions.at(key).empty()) {
-        nextpos = positions.at(key).back();
-      }
-      auto &&res = fartherst_keys.insert({key, nextpos});
-      assert(res.second);
-      cache.at(key) = res.first;
+    }
+
+    auto const nextpos = positions.at(key).empty() ? keys.size() : positions.at(key).back();
+    auto const res = fartherst_keys.insert({key, nextpos});
+    assert(res.second);
+    cache.insert_or_assign(key, res.first);
+    if (cache.size() > max_length) {
+      assert(cache.size() == max_length + 1);
+      auto const erase_key = fartherst_keys.begin()->key;
+      fartherst_keys.erase(fartherst_keys.begin());
+      cache.erase(erase_key);
     }
   }
   return hits;
