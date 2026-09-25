@@ -1,0 +1,11 @@
+add_executable(minimal_covering_circle_tests)
+target_sources(minimal_covering_circle_tests PRIVATE test.cpp)
+
+target_link_libraries(minimal_covering_circle_tests PRIVATE utils)
+target_link_libraries(minimal_covering_circle_tests PRIVATE Boost::headers)
+add_dependencies(minimal_covering_circle_tests minimal_covering_circle_cli)
+
+target_allow_instrumentation(minimal_covering_circle_tests)
+target_allow_coding_standards(minimal_covering_circle_tests)
+
+add_tests(minimal_covering_circle_tests)
