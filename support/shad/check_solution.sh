@@ -27,4 +27,4 @@ while IFS= read -r line; do
 done < <(clang++ -E -v -x c++ /dev/null 2>&1)
 
 clang-tidy --quiet --config-file="$config_dir/.clang-tidy" "$source_path" -- -std=c++20 "${include_args[@]}"
-clang++ -std=c++20 -Og -g "$source_path" -o "$binary_path"
+clang++ -std=c++20 -O0 -g "$source_path" -o "$binary_path"
