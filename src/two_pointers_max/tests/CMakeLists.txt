@@ -1,0 +1,11 @@
+add_executable(two_pointers_max_tests)
+target_sources(two_pointers_max_tests PRIVATE test.cpp)
+
+target_link_libraries(two_pointers_max_tests PRIVATE utils)
+target_link_libraries(two_pointers_max_tests PRIVATE Boost::headers)
+add_dependencies(two_pointers_max_tests two_pointers_max_cli)
+
+target_allow_instrumentation(two_pointers_max_tests)
+target_allow_coding_standards(two_pointers_max_tests)
+
+add_tests(two_pointers_max_tests)
