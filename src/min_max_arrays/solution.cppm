@@ -43,20 +43,20 @@ auto run([[maybe_unused]] std::span<char *> args) -> void {
   std::vector<int32_t> a_inc(n_len * len);
   std::vector<int32_t> b_dec(m_len * len);
 
-  for (size_t i = 0; i < n_len * len; ++i) {
+  for (std::size_t i = 0; i < n_len * len; ++i) {
     std::cin >> a_inc[i];
   }
-  for (size_t i = 0; i < m_len * len; ++i) {
+  for (std::size_t i = 0; i < m_len * len; ++i) {
     std::cin >> b_dec[i];
   }
   std::cin >> q_queries;
-  std::vector<size_t> its(q_queries);
-  std::vector<size_t> jts(q_queries);
+  std::vector<std::size_t> its(q_queries);
+  std::vector<std::size_t> jts(q_queries);
 
   for (std::size_t qt = 0; qt < q_queries; ++qt) {
     std::cin >> its[qt] >> jts[qt];
   }
-  std::vector<size_t> results(q_queries);
+  std::vector<std::size_t> results(q_queries);
 
   for (std::size_t qt = 0; qt < q_queries; ++qt) {
     auto res = solve(std::span{&a_inc[(its[qt] - 1) * len], len}, std::span{&b_dec[(jts[qt] - 1) * len], len}) + 1;

@@ -93,7 +93,7 @@ auto run([[maybe_unused]] std::span<char *> args) -> void {
 
   std::vector<Point> coords(n_len);
 
-  for (size_t i = 0; i < n_len; ++i) {
+  for (std::size_t i = 0; i < n_len; ++i) {
     std::cin >> coords[i].x >> coords[i].y;
     coords[i].y = static_cast<int16_t>(std::abs(coords[i].y));
   }
