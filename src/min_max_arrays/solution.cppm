@@ -7,6 +7,7 @@ module;
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <print>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -62,7 +63,7 @@ auto run([[maybe_unused]] std::span<char *> args) -> void {
     results[qt] = res;
   }
   for (std::size_t qt = 0; qt < q_queries; ++qt) {
-    std::cout << results[qt] << " ";
+    std::print("{} ", results[qt]);
   }
 }
 
