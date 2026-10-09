@@ -4,9 +4,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <format>
-#include <iostream>
 #include <iterator>
+#include <print>
 #include <random>
 #include <vector>
 
@@ -67,16 +66,12 @@ BOOST_AUTO_TEST_CASE(UniformDistributionCacheTest) {
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&two_queue = cpp_contests::two_queue_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&perfect = cpp_contests::perfect_cache(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
-  std::cout << "Cache results for uniform_int_distribution:\n";
-  std::cout << "Cache size=" << size_to_string(cache_size_in_bytes)
-            << ", page size=" << size_to_string(kVirtualWebPageSizeInBenchmark)
-            << ", keys amplitude=" << (max - min + 1) << ", pool size=" << n_elements << "\n";
-  std::cout << "LRU cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
-  std::cout << "2Q cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
-  std::cout << "Perfect cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
+  std::println("Cache results for uniform_int_distribution:");
+  std::println("Cache size={}, page size={}, keys amplitude={}, pool size={}", size_to_string(cache_size_in_bytes),
+               size_to_string(kVirtualWebPageSizeInBenchmark), max - min + 1, n_elements);
+  std::println("LRU cache hit rate: {:.2f}%", cents * static_cast<double>(lru) / n_elements);
+  std::println("2Q cache hit rate: {:.2f}%", cents * static_cast<double>(two_queue) / n_elements);
+  std::println("Perfect cache hit rate: {:.2f}%\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
@@ -93,16 +88,12 @@ BOOST_AUTO_TEST_CASE(BinomialDistributionCacheTest) {
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&two_queue = cpp_contests::two_queue_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&perfect = cpp_contests::perfect_cache(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
-  std::cout << "Cache results for binomial_distribution with perfect coin:\n";
-  std::cout << "Cache size=" << size_to_string(cache_size_in_bytes)
-            << ", page size=" << size_to_string(kVirtualWebPageSizeInBenchmark) << ", keys amplitude=" << (max + 1)
-            << ", pool size=" << n_elements << "\n";
-  std::cout << "LRU cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
-  std::cout << "2Q cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
-  std::cout << "Perfect cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
+  std::println("Cache results for binomial_distribution with perfect coin:");
+  std::println("Cache size={}, page size={}, keys amplitude={}, pool size={}", size_to_string(cache_size_in_bytes),
+               size_to_string(kVirtualWebPageSizeInBenchmark), max + 1, n_elements);
+  std::println("LRU cache hit rate: {:.2f}%", cents * static_cast<double>(lru) / n_elements);
+  std::println("2Q cache hit rate: {:.2f}%", cents * static_cast<double>(two_queue) / n_elements);
+  std::println("Perfect cache hit rate: {:.2f}%\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
@@ -119,15 +110,12 @@ BOOST_AUTO_TEST_CASE(PoissonDistributionCacheTest) {
   auto &&lru = cpp_contests::lru_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&two_queue = cpp_contests::two_queue_hits(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
   auto &&perfect = cpp_contests::perfect_cache(elements, cache_size_in_bytes, kVirtualWebPageSizeInBenchmark);
-  std::cout << "Cache results for poisson_distribution:\n";
-  std::cout << "Cache size=" << size_to_string(cache_size_in_bytes)
-            << ", page size=" << size_to_string(kVirtualWebPageSizeInBenchmark) << ", pool size=" << n_elements << "\n";
-  std::cout << "LRU cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(lru) / n_elements);
-  std::cout << "2Q cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n", cents * static_cast<double>(two_queue) / n_elements);
-  std::cout << "Perfect cache hit rate: ";
-  std::cout << std::format("{:.2f}%\n\n", cents * static_cast<double>(perfect) / n_elements);
+  std::println("Cache results for poisson_distribution:");
+  std::println("Cache size={}, page size={}, pool size={}", size_to_string(cache_size_in_bytes),
+               size_to_string(kVirtualWebPageSizeInBenchmark), n_elements);
+  std::println("LRU cache hit rate: {:.2f}%", cents * static_cast<double>(lru) / n_elements);
+  std::println("2Q cache hit rate: {:.2f}%", cents * static_cast<double>(two_queue) / n_elements);
+  std::println("Perfect cache hit rate: {:.2f}%\n", cents * static_cast<double>(perfect) / n_elements);
   BOOST_TEST(lru <= perfect);
 }
 
