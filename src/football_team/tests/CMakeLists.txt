@@ -1,0 +1,11 @@
+add_executable(football_team_tests)
+target_sources(football_team_tests PRIVATE test.cpp)
+
+target_link_libraries(football_team_tests PRIVATE utils)
+target_link_libraries(football_team_tests PRIVATE Boost::headers)
+add_dependencies(football_team_tests football_team_cli)
+
+target_allow_instrumentation(football_team_tests)
+target_allow_coding_standards(football_team_tests)
+
+add_tests(football_team_tests)
