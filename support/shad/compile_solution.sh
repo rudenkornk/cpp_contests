@@ -2,12 +2,24 @@
 
 set -euo pipefail
 
-if (( $# < 1 || $# > 2 )); then
-  printf 'Usage: %s source.cpp [binary]\n' "$0" >&2
+debug=false
+while getopts ':d' option; do
+  case $option in
+    d) debug=true ;;
+    \?)
+      printf 'Usage: %s [-d] [source.cpp [binary]]\n' "$0" >&2
+      exit 2
+      ;;
+  esac
+done
+shift "$((OPTIND - 1))"
+
+if (( $# > 2 )); then
+  printf 'Usage: %s [-d] [source.cpp [binary]]\n' "$0" >&2
   exit 2
 fi
 
-source_path=$1
+source_path=${1:-a.cpp}
 binary_path=${2:-${source_path%.cpp}.out}
 config_dir=$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")
 
@@ -27,4 +39,9 @@ while IFS= read -r line; do
 done < <(clang++ -E -v -x c++ /dev/null 2>&1)
 
 clang-tidy --quiet --config-file="$config_dir/.clang-tidy" "$source_path" -- -std=c++20 "${include_args[@]}"
-clang++ -std=c++20 -O0 -g "$source_path" -o "$binary_path"
+compile_flags=(-O2)
+if [[ $debug == true ]]; then
+  compile_flags=(-O0 -g)
+fi
+
+clang++ -std=c++20 "${compile_flags[@]}" "$source_path" -o "$binary_path"

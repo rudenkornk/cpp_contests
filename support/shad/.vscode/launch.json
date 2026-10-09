@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug SHAD solution",
+      "type": "codelldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/a.out",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "stopOnEntry": false,
+      "terminal": "integrated",
+      "stdio": ["${workspaceFolder}/test_0", null, null]
+    }
+  ]
+}
