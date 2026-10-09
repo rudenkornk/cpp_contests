@@ -2,6 +2,8 @@ Take a solution from a.cpp and format it as another solution in proj_root/src/
 
 1. Copy solution AS IS WITHOUT ANY MODIFICATIONS OR "IMPROVEMENTS" except stated explicitly below.
 1. Use modules. Copy this file with cppm extension, add `module;` at the top, and `export module <task>;`
+1. Use std::print/std::println instead of std::cout/std::endl.
+1. If unqualified size_t found, replace with std::size_t.
 1. Reformat using clang-format rules from the root (just run `cmake --build --target format`).
 1. Use min_max_arrays as an example reference for all the cmake stuff, tests, readme, module and namespace.
 1. Add namespace cpp_contests where appropriate.
