@@ -1,4 +1,5 @@
 add_subdirectory(artifacts)
+add_subdirectory(football_team)
 add_subdirectory(geometry)
 add_subdirectory(k_max)
 add_subdirectory(longest_alternating_seq)
