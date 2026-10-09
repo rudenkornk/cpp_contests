@@ -5,6 +5,7 @@ module;
 #include <exception>
 #include <iostream>
 #include <limits>
+#include <print>
 #include <span>
 #include <utility>
 #include <vector>
@@ -27,7 +28,7 @@ auto print(std::span<std::int32_t> nums, std::span<Info> ups, std::span<Info> do
 
   std::size_t idx = 0;
   while (idx != kMax) {
-    std::cout << nums[idx] << " ";
+    std::print("{} ", nums[idx]);
     idx = ups[idx].prev;
     std::swap(ups, downs);
   };

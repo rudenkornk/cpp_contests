@@ -5,8 +5,8 @@ module;
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <format>
 #include <iostream>
+#include <print>
 #include <span>
 #include <vector>
 
@@ -99,7 +99,7 @@ auto run([[maybe_unused]] std::span<char *> args) -> void {
   }
 
   auto result = solve(coords, k_len);
-  std::cout << std::format("{:.6f}", result) << "\n";
+  std::println("{:.6f}", result);
 }
 
 } // namespace
