@@ -1,0 +1,11 @@
+add_executable(merge_sorted_arrays_tests)
+target_sources(merge_sorted_arrays_tests PRIVATE test.cpp)
+
+target_link_libraries(merge_sorted_arrays_tests PRIVATE utils)
+target_link_libraries(merge_sorted_arrays_tests PRIVATE Boost::headers)
+add_dependencies(merge_sorted_arrays_tests merge_sorted_arrays_cli)
+
+target_allow_instrumentation(merge_sorted_arrays_tests)
+target_allow_coding_standards(merge_sorted_arrays_tests)
+
+add_tests(merge_sorted_arrays_tests)
