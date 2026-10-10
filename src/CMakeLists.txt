@@ -1,3 +1,4 @@
+add_subdirectory(ali_baba)
 add_subdirectory(artifacts)
 add_subdirectory(football_team)
 add_subdirectory(geometry)
