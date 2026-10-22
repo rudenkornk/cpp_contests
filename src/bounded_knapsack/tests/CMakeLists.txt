@@ -1,0 +1,11 @@
+add_executable(bounded_knapsack_tests)
+target_sources(bounded_knapsack_tests PRIVATE test.cpp)
+
+target_link_libraries(bounded_knapsack_tests PRIVATE utils)
+target_link_libraries(bounded_knapsack_tests PRIVATE Boost::headers)
+add_dependencies(bounded_knapsack_tests bounded_knapsack_cli)
+
+target_allow_instrumentation(bounded_knapsack_tests)
+target_allow_coding_standards(bounded_knapsack_tests)
+
+add_tests(bounded_knapsack_tests)
