@@ -1,0 +1,11 @@
+add_executable(tree_isomorphism_tests)
+target_sources(tree_isomorphism_tests PRIVATE test.cpp)
+
+target_link_libraries(tree_isomorphism_tests PRIVATE utils)
+target_link_libraries(tree_isomorphism_tests PRIVATE Boost::headers)
+add_dependencies(tree_isomorphism_tests tree_isomorphism_cli)
+
+target_allow_instrumentation(tree_isomorphism_tests)
+target_allow_coding_standards(tree_isomorphism_tests)
+
+add_tests(tree_isomorphism_tests)
