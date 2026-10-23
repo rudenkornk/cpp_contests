@@ -1,6 +1,7 @@
 add_subdirectory(ali_baba)
 add_subdirectory(artifacts)
 add_subdirectory(bounded_knapsack)
+add_subdirectory(fixed_set)
 add_subdirectory(football_team)
 add_subdirectory(geometry)
 add_subdirectory(k_max)
