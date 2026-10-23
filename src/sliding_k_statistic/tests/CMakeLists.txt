@@ -1,0 +1,11 @@
+add_executable(sliding_k_statistic_tests)
+target_sources(sliding_k_statistic_tests PRIVATE test.cpp)
+
+target_link_libraries(sliding_k_statistic_tests PRIVATE utils)
+target_link_libraries(sliding_k_statistic_tests PRIVATE Boost::headers)
+add_dependencies(sliding_k_statistic_tests sliding_k_statistic_cli)
+
+target_allow_instrumentation(sliding_k_statistic_tests)
+target_allow_coding_standards(sliding_k_statistic_tests)
+
+add_tests(sliding_k_statistic_tests)
