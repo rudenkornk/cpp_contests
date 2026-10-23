@@ -1,0 +1,11 @@
+add_executable(memory_manager_tests)
+target_sources(memory_manager_tests PRIVATE test.cpp)
+
+target_link_libraries(memory_manager_tests PRIVATE utils)
+target_link_libraries(memory_manager_tests PRIVATE Boost::headers)
+add_dependencies(memory_manager_tests memory_manager_cli)
+
+target_allow_instrumentation(memory_manager_tests)
+target_allow_coding_standards(memory_manager_tests)
+
+add_tests(memory_manager_tests)
