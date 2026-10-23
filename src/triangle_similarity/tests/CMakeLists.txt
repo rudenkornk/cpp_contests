@@ -1,0 +1,11 @@
+add_executable(triangle_similarity_tests)
+target_sources(triangle_similarity_tests PRIVATE test.cpp)
+
+target_link_libraries(triangle_similarity_tests PRIVATE utils)
+target_link_libraries(triangle_similarity_tests PRIVATE Boost::headers)
+add_dependencies(triangle_similarity_tests triangle_similarity_cli)
+
+target_allow_instrumentation(triangle_similarity_tests)
+target_allow_coding_standards(triangle_similarity_tests)
+
+add_tests(triangle_similarity_tests)
