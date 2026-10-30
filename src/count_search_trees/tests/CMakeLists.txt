@@ -1,0 +1,11 @@
+add_executable(count_search_trees_tests)
+target_sources(count_search_trees_tests PRIVATE test.cpp)
+
+target_link_libraries(count_search_trees_tests PRIVATE utils)
+target_link_libraries(count_search_trees_tests PRIVATE Boost::headers)
+add_dependencies(count_search_trees_tests count_search_trees_cli)
+
+target_allow_instrumentation(count_search_trees_tests)
+target_allow_coding_standards(count_search_trees_tests)
+
+add_tests(count_search_trees_tests)
