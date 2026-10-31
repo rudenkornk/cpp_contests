@@ -1,0 +1,11 @@
+add_executable(external_rectangles_tests)
+target_sources(external_rectangles_tests PRIVATE test.cpp)
+
+target_link_libraries(external_rectangles_tests PRIVATE utils)
+target_link_libraries(external_rectangles_tests PRIVATE Boost::headers)
+add_dependencies(external_rectangles_tests external_rectangles_cli)
+
+target_allow_instrumentation(external_rectangles_tests)
+target_allow_coding_standards(external_rectangles_tests)
+
+add_tests(external_rectangles_tests)
