@@ -1,6 +1,7 @@
 add_subdirectory(ali_baba)
 add_subdirectory(artifacts)
 add_subdirectory(bounded_knapsack)
+add_subdirectory(bst_traversal)
 add_subdirectory(count_search_trees)
 add_subdirectory(external_rectangles)
 add_subdirectory(fixed_set)
