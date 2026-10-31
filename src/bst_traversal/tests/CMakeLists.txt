@@ -1,0 +1,11 @@
+add_executable(bst_traversal_tests)
+target_sources(bst_traversal_tests PRIVATE test.cpp)
+
+target_link_libraries(bst_traversal_tests PRIVATE utils)
+target_link_libraries(bst_traversal_tests PRIVATE Boost::headers)
+add_dependencies(bst_traversal_tests bst_traversal_cli)
+
+target_allow_instrumentation(bst_traversal_tests)
+target_allow_coding_standards(bst_traversal_tests)
+
+add_tests(bst_traversal_tests)
