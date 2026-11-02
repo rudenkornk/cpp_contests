@@ -1,0 +1,11 @@
+add_executable(treap_height_tests)
+target_sources(treap_height_tests PRIVATE test.cpp)
+
+target_link_libraries(treap_height_tests PRIVATE utils)
+target_link_libraries(treap_height_tests PRIVATE Boost::headers)
+add_dependencies(treap_height_tests treap_height_cli)
+
+target_allow_instrumentation(treap_height_tests)
+target_allow_coding_standards(treap_height_tests)
+
+add_tests(treap_height_tests)
