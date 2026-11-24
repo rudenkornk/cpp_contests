@@ -1,6 +1,5 @@
 module;
 
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -20,105 +19,134 @@ namespace {
 constexpr uint64_t kP = 2'000'000'011;
 
 class HashFunction {
-public:
-  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-  uint64_t kp = kP;
-  uint64_t a = 1;
-  uint64_t b = 0;
-  uint64_t n = 0;
-  // NOLINTEND(misc-non-private-member-variables-in-classes)
+private:
+  uint64_t modulus_;
+  uint64_t multiplier_;
+  uint64_t increment_;
 
-  HashFunction() = default;
+public:
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+  HashFunction(uint64_t modulus, uint64_t multiplier, uint64_t increment)
+      : modulus_(modulus), multiplier_(multiplier), increment_(increment) {}
+
   auto operator()(int item) const -> std::size_t {
-    constexpr int64_t offset = 1'000'000'000;
-    return ((a * (static_cast<int64_t>(item) + offset)) + b) % kp % n;
+    auto const modulus = static_cast<int64_t>(modulus_);
+    auto residue = static_cast<int64_t>(item) % modulus;
+    if (residue < 0) {
+      residue += modulus;
+    }
+    return ((multiplier_ * static_cast<uint64_t>(residue)) + increment_) % modulus_;
   }
 };
 
-struct Bucket {
-  std::vector<std::optional<int>> items;
-  HashFunction hash;
+template <typename Generator, typename Predicate>
+auto find_hash(Generator generate, Predicate accepts) -> HashFunction {
+  for (;;) {
+    auto hash = generate();
+    if (accepts(hash)) {
+      return hash;
+    }
+  }
+}
+
+template <typename Keys, typename Insert>
+auto distribute_keys(Keys const &keys, HashFunction const &hash, std::size_t bucket_count, Insert insert) -> bool {
+  // Insertion changes the table, so this is not a pure predicate for all_of.
+  // NOLINTNEXTLINE(readability-use-anyofallof)
+  for (int const key : keys) {
+    if (!insert(hash(key) % bucket_count, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+class SecondaryTable {
+private:
+  std::vector<std::optional<int>> items_;
+  HashFunction hash_{kP, 1, 0};
+
+public:
+  template <typename Generator> auto initialize(std::span<const int> keys, Generator generate) -> void {
+    std::vector<std::optional<int>> items;
+    auto size = keys.size() * keys.size();
+    auto insert = [&](std::size_t idx, int key) -> bool {
+      if (items[idx].has_value()) {
+        return false;
+      }
+      items[idx] = key;
+      return true;
+    };
+    hash_ = find_hash(generate, [&](HashFunction const &hash) -> bool {
+      items.clear();
+      items.resize(size);
+      return distribute_keys(keys, hash, items.size(), insert);
+    });
+    items_ = std::move(items);
+  }
+
+  [[nodiscard]] auto contains(int number) const -> bool {
+    if (items_.empty()) {
+      return false;
+    }
+    auto const &item = items_[hash_(number) % items_.size()];
+    return item.has_value() && item.value() == number;
+  }
 };
+
+auto sum_squared_bucket_sizes(std::span<const std::vector<int>> buckets) -> std::size_t {
+  std::size_t sum = 0;
+  for (auto const &bucket : buckets) {
+    auto size = bucket.size();
+    sum += size * size;
+  }
+  return sum;
+}
 
 class FixedSet {
 private:
-  std::vector<Bucket> buckets_;
-  HashFunction hash_;
+  std::vector<SecondaryTable> tables_;
+  HashFunction hash_{kP, 1, 0};
   std::mt19937_64 engine_;
   std::uniform_int_distribution<uint32_t> a_dist_ = std::uniform_int_distribution<uint32_t>(1, kP - 1);
   std::uniform_int_distribution<uint32_t> b_dist_ = std::uniform_int_distribution<uint32_t>(0, kP - 1);
 
-  auto try_initialize(std::vector<int> const &numbers) -> bool {
+  auto random_hash() -> HashFunction { return {kP, a_dist_(engine_), b_dist_(engine_)}; }
+
+  static auto try_initialize(std::vector<int> const &numbers, HashFunction const &hash,
+                             std::vector<std::vector<int>> &buckets) -> bool {
     auto n_len = numbers.size();
-    auto ac = a_dist_(engine_);
-    auto bc = b_dist_(engine_);
+    buckets.clear();
+    buckets.resize(n_len);
 
-    hash_.n = n_len;
-    hash_.a = ac;
-    hash_.b = bc;
-    buckets_.clear();
-    buckets_.resize(n_len);
+    distribute_keys(numbers, hash, buckets.size(), [&](std::size_t idx, int key) -> bool {
+      buckets[idx].push_back(key);
+      return true;
+    });
 
-    for (auto number : numbers) {
-      buckets_[hash_(number)].items.emplace_back(number);
-    }
-
-    std::size_t count = 0;
-    for (auto &&bucket : buckets_) {
-      count += bucket.items.size() * bucket.items.size();
-    }
-
-    return count <= 4 * n_len;
-  }
-
-  auto try_initialize_bucket(Bucket &bucket) -> bool {
-    auto n_len = bucket.items.size();
-    auto ac = a_dist_(engine_);
-    auto bc = b_dist_(engine_);
-
-    bucket.hash.n = n_len * n_len;
-    bucket.hash.a = ac;
-    bucket.hash.b = bc;
-
-    auto nums = bucket.items;
-    bucket.items.clear();
-    bucket.items.resize(n_len * n_len);
-
-    for (auto number : nums) {
-      assert(number.has_value());
-      auto idx = bucket.hash(number.value());
-      if (bucket.items[idx].has_value()) {
-        bucket.items = std::move(nums);
-        return false;
-      }
-      bucket.items[idx] = number;
-    }
-    return true;
+    return sum_squared_bucket_sizes(buckets) <= 4 * n_len;
   }
 
 public:
   // NOLINTNEXTLINE(bugprone-random-generator-seed, cert-msc32-c, cert-msc51-cpp)
   FixedSet() = default;
   auto initialize(std::vector<int> const &numbers) -> void {
-    while (!try_initialize(numbers)) {
-    }
-    for (auto &&bucket : buckets_) {
-      while (!try_initialize_bucket(bucket)) {
-      }
+    std::vector<std::vector<int>> buckets;
+    auto generate = [&] -> HashFunction { return random_hash(); };
+    hash_ =
+        find_hash(generate, [&](HashFunction const &hash) -> bool { return try_initialize(numbers, hash, buckets); });
+    std::vector<SecondaryTable>{}.swap(tables_);
+    tables_.resize(buckets.size());
+    for (std::size_t idx = 0; idx < buckets.size(); ++idx) {
+      tables_[idx].initialize(buckets[idx], generate);
     }
   }
   [[nodiscard]] auto contains(int number) const -> bool {
-    if (buckets_.empty()) {
+    if (tables_.empty()) {
       return false;
     }
 
-    auto &&bucket = buckets_[hash_(number)];
-    if (bucket.items.empty()) {
-      return false;
-    }
-    auto &&item = bucket.items[bucket.hash(number)];
-
-    return item.has_value() && item.value() == number;
+    return tables_[hash_(number) % tables_.size()].contains(number);
   }
 };
 
